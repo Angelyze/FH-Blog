@@ -22,6 +22,9 @@ const SEO_DESCRIPTION_MIN_CHARS = 120;
 const SEO_DESCRIPTION_MAX_CHARS = 160;
 const TOPIC_SIMILARITY_THRESHOLD = 0.6;
 const REDDIT_USER_AGENT = 'FalloutHubBlogBot/1.0 (editorial automation; contact: fallout-hub)';
+const REDDIT_FETCH_DELAY_MS = Number.parseInt(process.env.REDDIT_FETCH_DELAY_MS || '1500', 10);
+const REDDIT_RATE_LIMIT_BACKOFF_MS = Number.parseInt(process.env.REDDIT_RATE_LIMIT_BACKOFF_MS || '3000', 10);
+const PERSISTENT_BLOCK_FAILURE_STREAK = 2;
 const FEED_USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 const NEXUS_FEED_HEADERS = {
   Referer: 'https://www.nexusmods.com/',
@@ -1225,13 +1228,34 @@ export function recordFeedHealthResult(existing = {}, sourceName, { success, ite
 
 export function getUnhealthyFeedSources(sources = {}, { minFailureStreak = 3 } = {}) {
   return Object.entries(sources)
-    .filter(([, stats]) => (stats.failureStreak || 0) >= minFailureStreak)
+    .filter(([name]) => shouldSkipFeedSource(name, sources, { minFailureStreak }))
     .map(([name, stats]) => ({ name, failureStreak: stats.failureStreak, lastError: stats.lastError }));
+}
+
+export function isPersistentlyBlockedFeedError(error = '') {
+  return /403|blocked by bot protection/i.test(String(error));
+}
+
+export function isRateLimitedFeedError(error = '') {
+  const message = String(error).toLowerCase();
+  return message.includes('429') || message.includes('rate limit');
+}
+
+export function getRedditFetchStrategies({ preferRss = process.env.REDDIT_PREFER_RSS === 'true' || process.env.CI === 'true' } = {}) {
+  return preferRss ? ['rss', 'json'] : ['json', 'rss'];
 }
 
 export function shouldSkipFeedSource(sourceName, feedHealth = {}, { minFailureStreak = 3 } = {}) {
   const stats = feedHealth[sourceName];
-  return (stats?.failureStreak || 0) >= minFailureStreak;
+  const failureStreak = stats?.failureStreak || 0;
+  const requiredStreak = isPersistentlyBlockedFeedError(stats?.lastError)
+    ? Math.min(minFailureStreak, PERSISTENT_BLOCK_FAILURE_STREAK)
+    : minFailureStreak;
+  return failureStreak >= requiredStreak;
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export function resolveFeedItemLink(link, feedUrl) {
@@ -1575,12 +1599,19 @@ export function parseRedditRssFeed(xmlText = '', source = {}) {
 
 async function fetchRedditJsonItems(source) {
   const url = `https://www.reddit.com/r/${source.subreddit}/hot.json?limit=25`;
-  const response = await fetch(url, {
+  const request = () => fetch(url, {
     headers: {
       'User-Agent': REDDIT_USER_AGENT,
       Accept: 'application/json'
     }
   });
+
+  let response = await request();
+  if (response.status === 429) {
+    const retryAfterSec = Number.parseInt(response.headers.get('retry-after') || '3', 10);
+    await sleep(Math.min(retryAfterSec, 10) * 1000);
+    response = await request();
+  }
 
   if (!response.ok) {
     throw new Error(`Reddit request failed (${response.status})`);
@@ -1599,20 +1630,31 @@ async function fetchRedditRssItems(source) {
 }
 
 async function fetchRedditSourceItems(source) {
-  let items = [];
+  const strategies = getRedditFetchStrategies();
+  const errors = [];
 
-  try {
-    items = await fetchRedditJsonItems(source);
-  } catch {
-    items = await fetchRedditRssItems(source);
+  for (const strategy of strategies) {
+    try {
+      const items = strategy === 'rss'
+        ? await fetchRedditRssItems(source)
+        : await fetchRedditJsonItems(source);
+
+      return items
+        .filter((item) => isRelevantFalloutItem(item, source))
+        .filter((item) => passesCommunityQualityGate(item))
+        .map((item) => mapSourceItem(item, source))
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 4);
+    } catch (error) {
+      const message = error?.message || 'unknown error';
+      errors.push(message);
+      if (isRateLimitedFeedError(message)) {
+        await sleep(REDDIT_RATE_LIMIT_BACKOFF_MS);
+      }
+    }
   }
 
-  return items
-    .filter((item) => isRelevantFalloutItem(item, source))
-    .filter((item) => passesCommunityQualityGate(item))
-    .map((item) => mapSourceItem(item, source))
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 4);
+  throw new Error(`Feed request failed (${errors[errors.length - 1] || 'unknown error'})`);
 }
 
 function dedupeCollectedItems(collected = []) {
@@ -1651,33 +1693,47 @@ async function fetchContentItems() {
     console.warn(`Skipping unhealthy feeds (${skippedFeeds.length}): ${skippedFeeds.join(', ')}`);
   }
 
-  const results = await Promise.allSettled(
-    activeJobs.map(async ({ source, kind }) => {
-      if (kind === 'reddit') {
-        return fetchRedditSourceItems(source);
-      }
-      return fetchRssSourceItems(source);
-    })
-  );
-
+  const rssJobs = activeJobs.filter((job) => job.kind === 'rss');
+  const redditJobs = activeJobs.filter((job) => job.kind === 'reddit');
   const collected = [];
   const feedErrors = [];
 
-  for (const [index, result] of results.entries()) {
-    const sourceName = activeJobs[index].source.name;
+  const recordSourceResult = (sourceName, result) => {
     if (result.status === 'fulfilled') {
       collected.push(...result.value);
       feedHealth = recordFeedHealthResult(feedHealth, sourceName, {
         success: true,
         itemCount: result.value.length
       });
-    } else {
-      const message = result.reason?.message || 'unknown error';
-      feedErrors.push(`${sourceName}: ${message}`);
-      feedHealth = recordFeedHealthResult(feedHealth, sourceName, {
-        success: false,
-        error: message
-      });
+      return;
+    }
+
+    const message = result.reason?.message || 'unknown error';
+    feedErrors.push(`${sourceName}: ${message}`);
+    feedHealth = recordFeedHealthResult(feedHealth, sourceName, {
+      success: false,
+      error: message
+    });
+  };
+
+  const rssResults = await Promise.allSettled(
+    rssJobs.map(({ source }) => fetchRssSourceItems(source))
+  );
+
+  for (const [index, result] of rssResults.entries()) {
+    recordSourceResult(rssJobs[index].source.name, result);
+  }
+
+  for (const [index, { source }] of redditJobs.entries()) {
+    if (index > 0 && REDDIT_FETCH_DELAY_MS > 0) {
+      await sleep(REDDIT_FETCH_DELAY_MS);
+    }
+
+    try {
+      const value = await fetchRedditSourceItems(source);
+      recordSourceResult(source.name, { status: 'fulfilled', value });
+    } catch (error) {
+      recordSourceResult(source.name, { status: 'rejected', reason: error });
     }
   }
 

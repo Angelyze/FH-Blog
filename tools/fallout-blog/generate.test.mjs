@@ -18,8 +18,11 @@ import {
   getStoryTopicKey,
   getTitleValidationIssue,
   formatFeedWarnings,
+  getRedditFetchStrategies,
   getUnhealthyFeedSources,
   isFeedTitleExcluded,
+  isPersistentlyBlockedFeedError,
+  isRateLimitedFeedError,
   resolveFeedItemLink,
   shouldSkipFeedSource,
   isArticleSubstantive,
@@ -399,6 +402,29 @@ test('shouldSkipFeedSource skips feeds after repeated failures', () => {
 
   assert.equal(shouldSkipFeedSource('Nexus — Fallout 4', health), true);
   assert.equal(shouldSkipFeedSource('IGN', health), false);
+});
+
+test('shouldSkipFeedSource skips persistently blocked feeds after two failures', () => {
+  const health = {
+    'Nexus — Fallout 4': { failureStreak: 2, lastError: 'Feed request failed (403)' }
+  };
+
+  assert.equal(shouldSkipFeedSource('Nexus — Fallout 4', health), true);
+});
+
+test('getRedditFetchStrategies prefers RSS in CI environments', () => {
+  assert.deepEqual(getRedditFetchStrategies({ preferRss: true }), ['rss', 'json']);
+  assert.deepEqual(getRedditFetchStrategies({ preferRss: false }), ['json', 'rss']);
+});
+
+test('isRateLimitedFeedError detects Reddit throttling', () => {
+  assert.equal(isRateLimitedFeedError('Reddit request failed (429)'), true);
+  assert.equal(isRateLimitedFeedError('Feed request failed (403)'), false);
+});
+
+test('isPersistentlyBlockedFeedError detects bot protection failures', () => {
+  assert.equal(isPersistentlyBlockedFeedError('Feed request failed (403)'), true);
+  assert.equal(isPersistentlyBlockedFeedError('blocked by bot protection'), true);
 });
 
 test('resolveFeedItemLink normalizes relative feed links', () => {
