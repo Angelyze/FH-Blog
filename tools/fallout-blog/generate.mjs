@@ -17,33 +17,84 @@ function buildPrompt(headlines) {
   return `You are writing a casual, conversational Fallout news article for a fandom blog. \nWrite one polished article draft in English.\nUse the following headlines as the main source material:\n${headlines.join('\n')}\n\nRequirements:\n- Keep the tone balanced, casual, and readable.\n- Avoid rumor-heavy language.\n- Focus on what matters to Fallout fans.\n- Write a clear title, a short intro, 3-5 short sections, and a short conclusion.\n- Include a light CTA such as "What do you think about this?"\n- Do not invent facts.\nReturn JSON with fields: title, intro, sections, conclusion, cta, sources.`;
 }
 
+function buildFallbackArticle(headlines) {
+  const topic = headlines[0] || 'the latest Fallout news';
+  const safeHeadlines = headlines.slice(0, 3);
+
+  return {
+    title: `What Fallout fans should know about ${topic}`,
+    intro: `Recent Fallout coverage has kept fans talking, and there is plenty to follow when a new update, release, or announcement lands. This draft keeps the focus on the developments that matter most without leaning into rumor or speculation.`,
+    sections: safeHeadlines.map((headline, index) => ({
+      heading: `Point ${index + 1}: ${headline}`,
+      body: `This story is worth watching because it touches on the part of the Fallout community that is most likely to care right now. A good follow-up is to read the original report and compare it with any official clarification that follows.`
+    })),
+    conclusion: 'The best approach is to follow the official updates closely and keep an eye on how the wider Fallout community reacts, especially when a story has real implications for future releases or content.',
+    cta: 'What do you think about this latest development?',
+    sources: safeHeadlines.map((headline) => ({ title: headline, url: 'https://fallout.fandom.com/wiki/Fallout_Wiki' }))
+  };
+}
+
+function extractJsonText(text) {
+  const trimmed = text.trim();
+  const fenced = trimmed.match(/```json\s*([\s\S]*?)\s*```/i);
+  if (fenced?.[1]) {
+    return fenced[1].trim();
+  }
+
+  return trimmed;
+}
+
+function parseModelList(value) {
+  if (!value) return [];
+  return value
+    .split(',')
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+}
+
 async function callGemini(prompt) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     throw new Error('Missing GEMINI_API_KEY');
   }
 
-  const model = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
-  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }]
-    })
-  });
+  const primaryModels = parseModelList(process.env.GEMINI_MODEL || 'gemini-2.0-flash');
+  const fallbackModels = parseModelList(process.env.GEMINI_MODEL_FALLBACK || 'gemini-2.0-flash-lite');
+  const tertiaryModels = parseModelList(process.env.GEMINI_MODEL_FALLBACK_2 || 'gemini-2.0-flash-exp');
+  const models = [...primaryModels, ...fallbackModels, ...tertiaryModels].filter((model, index, all) => model && all.indexOf(model) === index);
+  const errors = [];
 
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`Gemini API error ${response.status}: ${text}`);
+  for (const model of models) {
+    try {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }]
+        })
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        const message = `Gemini API error ${response.status}: ${text}`;
+        errors.push(`${model}: ${message}`);
+        continue;
+      }
+
+      const data = await response.json();
+      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      if (!text) {
+        throw new Error('Gemini returned empty content');
+      }
+
+      const jsonText = extractJsonText(text);
+      return JSON.parse(jsonText);
+    } catch (error) {
+      errors.push(`${model}: ${error.message}`);
+    }
   }
 
-  const data = await response.json();
-  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-  if (!text) {
-    throw new Error('Gemini returned empty content');
-  }
-
-  return JSON.parse(text);
+  throw new Error(errors.join(' | '));
 }
 
 async function fetchHeadlines() {
@@ -127,18 +178,44 @@ async function main() {
   await fs.mkdir(OUTPUT_DIR, { recursive: true });
   const headlines = await fetchHeadlines();
   const prompt = buildPrompt(headlines);
-  const article = await callGemini(prompt);
-  const draft = await createBloggerDraft(article);
+
+  let article;
+  let generationError = null;
+
+  try {
+    article = await callGemini(prompt);
+    console.log('LLM article generated successfully.');
+  } catch (error) {
+    generationError = error;
+    article = buildFallbackArticle(headlines);
+    console.warn(`LLM generation failed, using fallback article: ${error.message}`);
+  }
+
+  let bloggerPost = null;
+  let bloggerError = null;
+
+  try {
+    bloggerPost = await createBloggerDraft(article);
+    if (bloggerPost) {
+      console.log('Blogger draft created successfully.');
+    }
+  } catch (error) {
+    bloggerError = error;
+    console.warn(`Blogger draft skipped: ${error.message}`);
+  }
 
   const output = {
     generatedAt: new Date().toISOString(),
     sourceHeadlines: headlines,
     article,
-    bloggerPost: draft
+    bloggerPost,
+    generationError: generationError ? generationError.message : null,
+    bloggerError: bloggerError ? bloggerError.message : null,
+    mode: generationError ? 'fallback-template' : 'llm-generated'
   };
 
   await fs.writeFile(OUTPUT_FILE, JSON.stringify(output, null, 2));
-  console.log(`Draft created and saved to ${OUTPUT_FILE}`);
+  console.log(`Draft output saved to ${OUTPUT_FILE}`);
 }
 
 main().catch((error) => {
