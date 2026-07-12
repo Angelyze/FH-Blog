@@ -1,17 +1,28 @@
 import fs from 'node:fs/promises';
+import crypto from 'node:crypto';
 import path from 'node:path';
 import process from 'node:process';
+import { pathToFileURL } from 'node:url';
 
 const ROOT = process.cwd();
 const OUTPUT_DIR = path.join(ROOT, 'artifacts');
 const OUTPUT_FILE = path.join(OUTPUT_DIR, 'latest-draft.json');
 
 const NEWS_SOURCES = [
-  { name: 'IGN', url: 'https://www.ign.com/rss/articles', weight: 1.4 },
-  { name: 'GamesRadar', url: 'https://www.gamesradar.com/rss', weight: 1.2 },
+  { name: 'IGN', url: 'https://www.ign.com/rss/articles', weight: 1.45 },
+  { name: 'GamesRadar', url: 'https://www.gamesradar.com/rss', weight: 1.25 },
   { name: 'Eurogamer', url: 'https://www.eurogamer.net/rss', weight: 1.2 },
-  { name: 'VGC', url: 'https://www.videogameschronicle.com/feed/', weight: 1.1 },
-  { name: 'GameSpot', url: 'https://www.gamespot.com/feeds/news/', weight: 1.1 }
+  { name: 'VGC', url: 'https://www.videogameschronicle.com/feed/', weight: 1.15 },
+  { name: 'GameSpot', url: 'https://www.gamespot.com/feeds/news/', weight: 1.15 },
+  { name: 'Polygon', url: 'https://www.polygon.com/rss/index.xml', weight: 1.1 },
+  { name: 'The Verge', url: 'https://www.theverge.com/rss/index.xml', weight: 1.05 },
+  { name: 'Bethesda Softworks', url: 'https://bethesda.net/en/rss', weight: 1.35 },
+  { name: 'Bethesda Blog', url: 'https://www.bethesda.net/en/rss', weight: 1.3 },
+  { name: 'Steam News', url: 'https://store.steampowered.com/feeds/news/app/22370/?l=english&cc=US', weight: 1.1 },
+  { name: 'Nexus Mods', url: 'https://www.nexusmods.com/news/rss', weight: 1.05 },
+  { name: 'Kotaku', url: 'https://kotaku.com/rss', weight: 1.05 },
+  { name: 'Rock Paper Shotgun', url: 'https://www.rockpapershotgun.com/feed/', weight: 1.0 },
+  { name: 'PC Gamer', url: 'https://www.pcgamer.com/feed/', weight: 1.0 }
 ];
 
 function decodeHtmlEntities(value) {
@@ -33,6 +44,52 @@ function stripHtml(value) {
 
 function cleanText(value) {
   return decodeHtmlEntities(stripHtml(value || '')).trim();
+}
+
+function normalizeStoryText(value) {
+  return (value || '')
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+export function getStoryFingerprint(item = {}) {
+  const source = normalizeStoryText(item.source);
+  const title = normalizeStoryText(item.title);
+  let link = '';
+
+  if (item.link) {
+    try {
+      const parsed = new URL(item.link);
+      link = normalizeStoryText(parsed.hostname + parsed.pathname);
+    } catch {
+      link = normalizeStoryText(item.link);
+    }
+  }
+
+  const seed = [source, title, link].filter(Boolean).join('|');
+  return crypto.createHash('sha256').update(seed).digest('hex');
+}
+
+export function getDedupLabel(item = {}) {
+  return `fallout-story-${getStoryFingerprint(item).slice(0, 16)}`;
+}
+
+export function filterFreshStories(items = [], history = []) {
+  const seen = new Set(history.map((entry) => {
+    if (typeof entry === 'string') return entry;
+    if (typeof entry === 'object' && entry) {
+      return entry.id || entry.label || entry.fingerprint || entry.value;
+    }
+    return '';
+  }));
+
+  return items.filter((item) => {
+    const fingerprint = getStoryFingerprint(item);
+    return !seen.has(fingerprint);
+  });
 }
 
 function extractItems(xmlText) {
@@ -238,7 +295,23 @@ async function fetchNewsItems() {
   return unique.slice(0, 6);
 }
 
-async function createBloggerDraft(article) {
+async function findExistingBloggerPost(blogId, accessToken, label) {
+  const response = await fetch(`https://www.googleapis.com/blogger/v3/blogs/${blogId}/posts?labels=${encodeURIComponent(label)}&maxResults=10`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!response.ok) {
+    return null;
+  }
+
+  const data = await response.json();
+  return Array.isArray(data?.items) ? data.items[0] || null : null;
+}
+
+async function createBloggerDraft(article, newsItems = []) {
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
   const refreshToken = process.env.GOOGLE_REFRESH_TOKEN;
@@ -266,6 +339,15 @@ async function createBloggerDraft(article) {
   const tokenData = await tokenResponse.json();
   const accessToken = tokenData.access_token;
 
+  const mainStory = Array.isArray(newsItems) && newsItems.length > 0 ? newsItems[0] : null;
+  const dedupLabel = mainStory ? getDedupLabel(mainStory) : null;
+  if (dedupLabel) {
+    const existingPost = await findExistingBloggerPost(blogId, accessToken, dedupLabel);
+    if (existingPost) {
+      throw new Error('Duplicate story already exists in Blogger');
+    }
+  }
+
   const bodySections = Array.isArray(article.sections)
     ? article.sections.map((section) => `<h3>${section.heading}</h3><p>${section.body}</p>`).join('')
     : '';
@@ -285,7 +367,7 @@ async function createBloggerDraft(article) {
         ${ctaHtml}
       </article>
     `,
-    labels: ['fallout', 'automation', 'draft'],
+    labels: ['fallout', 'automation', 'draft', dedupLabel].filter(Boolean),
     status: 'DRAFT',
     isDraft: true
   };
@@ -307,21 +389,39 @@ async function createBloggerDraft(article) {
   return response.json();
 }
 
+async function loadRecentStoryHistory() {
+  try {
+    const raw = await fs.readFile(OUTPUT_FILE, 'utf8');
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed?.selectedNews) ? parsed.selectedNews.map((item) => getStoryFingerprint(item)) : [];
+  } catch {
+    return [];
+  }
+}
+
 async function main() {
   await fs.mkdir(OUTPUT_DIR, { recursive: true });
   const newsItems = await fetchNewsItems();
-  const prompt = buildPrompt(newsItems);
+  const previousStoryHistory = await loadRecentStoryHistory();
+  const freshNewsItems = filterFreshStories(newsItems, previousStoryHistory);
+
+  if (freshNewsItems.length === 0) {
+    console.log('No fresh Fallout stories to post; skipping generation.');
+    return;
+  }
+
+  const prompt = buildPrompt(freshNewsItems);
 
   let article;
   let generationError = null;
 
   try {
     article = await callGemini(prompt);
-    article = normalizeArticle(article, newsItems);
+    article = normalizeArticle(article, freshNewsItems);
     console.log('LLM article generated successfully.');
   } catch (error) {
     generationError = error;
-    article = buildFallbackArticle(newsItems);
+    article = buildFallbackArticle(freshNewsItems);
     console.warn(`LLM generation failed, using fallback article: ${error.message}`);
   }
 
@@ -329,7 +429,7 @@ async function main() {
   let bloggerError = null;
 
   try {
-    bloggerPost = await createBloggerDraft(article);
+    bloggerPost = await createBloggerDraft(article, freshNewsItems);
     if (bloggerPost) {
       console.log('Blogger draft created successfully.');
     }
@@ -340,7 +440,7 @@ async function main() {
 
   const output = {
     generatedAt: new Date().toISOString(),
-    selectedNews: newsItems,
+    selectedNews: freshNewsItems,
     article,
     bloggerPost,
     generationError: generationError ? generationError.message : null,
@@ -352,7 +452,11 @@ async function main() {
   console.log(`Draft output saved to ${OUTPUT_FILE}`);
 }
 
-main().catch((error) => {
-  console.error(error.message);
-  process.exit(1);
-});
+const isMainModule = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
+
+if (isMainModule) {
+  main().catch((error) => {
+    console.error(error.message);
+    process.exit(1);
+  });
+}
