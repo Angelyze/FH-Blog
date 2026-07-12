@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import {
   buildArticleHtml,
   detectContentType,
+  detectTrustLevel,
+  ensureTrustKeyFacts,
   extractFeedItems,
   freshnessBonus,
   getArticleWordCount,
@@ -14,6 +16,7 @@ import {
   meetsMinimumSourceQuality,
   parseRssDate,
   pickFeaturedStory,
+  resolveReportingOutlet,
   selectStoriesForGeneration
 } from './generate.mjs';
 
@@ -136,6 +139,68 @@ test('buildArticleHtml includes trust markers, key facts, and linked sources', (
   assert.match(html, /editorial standard/);
   assert.match(html, /<a href="https:\/\/example.com\/story">IGN<\/a>/);
   assert.doesNotMatch(html, /<h2>/);
+});
+
+test('buildArticleHtml shows press-report disclaimer and label', () => {
+  const html = buildArticleHtml({
+    title: 'Obsidian reportedly returns to Fallout',
+    subtitle: 'What Bloomberg reported — and what is not confirmed yet.',
+    intro: 'According to Bloomberg, Obsidian may be refocusing on Fallout.',
+    keyFacts: ['Reported by Bloomberg; not yet confirmed by the developer or publisher.'],
+    sections: [{ heading: 'What the report says', body: 'According to Bloomberg, Obsidian is shifting its priorities toward a new Fallout project, though neither Obsidian nor Xbox has confirmed the report.' }],
+    takeaway: 'This is a story to watch, not a confirmed announcement.',
+    conclusion: 'Official confirmation is still pending.',
+    cta: 'What would you want from a new Obsidian Fallout game?',
+    contentType: 'news',
+    trustLevel: 'press-report',
+    sources: [{ title: 'Bloomberg report', url: 'https://example.com/bloomberg', type: 'press' }]
+  });
+
+  assert.match(html, /Fallout Hub · Press Report/);
+  assert.match(html, /Editorial note:/);
+  assert.match(html, /not<\/strong> been confirmed by the developer or publisher/);
+  assert.match(html, /Press report — based on journalism cited below/);
+});
+
+test('detectTrustLevel marks industry reports as press-report', () => {
+  const item = {
+    title: 'New Fallout Game Is New Focus For Obsidian Entertainment – Report',
+    description: 'Bloomberg reports that Obsidian is shelving other projects to focus on Fallout.'
+  };
+
+  assert.equal(
+    detectTrustLevel(item, { tier: 'press', category: 'news' }),
+    'press-report'
+  );
+});
+
+test('detectTrustLevel marks official patch notes as confirmed', () => {
+  const item = {
+    title: 'Fallout 76 patch notes are now live for update 1.18',
+    description: 'The update is available to download today with balance changes and bug fixes.'
+  };
+
+  assert.equal(
+    detectTrustLevel(item, { tier: 'press', category: 'news' }),
+    'confirmed'
+  );
+});
+
+test('ensureTrustKeyFacts adds disclaimer for press-report stories', () => {
+  const facts = ensureTrustKeyFacts(
+    ['Obsidian is reportedly refocusing on Fallout.'],
+    { title: 'Obsidian Fallout report', source: 'GamesRadar', description: 'Bloomberg report coverage' },
+    'press-report'
+  );
+
+  assert.match(facts[0], /Reported by Bloomberg; not yet confirmed/);
+});
+
+test('resolveReportingOutlet prefers outlet named in the story', () => {
+  assert.equal(
+    resolveReportingOutlet({ title: 'Obsidian Fallout pivot – Report', description: 'Bloomberg says Obsidian is refocusing.' }),
+    'Bloomberg'
+  );
 });
 
 test('getBloggerInsertUrl requests draft creation via query parameter', () => {

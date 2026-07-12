@@ -325,6 +325,24 @@ const FALLOUT_KEYWORDS = [
 
 const NOISE_TERMS = ['rumor', 'rumour', 'leak', 'leaked', 'speculation', 'datamine', 'insider claims', 'allegedly'];
 
+const REPORT_SIGNALS = [
+  'report', 'reportedly', 'according to', 'sources say', 'sources tell', 'insider',
+  'claims that', 'said to be', 'is said to', 'people familiar', 'people with knowledge',
+  'unconfirmed', 'could be', 'may be', 'shelving', 'shelved', 'greenlit', 're-focusing',
+  'shifting focus', 'in development', 'working on a new'
+];
+
+const CONFIRMED_PRESS_SIGNALS = [
+  'patch notes', 'now available', 'out now', 'launches today', 'is live', 'now live',
+  'release date', 'official trailer', 'premiere date', 'maintenance update', 'scheduled for',
+  'season begins', 'update is available', 'available to download'
+];
+
+const REPORTING_OUTLETS = [
+  'Bloomberg', 'IGN', 'Kotaku', 'Eurogamer', 'VGC', 'GamesRadar', 'GameSpot', 'Polygon',
+  'The Verge', 'PC Gamer', 'Rock Paper Shotgun', 'Video Games Chronicle'
+];
+
 function scoreItem(item, source) {
   const haystack = `${item.title} ${item.description}`.toLowerCase();
   const keywordHits = FALLOUT_KEYWORDS.filter((keyword) => haystack.includes(keyword));
@@ -348,30 +366,167 @@ function scoreItem(item, source) {
   return score;
 }
 
-function getTrustLevel(contentType, source = {}) {
-  if (source.tier === 'official') return 'confirmed';
-  if (contentType === 'news' && source.tier === 'press') return 'confirmed';
-  if (contentType === 'mods' || contentType === 'community') return 'community-highlight';
-  return 'editorial';
+export function resolveReportingOutlet(item = {}) {
+  const haystack = `${item.title} ${item.description} ${item.link || ''}`;
+
+  for (const outlet of REPORTING_OUTLETS) {
+    if (haystack.toLowerCase().includes(outlet.toLowerCase())) {
+      return outlet;
+    }
+  }
+
+  return item.source || 'the original report';
 }
 
-function getContentTypeGuidance(contentType) {
+export function detectTrustLevel(item = {}, source = {}) {
+  if (source.tier === 'official') return 'official';
+  if (source.category === 'mods' || source.category === 'community') return 'community-highlight';
+
+  const haystack = `${item.title} ${item.description}`.toLowerCase();
+  const title = item.title || '';
+
+  const isReportTitle = /\breport\b/i.test(title) || /[–-]\s*report/i.test(title);
+  const hasReportSignal = isReportTitle || REPORT_SIGNALS.some((signal) => haystack.includes(signal));
+  const hasConfirmedSignal = CONFIRMED_PRESS_SIGNALS.some((signal) => haystack.includes(signal));
+
+  if (hasReportSignal && !hasConfirmedSignal) return 'press-report';
+  if (hasConfirmedSignal && !hasReportSignal) return 'confirmed';
+
+  if (hasReportSignal && hasConfirmedSignal) return 'press-report';
+
+  if (/\b(obsidian|bethesda|microsoft|xbox|developer|studio)\b/.test(haystack)
+    && /\b(new game|sequel|spin-off|fallout 5|project|return to)\b/.test(haystack)) {
+    return 'press-report';
+  }
+
+  return source.tier === 'press' ? 'press-report' : 'confirmed';
+}
+
+export function getTrustLabel(trustLevel) {
+  switch (trustLevel) {
+    case 'official':
+      return 'Official';
+    case 'confirmed':
+      return 'Confirmed News';
+    case 'press-report':
+      return 'Press Report';
+    case 'community-highlight':
+      return 'Community Highlight';
+    default:
+      return 'Editorial';
+  }
+}
+
+export function getTrustNote(trustLevel) {
+  switch (trustLevel) {
+    case 'official':
+      return 'Official source — verified announcement or update from Bethesda or an official channel.';
+    case 'confirmed':
+      return 'Confirmed news — coverage of official announcements, patch notes, or established facts.';
+    case 'press-report':
+      return 'Press report — based on journalism cited below; not yet confirmed by the developer or publisher.';
+    case 'community-highlight':
+      return 'Community highlight — fan-created content, not official Bethesda news.';
+    default:
+      return 'Prepared from sourced material listed below.';
+  }
+}
+
+export function ensureTrustKeyFacts(keyFacts = [], mainStory = {}, trustLevel = 'confirmed') {
+  const facts = [...keyFacts];
+  const outlet = resolveReportingOutlet(mainStory);
+
+  if (trustLevel === 'press-report') {
+    const disclaimer = `Reported by ${outlet}; not yet confirmed by the developer or publisher.`;
+    if (!facts.some((fact) => /not yet confirmed|not confirmed by/i.test(fact))) {
+      facts.unshift(disclaimer);
+    }
+  }
+
+  if (trustLevel === 'official') {
+    const officialFact = `Source: official ${mainStory.source || 'channel'} announcement.`;
+    if (!facts.some((fact) => /official/i.test(fact))) {
+      facts.unshift(officialFact);
+    }
+  }
+
+  return facts.slice(0, 6);
+}
+
+export function ensurePrimarySource(sources = [], mainStory = {}) {
+  const list = Array.isArray(sources) ? [...sources] : [];
+  const primaryUrl = mainStory.link;
+
+  if (primaryUrl && !list.some((source) => source.url === primaryUrl)) {
+    list.unshift({
+      title: mainStory.title || resolveReportingOutlet(mainStory),
+      url: primaryUrl,
+      type: mainStory.sourceTier || 'press'
+    });
+  }
+
+  return list;
+}
+
+export function validateArticleTrust(article = {}, newsItems = []) {
+  const mainStory = newsItems[0] || {};
+  const trustLevel = detectTrustLevel(mainStory, {
+    tier: mainStory.sourceTier,
+    category: mainStory.contentType
+  });
+
+  return {
+    ...article,
+    trustLevel,
+    contentType: article.contentType || mainStory.contentType || 'news',
+    keyFacts: ensureTrustKeyFacts(article.keyFacts, mainStory, trustLevel),
+    sources: ensurePrimarySource(article.sources, mainStory)
+  };
+}
+
+function getContentTypeGuidance(contentType, trustLevel = 'confirmed') {
+  const trustGuidance = trustLevel === 'press-report'
+    ? `TRUST LEVEL: PRESS REPORT (unconfirmed by developer/publisher)
+- This story is based on journalism, NOT an official announcement
+- The intro MUST state that this is reported by [outlet] and not confirmed by the developer/publisher
+- Attribute claims throughout with "according to [outlet]" or "the report states" — never present claims as settled fact
+- Use hedging language: "reportedly", "is said to", "the report claims" where appropriate
+- Do NOT invent background details, past quotes, or related rumors not present in the source summaries
+- keyFacts MUST include: "Reported by [outlet]; not yet confirmed by the developer or publisher."
+- The conclusion MUST remind readers that official confirmation is still pending`
+    : trustLevel === 'official'
+      ? `TRUST LEVEL: OFFICIAL
+- This comes from an official Bethesda or platform source — write with confidence
+- Still cite the official source clearly`
+      : trustLevel === 'community-highlight'
+        ? `TRUST LEVEL: COMMUNITY HIGHLIGHT
+- Make clear this is fan-created content, not official news`
+        : `TRUST LEVEL: CONFIRMED NEWS
+- Report on established facts from official announcements or patch notes
+- Cite sources clearly; do not embellish beyond what sources support`;
+
   switch (contentType) {
     case 'mods':
-      return `CONTENT TYPE: MOD SPOTLIGHT
+      return `${trustGuidance}
+
+CONTENT TYPE: MOD SPOTLIGHT
 - Explain what the mod changes for players in practical terms
 - Credit the creator and point readers to the original mod page or thread
 - Mention game, platform, or compatibility details only if present in the sources
 - Help readers decide whether it is worth checking out
 - Never present mods as official Bethesda content`;
     case 'community':
-      return `CONTENT TYPE: COMMUNITY HIGHLIGHT
+      return `${trustGuidance}
+
+CONTENT TYPE: COMMUNITY HIGHLIGHT
 - Spotlight fan creativity: art, cosplay, builds, lore discussion, or projects worth seeing
 - Credit the creator or community thread clearly
 - Explain why this is interesting to Fallout fans and worth sharing
 - Frame as community-driven, not official news`;
     default:
-      return `CONTENT TYPE: NEWS / OFFICIAL UPDATE
+      return `${trustGuidance}
+
+CONTENT TYPE: NEWS
 - Accuracy and attribution come first — this is why readers trust ${BRAND_NAME}
 - Only state facts supported by the provided sources
 - Separate confirmed information from fan reaction or interpretation
@@ -379,7 +534,10 @@ function getContentTypeGuidance(contentType) {
   }
 }
 
-function getContentTypeLabel(contentType) {
+function getContentTypeLabel(contentType, trustLevel = 'confirmed') {
+  if (trustLevel === 'press-report') return 'Press Report';
+  if (trustLevel === 'official') return 'Official Update';
+
   switch (contentType) {
     case 'mods':
       return 'Mod Spotlight';
@@ -393,17 +551,23 @@ function getContentTypeLabel(contentType) {
 function buildPrompt(newsItems, { expansion = false, previousArticle = null } = {}) {
   const mainStory = newsItems[0];
   const contentType = mainStory.contentType || 'news';
-  const trustLevel = mainStory.trustLevel || getTrustLevel(contentType, { tier: mainStory.sourceTier });
+  const trustLevel = mainStory.trustLevel || detectTrustLevel(mainStory, {
+    tier: mainStory.sourceTier,
+    category: contentType
+  });
+  const reportingOutlet = resolveReportingOutlet(mainStory);
   const contextStories = newsItems.slice(0, 5);
   const contextText = contextStories
     .map((item, index) => {
       const ageLabel = item.publishedAt
         ? `${Math.max(1, Math.round((Date.now() - item.publishedAt) / (1000 * 60 * 60)))}h ago`
         : 'recent';
+      const itemTrust = item.trustLevel || detectTrustLevel(item, { tier: item.sourceTier, category: item.contentType });
       const summary = item.description ? item.description.slice(0, 900) : 'No summary available.';
       return `${index + 1}. ${item.title}
    Source: ${item.source}
-   Type: ${getContentTypeLabel(item.contentType || 'news')}
+   Type: ${getContentTypeLabel(item.contentType || 'news', itemTrust)}
+   Trust: ${getTrustLabel(itemTrust)}
    Published: ${ageLabel}
    Summary: ${summary}${item.link ? `\n   URL: ${item.link}` : ''}`;
     })
@@ -420,13 +584,15 @@ You must exceed ${MIN_ARTICLE_WORDS} words and include more concrete detail from
 
 Your mission: help Fallout fans quickly understand what happened (or what is worth seeing), why it matters, and where to look next. Readers should feel confident sharing ${BRAND_NAME} posts because the facts are sourced, the framing is honest, and the value is clear.
 
-${getContentTypeGuidance(contentType)}
+${getContentTypeGuidance(contentType, trustLevel)}
 
 TRUST AND EDITORIAL STANDARDS:
 - Use ONLY the material below. Never invent facts, dates, quotes, patch notes, or creator names.
-- trustLevel for this post: ${trustLevel}
-- If trustLevel is "confirmed", write with newsroom confidence but still cite sources
-- If trustLevel is "community-highlight", make clear this is fan-created content — celebrate it, but do not imply official status
+- trustLevel for this post: ${trustLevel} (${getTrustLabel(trustLevel)})
+- Primary reporting outlet to attribute: ${reportingOutlet}
+- If trustLevel is "press-report", every section making a claim must attribute it to ${reportingOutlet} or "the report"
+- If trustLevel is "confirmed", write about established facts but still cite sources
+- If trustLevel is "community-highlight", make clear this is fan-created content
 - If a detail is missing from the sources, say "details are still limited" instead of guessing
 - Include a keyFacts array with 3-5 bullet points a busy reader can scan in 10 seconds
 
@@ -440,18 +606,18 @@ Write one polished article in English that fans would genuinely click, read, and
 VOICE AND STYLE:
 - Confident, warm, and knowledgeable — like a trusted fan-site editor, not a content farm
 - Assume readers know Fallout, but explain enough context that newcomers still get value
-- Lead with the single most compelling fact or hook
+- Lead with the single most compelling fact or hook, with honest framing about what is confirmed vs reported
 - Every paragraph must deliver insight, not filler
 - Make the post feel organically shareable: specific, useful, and clearly worth 3 minutes
 
 ARTICLE REQUIREMENTS:
 - title: specific and click-worthy without clickbait — make fans want to know more
-- subtitle: one sentence explaining the value proposition of reading this post
-- intro: 3-4 sentences with a strong hook and clear "why this matters today"
+- subtitle: one sentence explaining the value proposition; for press-report, mention it is based on reporting
+- intro: 3-4 sentences with a strong hook; if press-report, clearly state this is reported by ${reportingOutlet} and not confirmed by the developer/publisher
 - keyFacts: 3-5 short scannable bullet points (only facts supported by sources)
 - sections: exactly 5 or 6 sections, each with "heading" and "body" (4-6 sentences, roughly 80-130 words each)
 - takeaway: one standout insight sentence fans might quote when sharing
-- conclusion: 2-3 sentences with a clear final perspective
+- conclusion: 2-3 sentences with a clear final perspective; for press-report, note official confirmation is still pending
 - cta: one conversational question that fits the content type
 - contentType: "${contentType}"
 - trustLevel: "${trustLevel}"
@@ -496,7 +662,7 @@ function buildFallbackArticle(newsItems) {
     conclusion: 'For now, the smart play is to follow the story closely, stay skeptical of unconfirmed chatter, and see what official channels confirm next.',
     cta: 'Which part of this story matters most to you — the games, the show, or the wider franchise?',
     contentType: mainStory.contentType || 'news',
-    trustLevel: mainStory.trustLevel || getTrustLevel(mainStory.contentType, { tier: mainStory.sourceTier }),
+    trustLevel: mainStory.trustLevel || detectTrustLevel(mainStory, { tier: mainStory.sourceTier, category: mainStory.contentType }),
     sources: newsItems.slice(0, 4).map((item) => ({ title: item.title, url: item.link || 'https://fallout.fandom.com/wiki/Fallout_Wiki', type: item.sourceTier || 'press' }))
   };
 }
@@ -504,6 +670,7 @@ function buildFallbackArticle(newsItems) {
 function normalizeArticle(article, newsItems) {
   const mainStory = newsItems[0] || {};
   const contentType = article?.contentType || mainStory.contentType || 'news';
+  const trustLevel = detectTrustLevel(mainStory, { tier: mainStory.sourceTier, category: contentType });
   const sections = Array.isArray(article?.sections) && article.sections.length > 0
     ? article.sections
     : [
@@ -516,13 +683,13 @@ function normalizeArticle(article, newsItems) {
     ? article.keyFacts
     : [
         `Source: ${mainStory.source || 'Trusted Fallout coverage'}`,
-        `Category: ${getContentTypeLabel(contentType)}`,
+        `Category: ${getContentTypeLabel(contentType, trustLevel)}`,
         mainStory.description ? mainStory.description.slice(0, 140) : 'A development Fallout fans should know about.'
       ];
 
-  return {
+  return validateArticleTrust({
     title: article?.title || 'Why the latest Fallout news matters right now',
-    subtitle: article?.subtitle || `Your daily ${getContentTypeLabel(contentType).toLowerCase()} from ${BRAND_NAME}.`,
+    subtitle: article?.subtitle || `Your daily ${getContentTypeLabel(contentType, trustLevel).toLowerCase()} from ${BRAND_NAME}.`,
     intro: article?.intro || 'The latest Fallout headlines are worth following because they can shape the conversation around the franchise in the days ahead.',
     keyFacts,
     sections,
@@ -530,11 +697,11 @@ function normalizeArticle(article, newsItems) {
     conclusion: article?.conclusion || 'The best takeaway is to stay close to official updates and trusted coverage until more details arrive.',
     cta: article?.cta || 'What do you think is the most interesting part of this story?',
     contentType,
-    trustLevel: article?.trustLevel || getTrustLevel(contentType, { tier: mainStory.sourceTier }),
+    trustLevel: article?.trustLevel || trustLevel,
     sources: Array.isArray(article?.sources) && article.sources.length > 0
       ? article.sources
       : newsItems.slice(0, 4).map((item) => ({ title: item.title, url: item.link || 'https://fallout.fandom.com/wiki/Fallout_Wiki', type: item.sourceTier || 'press' }))
-  };
+  }, newsItems);
 }
 
 function escapeHtml(value) {
@@ -546,14 +713,14 @@ function escapeHtml(value) {
 }
 
 export function buildArticleHtml(article) {
-  const contentLabel = getContentTypeLabel(article.contentType || 'news');
-  const trustNote = article.trustLevel === 'community-highlight'
-    ? 'Community highlight — fan-created content, not official Bethesda news.'
-    : article.trustLevel === 'confirmed'
-      ? 'Verified from official channels or established press sources.'
-      : 'Prepared from sourced material listed below.';
+  const trustLevel = article.trustLevel || 'confirmed';
+  const contentLabel = getContentTypeLabel(article.contentType || 'news', trustLevel);
+  const trustNote = getTrustNote(trustLevel);
 
   const badgeHtml = `<p><em>${escapeHtml(BRAND_NAME)} · ${escapeHtml(contentLabel)}</em></p>`;
+  const disclaimerHtml = trustLevel === 'press-report'
+    ? `<p><strong>Editorial note:</strong> This article is based on press reporting and has <strong>not</strong> been confirmed by the developer or publisher.</p>`
+    : '';
   const subtitleHtml = article.subtitle ? `<p><strong>${escapeHtml(article.subtitle)}</strong></p>` : '';
   const introHtml = article.intro ? `<p>${escapeHtml(article.intro)}</p>` : '';
   const keyFactsHtml = Array.isArray(article.keyFacts) && article.keyFacts.length > 0
@@ -575,7 +742,7 @@ export function buildArticleHtml(article) {
     : '';
   const editorialHtml = `<hr><p><strong>${escapeHtml(BRAND_NAME)} editorial standard:</strong> ${escapeHtml(trustNote)} We do not publish unconfirmed rumors as fact.</p>`;
 
-  return `<article>${badgeHtml}${subtitleHtml}${introHtml}${keyFactsHtml}${sectionsHtml}${takeawayHtml}${conclusionHtml}${ctaHtml}${sourcesHtml}${editorialHtml}</article>`;
+  return `<article>${badgeHtml}${disclaimerHtml}${subtitleHtml}${introHtml}${keyFactsHtml}${sectionsHtml}${takeawayHtml}${conclusionHtml}${ctaHtml}${sourcesHtml}${editorialHtml}</article>`;
 }
 
 export function getBloggerInsertUrl(blogId, { asDraft = true } = {}) {
@@ -841,12 +1008,13 @@ async function fetchContentItems() {
         .filter((item) => isRelevantFalloutItem(item, source))
         .map((item) => {
           const contentType = detectContentType(item, source);
+          const trustLevel = detectTrustLevel(item, source);
           return {
             ...item,
             source: source.name,
             sourceTier: source.tier,
             contentType,
-            trustLevel: getTrustLevel(contentType, source),
+            trustLevel,
             score: scoreItem({ ...item, contentType }, source)
           };
         })
@@ -965,10 +1133,10 @@ async function main() {
   try {
     article = await generateArticle(substantiveItems);
     article = normalizeArticle(article, substantiveItems);
-    console.log(`LLM article generated successfully (${getArticleWordCount(article)} words, ${article.contentType}).`);
+    console.log(`LLM article generated successfully (${getArticleWordCount(article)} words, ${article.contentType}, ${article.trustLevel}).`);
   } catch (error) {
     generationError = error;
-    article = buildFallbackArticle(substantiveItems);
+    article = normalizeArticle(buildFallbackArticle(substantiveItems), substantiveItems);
     console.warn(`LLM generation failed, using fallback article: ${error.message}`);
   }
 
@@ -991,6 +1159,7 @@ async function main() {
     generatedAt: new Date().toISOString(),
     brand: BRAND_NAME,
     featuredContentType: substantiveItems[0]?.contentType || 'news',
+    featuredTrustLevel: substantiveItems[0]?.trustLevel || 'confirmed',
     selectedNews: substantiveItems,
     article,
     articleWordCount: getArticleWordCount(article),
