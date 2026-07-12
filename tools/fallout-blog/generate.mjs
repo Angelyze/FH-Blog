@@ -264,6 +264,55 @@ export function isTitleLengthValid(title = '') {
   return chars >= MIN_TITLE_CHARS && chars <= MAX_TITLE_CHARS;
 }
 
+export function trimTitleToMaxChars(title = '', maxChars = MAX_TITLE_CHARS) {
+  const text = String(title).trim();
+  if (countChars(text) <= maxChars) return text;
+
+  let trimmed = text.slice(0, maxChars);
+  const lastSpace = trimmed.lastIndexOf(' ');
+  if (lastSpace >= Math.floor(maxChars * 0.5)) {
+    trimmed = trimmed.slice(0, lastSpace);
+  }
+
+  return trimmed.replace(/[,:;–—-]\s*$/u, '').trim();
+}
+
+export function ensureArticleTitle(title = '', mainStory = {}) {
+  const sourceTitle = String(mainStory.title || '').trim();
+  let candidate = String(title || '').trim();
+
+  if (!candidate || isVagueTitle(candidate)) {
+    candidate = sourceTitle || 'Latest Fallout news';
+  }
+
+  if (countChars(candidate) > MAX_TITLE_CHARS) {
+    candidate = trimTitleToMaxChars(candidate);
+  }
+
+  if (countChars(candidate) < MIN_TITLE_CHARS) {
+    const padding = mainStory.contentType === 'mods'
+      ? ' — mod spotlight'
+      : mainStory.contentType === 'community'
+        ? ' — community highlight'
+        : ' — what Fallout fans should know';
+    candidate = trimTitleToMaxChars(`${candidate || sourceTitle}${padding}`);
+  }
+
+  if (countChars(candidate) < MIN_TITLE_CHARS && sourceTitle) {
+    candidate = trimTitleToMaxChars(sourceTitle);
+  }
+
+  if (countChars(candidate) < MIN_TITLE_CHARS) {
+    candidate = 'Fallout fans should know about this update';
+  }
+
+  if (countChars(candidate) > MAX_TITLE_CHARS) {
+    candidate = trimTitleToMaxChars(candidate);
+  }
+
+  return candidate;
+}
+
 export function isDuplicateArticleTitle(title = '', historyEntries = [], { withinDays = TITLE_HISTORY_DAYS } = {}) {
   const cutoff = Date.now() - withinDays * 24 * 60 * 60 * 1000;
 
@@ -1011,7 +1060,7 @@ function buildFallbackArticle(newsItems) {
   const supportText = supportingStories.map((item) => item.title).join(' and ');
 
   return {
-    title: `${mainStory.title}: what it means for the Wasteland right now`,
+    title: ensureArticleTitle(`${mainStory.title}: what it means for the Wasteland right now`, mainStory),
     subtitle: `A ${getContentTypeLabel(mainStory.contentType || 'news').toLowerCase()} from ${mainStory.source}, explained for Fallout fans.`,
     intro: `Fallout fans have no shortage of headlines to track, but some stories cut through the noise more than others. ${mainStory.title} is one of those — worth reading closely whether you mainline Fallout 76, replay New Vegas, or follow the Prime Video series.`,
     keyFacts: [
@@ -1067,7 +1116,7 @@ function normalizeArticle(article, newsItems) {
       ];
 
   return validateArticleTrust({
-    title: article?.title || 'Why the latest Fallout news matters right now',
+    title: ensureArticleTitle(article?.title, mainStory),
     seoDescription: article?.seoDescription || '',
     subtitle: article?.subtitle || `Your daily ${getContentTypeLabel(contentType, trustLevel).toLowerCase()} from ${BRAND_NAME}.`,
     intro: article?.intro || 'The latest Fallout headlines are worth following because they can shape the conversation around the franchise in the days ahead.',
@@ -2156,7 +2205,10 @@ async function main() {
     } else {
       publishSkippedReason = getTitleValidationIssue(article.title, localHistory) || 'not-publishable';
     }
-    console.warn(`Blogger draft skipped: ${publishSkippedReason}`);
+    const titleDetail = ['title-length', 'vague-title', 'duplicate-title', 'empty-title'].includes(publishSkippedReason)
+      ? ` (${countChars(article.title)} chars: "${article.title}")`
+      : '';
+    console.warn(`Blogger draft skipped: ${publishSkippedReason}${titleDetail}`);
   } else if (isTopicCovered(substantiveItems[0], localHistory) || isDuplicateArticleTitle(article.title, localHistory)) {
     publishSkippedReason = 'already-covered';
     console.warn(`Blogger draft skipped: "${article.title}" matches a recently covered story.`);

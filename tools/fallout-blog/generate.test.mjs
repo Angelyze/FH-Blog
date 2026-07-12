@@ -31,7 +31,9 @@ import {
   isDuplicateArticleTitle,
   isTopicCovered,
   isPublishableArticle,
+  ensureArticleTitle,
   isTitleLengthValid,
+  trimTitleToMaxChars,
   compareCandidatePriority,
   meetsEngagementThreshold,
   meetsMinimumSourceQuality,
@@ -412,6 +414,38 @@ test('isTitleLengthValid enforces SEO-friendly title bounds', () => {
   assert.equal(isTitleLengthValid('Fallout 76 Season 18 adds new daily challenges'), true);
   assert.equal(isTitleLengthValid('Short'), false);
   assert.equal(isTitleLengthValid('A'.repeat(71)), false);
+});
+
+test('trimTitleToMaxChars shortens long headlines at word boundaries', () => {
+  const longTitle = 'Obsidian Entertainment is reportedly shifting its focus back to Fallout after shelving other projects, sources say';
+  const trimmed = trimTitleToMaxChars(longTitle);
+  assert.ok(trimmed.length <= 70);
+  assert.ok(isTitleLengthValid(trimmed));
+});
+
+test('ensureArticleTitle normalizes LLM headlines into publishable bounds', () => {
+  const mainStory = {
+    title: 'Obsidian Entertainment is reportedly shifting its focus back to Fallout after shelving other projects',
+    contentType: 'news'
+  };
+
+  const normalized = ensureArticleTitle(
+    'Report: Obsidian Entertainment is reportedly shifting its focus back to Fallout after shelving other projects',
+    mainStory
+  );
+
+  assert.ok(isTitleLengthValid(normalized));
+  assert.ok(normalized.length >= 20);
+});
+
+test('ensureArticleTitle expands titles that are too short', () => {
+  const normalized = ensureArticleTitle('Fallout report', {
+    title: 'Obsidian may return to Fallout',
+    contentType: 'news'
+  });
+
+  assert.ok(isTitleLengthValid(normalized));
+  assert.match(normalized, /Fallout/i);
 });
 
 test('isTopicCovered matches source headlines against prior article titles', () => {
