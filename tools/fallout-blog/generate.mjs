@@ -62,13 +62,11 @@ const CONTENT_SOURCES = [
     /^share of the week/i,
     /^players'? choice/i,
     /playstation store:.*top downloads/i
-  ] },
-  { name: 'Google News — Bloomberg', url: 'https://news.google.com/rss/search?q=when:14d+Fallout+(Bethesda+OR+Xbox+OR+Obsidian+OR+Microsoft)&hl=en-US&gl=US&ceid=US:en', weight: 1.35, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
-  { name: 'Google News — Business', url: 'https://news.google.com/rss/search?q=when:7d+(Fallout+OR+Bethesda)+(layoffs+OR+studio+OR+acquisition+OR+restructure)&hl=en-US&gl=US&ceid=US:en', weight: 1.25, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true }
+  ] }
 ];
 
 const REDDIT_SOURCES = [
-  { name: 'r/fallout', subreddit: 'fallout', weight: 1.25, category: 'community', tier: 'community', kind: 'reddit', minScore: 150, minComments: 35 },
+  { name: 'r/fallout', subreddit: 'fallout', weight: 1.25, category: 'community', tier: 'community', kind: 'reddit', minScore: 150, minComments: 35, primary: true },
   { name: 'r/fo76', subreddit: 'fo76', weight: 1.2, category: 'community', tier: 'community', kind: 'reddit', minScore: 75, minComments: 20 },
   { name: 'r/falloutlore', subreddit: 'falloutlore', weight: 1.1, category: 'community', tier: 'community', kind: 'reddit', minScore: 100, minComments: 25 },
   { name: 'r/FalloutMods', subreddit: 'FalloutMods', weight: 1.45, category: 'mods', tier: 'community', kind: 'reddit', minScore: 80, minComments: 18 },
@@ -1298,8 +1296,10 @@ export function isRateLimitedFeedError(error = '') {
 
 export function getRedditFetchStrategies({
   preferRss = process.env.REDDIT_PREFER_RSS === 'true' || process.env.CI === 'true',
-  rssOnly = process.env.REDDIT_RSS_ONLY === 'true' || process.env.CI === 'true'
+  rssOnly = process.env.REDDIT_RSS_ONLY === 'true' || process.env.CI === 'true',
+  source = null
 } = {}) {
+  if (source?.primary) return ['json', 'rss'];
   if (rssOnly) return ['rss'];
   return preferRss ? ['rss', 'json'] : ['json', 'rss'];
 }
@@ -1316,7 +1316,23 @@ export function getActiveRedditSources() {
 }
 
 function buildRedditRequestHeaders() {
-  return buildFeedRequestHeaders();
+  return {
+    'User-Agent': REDDIT_USER_AGENT,
+    Accept: 'application/rss+xml, application/atom+xml, application/xml, text/xml;q=0.9, */*;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.9'
+  };
+}
+
+function getRedditJsonRequestHeaders() {
+  return {
+    'User-Agent': REDDIT_USER_AGENT,
+    Accept: 'application/json'
+  };
+}
+
+function getRedditRateLimitBackoffMs(response, attempt = 0) {
+  const retryAfterSec = Number.parseInt(response?.headers?.get?.('retry-after') || '5', 10);
+  return Math.min(retryAfterSec, 30) * 1000 + attempt * REDDIT_RATE_LIMIT_BACKOFF_MS;
 }
 
 export function shouldSkipFeedSource(sourceName, feedHealth = {}, { minFailureStreak = 3 } = {}) {
@@ -1672,53 +1688,95 @@ export function parseRedditRssFeed(xmlText = '', source = {}) {
     .filter((item) => item.title);
 }
 
-async function fetchRedditJsonItems(source) {
-  const url = `https://www.reddit.com/r/${source.subreddit}/hot.json?limit=25`;
-  const request = () => fetch(url, {
-    headers: {
-      'User-Agent': REDDIT_USER_AGENT,
-      Accept: 'application/json'
+async function fetchRedditJsonItems(source, { maxAttempts = 4 } = {}) {
+  const url = `https://www.reddit.com/r/${source.subreddit}/hot.json?limit=25&raw_json=1`;
+  let lastError = null;
+
+  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+    try {
+      const response = await fetch(url, { headers: getRedditJsonRequestHeaders() });
+
+      if (response.status === 429) {
+        lastError = new Error('Reddit request failed (429)');
+        await sleep(getRedditRateLimitBackoffMs(response, attempt));
+        continue;
+      }
+
+      if (!response.ok) {
+        throw new Error(`Reddit request failed (${response.status})`);
+      }
+
+      return parseRedditListing(await response.json(), source);
+    } catch (error) {
+      lastError = error;
+      if (attempt < maxAttempts - 1 && !isRateLimitedFeedError(error.message)) {
+        await sleep(REDDIT_RATE_LIMIT_BACKOFF_MS * (attempt + 1));
+      }
     }
-  });
-
-  let response = await request();
-  if (response.status === 429) {
-    const retryAfterSec = Number.parseInt(response.headers.get('retry-after') || '3', 10);
-    await sleep(Math.min(retryAfterSec, 10) * 1000);
-    response = await request();
   }
 
-  if (!response.ok) {
-    throw new Error(`Reddit request failed (${response.status})`);
-  }
-
-  const payload = await response.json();
-  return parseRedditListing(payload, source);
+  throw lastError || new Error('Reddit request failed (unknown error)');
 }
 
-async function fetchRedditRssItems(source) {
+async function fetchRedditRssItems(source, { maxAttempts = 4 } = {}) {
   const subreddit = source.subreddit;
-  const xml = await fetchFeed(`https://old.reddit.com/r/${subreddit}/hot/.rss`, {
-    headers: buildRedditRequestHeaders(),
-    fallbackUrls: [
-      `https://www.reddit.com/r/${subreddit}/hot/.rss`,
-      `https://old.reddit.com/r/${subreddit}/.rss`
-    ]
-  });
-  return parseRedditRssFeed(xml, source);
+  const candidates = [
+    `https://old.reddit.com/r/${subreddit}/hot/.rss`,
+    `https://www.reddit.com/r/${subreddit}/hot/.rss`,
+    `https://old.reddit.com/r/${subreddit}/.rss`
+  ];
+  const errors = [];
+
+  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+    let rateLimited = false;
+
+    for (const url of candidates) {
+      try {
+        const response = await fetch(url, { headers: buildRedditRequestHeaders() });
+
+        if (response.status === 429) {
+          errors.push('429');
+          rateLimited = true;
+          await sleep(getRedditRateLimitBackoffMs(response, attempt));
+          break;
+        }
+
+        if (!response.ok) {
+          errors.push(`${response.status}`);
+          continue;
+        }
+
+        const text = await response.text();
+        if (isBlockedFeedPayload(text)) {
+          errors.push('blocked by bot protection');
+          continue;
+        }
+
+        return parseRedditRssFeed(text, source);
+      } catch (error) {
+        errors.push(error.message || 'network error');
+      }
+    }
+
+    if (!rateLimited && attempt < maxAttempts - 1) {
+      await sleep(REDDIT_RATE_LIMIT_BACKOFF_MS * (attempt + 1));
+    }
+  }
+
+  throw new Error(`Feed request failed (${errors[errors.length - 1] || 'unknown error'})`);
 }
 
 function normalizeRedditTitleKey(title = '') {
   return normalizeStoryText(title).slice(0, 120);
 }
 
-async function enrichRssItemsWithRedditJson(items = [], source) {
+async function enrichRssItemsWithRedditJson(items = [], source, { skipIfJsonAttempted = false } = {}) {
   if (items.length === 0 || items.every((item) => hasRedditEngagementMetrics(item))) {
     return items;
   }
 
   const shouldEnrich = process.env.REDDIT_ENRICH_ENGAGEMENT !== 'false';
-  if (!shouldEnrich) return items;
+  if (!shouldEnrich || skipIfJsonAttempted) return items;
 
   try {
     const jsonItems = await fetchRedditJsonItems(source);
@@ -1744,17 +1802,20 @@ async function enrichRssItemsWithRedditJson(items = [], source) {
 }
 
 async function fetchRedditSourceItems(source) {
-  const strategies = getRedditFetchStrategies();
+  const strategies = getRedditFetchStrategies({ source });
   const errors = [];
+  let jsonAttempted = false;
 
   for (const strategy of strategies) {
     try {
       let items = strategy === 'rss'
-        ? await fetchRedditRssItems(source)
-        : await fetchRedditJsonItems(source);
+        ? await fetchRedditRssItems(source, { maxAttempts: source.primary ? 5 : 4 })
+        : await fetchRedditJsonItems(source, { maxAttempts: source.primary ? 5 : 4 });
+
+      if (strategy === 'json') jsonAttempted = true;
 
       if (strategy === 'rss') {
-        items = await enrichRssItemsWithRedditJson(items, source);
+        items = await enrichRssItemsWithRedditJson(items, source, { skipIfJsonAttempted: jsonAttempted });
       }
 
       return items
@@ -1825,6 +1886,8 @@ async function fetchContentItems() {
 
   const rssJobs = activeJobs.filter((job) => job.kind === 'rss');
   const redditJobs = activeJobs.filter((job) => job.kind === 'reddit');
+  const primaryRedditJobs = redditJobs.filter(({ source }) => source.primary);
+  const secondaryRedditJobs = redditJobs.filter(({ source }) => !source.primary);
   const collected = [];
   const feedErrors = [];
 
@@ -1846,6 +1909,15 @@ async function fetchContentItems() {
     });
   };
 
+  for (const { source } of primaryRedditJobs) {
+    try {
+      const value = await fetchRedditSourceItems(source);
+      recordSourceResult(source.name, { status: 'fulfilled', value });
+    } catch (error) {
+      recordSourceResult(source.name, { status: 'rejected', reason: error });
+    }
+  }
+
   const rssResults = await Promise.allSettled(
     rssJobs.map(({ source }) => fetchRssSourceItems(source))
   );
@@ -1854,8 +1926,8 @@ async function fetchContentItems() {
     recordSourceResult(rssJobs[index].source.name, result);
   }
 
-  for (const [index, { source }] of redditJobs.entries()) {
-    if (index > 0 && REDDIT_FETCH_DELAY_MS > 0) {
+  for (const [index, { source }] of secondaryRedditJobs.entries()) {
+    if ((index > 0 || primaryRedditJobs.length > 0) && REDDIT_FETCH_DELAY_MS > 0) {
       await sleep(REDDIT_FETCH_DELAY_MS);
     }
 

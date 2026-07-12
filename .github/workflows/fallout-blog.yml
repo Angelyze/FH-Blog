@@ -16,7 +16,8 @@ jobs:
       GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
       GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
       BLOGGER_BLOG_ID: ${{ secrets.BLOGGER_BLOG_ID }}
-      REDDIT_FETCH_DELAY_MS: 4500
+      REDDIT_FETCH_DELAY_MS: 6000
+      REDDIT_RATE_LIMIT_BACKOFF_MS: 8000
       REDDIT_SUBREDDITS: fallout,FalloutMods
     steps:
       - name: Check out repository

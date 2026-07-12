@@ -498,6 +498,13 @@ test('getRedditFetchStrategies prefers RSS in CI environments', () => {
   assert.deepEqual(getRedditFetchStrategies({ rssOnly: true }), ['rss']);
 });
 
+test('getRedditFetchStrategies uses JSON first for the primary subreddit even in CI', () => {
+  assert.deepEqual(
+    getRedditFetchStrategies({ rssOnly: true, source: { primary: true } }),
+    ['json', 'rss']
+  );
+});
+
 test('isRateLimitedFeedError detects Reddit throttling', () => {
   assert.equal(isRateLimitedFeedError('Reddit request failed (429)'), true);
   assert.equal(isRateLimitedFeedError('Feed request failed (403)'), false);
