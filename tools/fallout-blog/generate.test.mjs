@@ -17,13 +17,19 @@ import {
   getStoryTopicFingerprint,
   getStoryTopicKey,
   getTitleValidationIssue,
+  formatFeedWarnings,
   getUnhealthyFeedSources,
+  isFeedTitleExcluded,
+  resolveFeedItemLink,
+  shouldSkipFeedSource,
   isArticleSubstantive,
   isDuplicateArticleTitle,
   isPublishableArticle,
   isTitleLengthValid,
+  meetsEngagementThreshold,
   meetsMinimumSourceQuality,
   parseRedditListing,
+  parseRedditRssFeed,
   parseRssDate,
   pickFeaturedStory,
   recordFeedHealthResult,
@@ -258,6 +264,37 @@ test('selectStoriesForGeneration skips fuzzy topic matches in history', () => {
   assert.deepEqual(fresh.map((story) => story.title), ['Bethesda teases more Fallout news']);
 });
 
+test('meetsEngagementThreshold allows Reddit RSS items without score metadata', () => {
+  assert.equal(
+    meetsEngagementThreshold({
+      sourceKind: 'reddit',
+      redditScore: null,
+      redditComments: null,
+      minScore: 150,
+      minComments: 35
+    }),
+    true
+  );
+});
+
+test('parseRedditRssFeed maps subreddit RSS into story items', () => {
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <entry>
+    <title>Fallout 76 Season 18 discussion thread</title>
+    <link href="https://www.reddit.com/r/fo76/comments/abc/season-18-thread/" />
+    <updated>2026-07-12T12:00:00+00:00</updated>
+    <content type="html">Players are comparing the new seasonal rewards and daily challenge changes.</content>
+  </entry>
+</feed>`;
+
+  const items = parseRedditRssFeed(xml, { minScore: 75, minComments: 20 });
+  assert.equal(items.length, 1);
+  assert.equal(items[0].sourceKind, 'reddit');
+  assert.equal(items[0].redditScore, null);
+  assert.match(items[0].description, /seasonal rewards/);
+});
+
 test('parseRedditListing maps hot posts into story items', () => {
   const payload = {
     data: {
@@ -307,6 +344,33 @@ test('isDuplicateArticleTitle catches near-duplicate published titles', () => {
   );
 });
 
+test('isDuplicateArticleTitle also compares against covered source headlines', () => {
+  const history = [{
+    title: 'Fallout 76 Season 18 patch notes are live',
+    coveredAt: Date.now() - (2 * 24 * 60 * 60 * 1000)
+  }];
+
+  assert.equal(
+    isDuplicateArticleTitle('Season 18 patch notes go live for Fallout 76', history),
+    true
+  );
+});
+
+test('isFeedTitleExcluded filters recurring platform blog noise', () => {
+  const source = {
+    excludeTitlePatterns: [/^share of the week/i, /^players'? choice/i]
+  };
+
+  assert.equal(isFeedTitleExcluded('Share of the Week: Portraits', source), true);
+  assert.equal(isFeedTitleExcluded('Fallout 76 comes to PlayStation Plus', source), false);
+});
+
+test('formatFeedWarnings lists every feed error on its own line', () => {
+  const lines = formatFeedWarnings(['IGN: timeout', 'Nexus — Fallout 4: blocked by bot protection']);
+  assert.equal(lines.length, 2);
+  assert.match(lines[0], /IGN: timeout/);
+});
+
 test('getTitleValidationIssue reports specific title problems', () => {
   const history = [{ articleTitle: 'Fallout 76 Season 18 goes live', coveredAt: Date.now() }];
   assert.equal(getTitleValidationIssue('Why the latest Fallout news matters right now', history), 'vague-title');
@@ -325,6 +389,27 @@ test('recordFeedHealthResult tracks streaks and unhealthy feeds', () => {
   assert.equal(unhealthy.length, 1);
   assert.equal(unhealthy[0].name, 'IGN');
   assert.equal(unhealthy[0].failureStreak, 3);
+});
+
+test('shouldSkipFeedSource skips feeds after repeated failures', () => {
+  const health = {
+    'Nexus — Fallout 4': { failureStreak: 3, lastError: 'blocked by bot protection' },
+    IGN: { failureStreak: 2, lastError: 'timeout' }
+  };
+
+  assert.equal(shouldSkipFeedSource('Nexus — Fallout 4', health), true);
+  assert.equal(shouldSkipFeedSource('IGN', health), false);
+});
+
+test('resolveFeedItemLink normalizes relative feed links', () => {
+  assert.equal(
+    resolveFeedItemLink('/article/149991/summer-games-done-quick', 'https://www.shacknews.com/feed/rss'),
+    'https://www.shacknews.com/article/149991/summer-games-done-quick'
+  );
+  assert.equal(
+    resolveFeedItemLink('https://www.ign.com/articles/fallout', 'https://www.ign.com/rss/articles/feed'),
+    'https://www.ign.com/articles/fallout'
+  );
 });
 
 test('isPublishableArticle rejects fallback and thin drafts', () => {

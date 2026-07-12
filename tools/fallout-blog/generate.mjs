@@ -9,6 +9,8 @@ const OUTPUT_DIR = path.join(ROOT, 'artifacts');
 const OUTPUT_FILE = path.join(OUTPUT_DIR, 'latest-draft.json');
 const HISTORY_FILE = path.join(ROOT, 'data', 'story-history.json');
 const FEED_HEALTH_FILE = path.join(ROOT, 'data', 'feed-health.json');
+const MANUAL_SEEDS_FILE = path.join(ROOT, 'data', 'manual-seeds.json');
+const MANUAL_SEED_RETENTION_DAYS = 14;
 const HISTORY_RETENTION_DAYS = 21;
 const TITLE_HISTORY_DAYS = 14;
 const MIN_TITLE_CHARS = 20;
@@ -20,41 +22,56 @@ const SEO_DESCRIPTION_MIN_CHARS = 120;
 const SEO_DESCRIPTION_MAX_CHARS = 160;
 const TOPIC_SIMILARITY_THRESHOLD = 0.6;
 const REDDIT_USER_AGENT = 'FalloutHubBlogBot/1.0 (editorial automation; contact: fallout-hub)';
+const FEED_USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+const NEXUS_FEED_HEADERS = {
+  Referer: 'https://www.nexusmods.com/',
+  Origin: 'https://www.nexusmods.com'
+};
 const BRAND_NAME = 'Fallout Hub';
 
 const CONTENT_TYPES = ['news', 'mods', 'community'];
 
 const CONTENT_SOURCES = [
-  { name: 'Bethesda Softworks', url: 'https://bethesda.net/en/rss', weight: 1.65, category: 'news', tier: 'official', kind: 'rss' },
-  { name: 'IGN', url: 'https://www.ign.com/rss/articles', weight: 1.45, category: 'news', tier: 'press', kind: 'rss' },
+  { name: 'IGN', url: 'https://www.ign.com/rss/articles/feed', weight: 1.45, category: 'news', tier: 'press', kind: 'rss' },
   { name: 'VGC', url: 'https://www.videogameschronicle.com/feed/', weight: 1.35, category: 'news', tier: 'press', kind: 'rss' },
   { name: 'GamesRadar', url: 'https://www.gamesradar.com/rss', weight: 1.3, category: 'news', tier: 'press', kind: 'rss' },
   { name: 'Eurogamer', url: 'https://www.eurogamer.net/rss', weight: 1.25, category: 'news', tier: 'press', kind: 'rss' },
   { name: 'GameSpot', url: 'https://www.gamespot.com/feeds/news/', weight: 1.2, category: 'news', tier: 'press', kind: 'rss' },
-  { name: 'Polygon', url: 'https://www.polygon.com/rss/index.xml', weight: 1.15, category: 'news', tier: 'press', kind: 'rss' },
+  { name: 'Polygon', url: 'https://www.polygon.com/feed/', weight: 1.15, category: 'news', tier: 'press', kind: 'rss' },
   { name: 'The Verge', url: 'https://www.theverge.com/rss/index.xml', weight: 1.1, category: 'news', tier: 'press', kind: 'rss' },
   { name: 'Steam — Fallout 76', url: 'https://store.steampowered.com/feeds/news/app/22370/?l=english&cc=US', weight: 1.2, category: 'news', tier: 'official', kind: 'rss' },
   { name: 'Steam — Fallout 4', url: 'https://store.steampowered.com/feeds/news/app/377160/?l=english&cc=US', weight: 1.1, category: 'news', tier: 'official', kind: 'rss' },
   { name: 'Steam — New Vegas', url: 'https://store.steampowered.com/feeds/news/app/22380/?l=english&cc=US', weight: 1.05, category: 'news', tier: 'official', kind: 'rss' },
-  { name: 'Xbox Wire', url: 'https://news.xbox.com/en-us/feed/', weight: 1.4, category: 'news', tier: 'official', kind: 'rss' },
-  { name: 'Bethesda — YouTube', url: 'https://www.youtube.com/feeds/videos.xml?channel_id=UCvBewYc8vMf5RsSMQsoGv8g', weight: 1.35, category: 'news', tier: 'official', kind: 'rss' },
-  { name: 'Amazon Newsroom', url: 'https://press.aboutamazon.com/news-releases/rss', weight: 1.15, category: 'news', tier: 'press', kind: 'rss' },
-  { name: 'Nexus Mods', url: 'https://www.nexusmods.com/news/rss', weight: 1.35, category: 'mods', tier: 'community', kind: 'rss' },
-  { name: 'Nexus — Fallout 4', url: 'https://www.nexusmods.com/fallout4/rss', weight: 1.45, category: 'mods', tier: 'community', kind: 'rss' },
-  { name: 'Nexus — New Vegas', url: 'https://www.nexusmods.com/falloutnewvegas/rss', weight: 1.4, category: 'mods', tier: 'community', kind: 'rss' },
-  { name: 'Nexus — Fallout 76', url: 'https://www.nexusmods.com/fallout76/rss', weight: 1.4, category: 'mods', tier: 'community', kind: 'rss' },
-  { name: 'Nexus — New Today', url: 'https://www.nexusmods.com/rss/newtoday', weight: 1.2, category: 'mods', tier: 'community', kind: 'rss', requiresFalloutMatch: true },
+  { name: 'Xbox Wire', url: 'https://news.xbox.com/en-us/feed/', weight: 1.45, category: 'news', tier: 'official', kind: 'rss' },
+  { name: 'Bethesda — YouTube', url: 'https://www.youtube.com/feeds/videos.xml?channel_id=UCvZHe-SP3xC7DdOk4Ri8QBw', weight: 1.35, category: 'news', tier: 'official', kind: 'rss' },
+  { name: 'Amazon Newsroom', url: 'https://www.aboutamazon.com/news/rss', weight: 1.15, category: 'news', tier: 'press', kind: 'rss' },
+  { name: 'Nexus — Fallout 4', url: 'https://www.nexusmods.com/fallout4/rss', weight: 1.15, category: 'mods', tier: 'community', kind: 'rss', headers: NEXUS_FEED_HEADERS },
+  { name: 'Nexus — New Vegas', url: 'https://www.nexusmods.com/falloutnewvegas/rss', weight: 1.1, category: 'mods', tier: 'community', kind: 'rss', headers: NEXUS_FEED_HEADERS },
+  { name: 'Nexus — Fallout 76', url: 'https://www.nexusmods.com/fallout76/rss', weight: 1.1, category: 'mods', tier: 'community', kind: 'rss', headers: NEXUS_FEED_HEADERS },
+  { name: 'Nexus — New Today', url: 'https://www.nexusmods.com/rss/newtoday', weight: 0.95, category: 'mods', tier: 'community', kind: 'rss', requiresFalloutMatch: true, headers: NEXUS_FEED_HEADERS },
   { name: 'Kotaku', url: 'https://kotaku.com/rss', weight: 1.05, category: 'news', tier: 'press', kind: 'rss' },
   { name: 'Rock Paper Shotgun', url: 'https://www.rockpapershotgun.com/feed/', weight: 1.0, category: 'news', tier: 'press', kind: 'rss' },
-  { name: 'PC Gamer', url: 'https://www.pcgamer.com/feed/', weight: 1.0, category: 'news', tier: 'press', kind: 'rss' }
+  { name: 'PC Gamer', url: 'https://www.pcgamer.com/feed/', weight: 1.0, category: 'news', tier: 'press', kind: 'rss' },
+  { name: 'PCGamesN', url: 'https://www.pcgamesn.com/mainrss.xml', weight: 1.0, category: 'news', tier: 'press', kind: 'rss' },
+  { name: 'Shacknews', url: 'https://www.shacknews.com/feed/rss', weight: 0.95, category: 'news', tier: 'press', kind: 'rss' },
+  { name: 'DualShockers', url: 'https://www.dualshockers.com/feed/', weight: 0.95, category: 'news', tier: 'press', kind: 'rss' },
+  { name: 'PlayStation Blog', url: 'https://blog.playstation.com/feed/', weight: 1.15, category: 'news', tier: 'official', kind: 'rss', excludeTitlePatterns: [
+    /^share of the week/i,
+    /^players'? choice/i,
+    /playstation store:.*top downloads/i
+  ] },
+  { name: 'Google News — Bloomberg', url: 'https://news.google.com/rss/search?q=when:14d+Fallout+(Bethesda+OR+Xbox+OR+Obsidian+OR+Microsoft)&hl=en-US&gl=US&ceid=US:en', weight: 1.35, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
+  { name: 'Google News — Business', url: 'https://news.google.com/rss/search?q=when:7d+(Fallout+OR+Bethesda)+(layoffs+OR+studio+OR+acquisition+OR+restructure)&hl=en-US&gl=US&ceid=US:en', weight: 1.25, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true }
 ];
 
 const REDDIT_SOURCES = [
   { name: 'r/fallout', subreddit: 'fallout', weight: 1.25, category: 'community', tier: 'community', kind: 'reddit', minScore: 150, minComments: 35 },
   { name: 'r/fo76', subreddit: 'fo76', weight: 1.2, category: 'community', tier: 'community', kind: 'reddit', minScore: 75, minComments: 20 },
   { name: 'r/falloutlore', subreddit: 'falloutlore', weight: 1.1, category: 'community', tier: 'community', kind: 'reddit', minScore: 100, minComments: 25 },
-  { name: 'r/FalloutMods', subreddit: 'FalloutMods', weight: 1.3, category: 'mods', tier: 'community', kind: 'reddit', minScore: 80, minComments: 18 },
-  { name: 'r/fo4', subreddit: 'fo4', weight: 1.15, category: 'mods', tier: 'community', kind: 'reddit', minScore: 60, minComments: 15 }
+  { name: 'r/FalloutMods', subreddit: 'FalloutMods', weight: 1.45, category: 'mods', tier: 'community', kind: 'reddit', minScore: 80, minComments: 18 },
+  { name: 'r/fo4', subreddit: 'fo4', weight: 1.3, category: 'mods', tier: 'community', kind: 'reddit', minScore: 60, minComments: 15 },
+  { name: 'r/FalloutTV', subreddit: 'FalloutTV', weight: 1.2, category: 'community', tier: 'community', kind: 'reddit', minScore: 120, minComments: 30 },
+  { name: 'r/fnv', subreddit: 'fnv', weight: 1.1, category: 'community', tier: 'community', kind: 'reddit', minScore: 80, minComments: 18 }
 ];
 
 function decodeHtmlEntities(value) {
@@ -256,8 +273,10 @@ export function isDuplicateArticleTitle(title = '', historyEntries = [], { withi
   const cutoff = Date.now() - withinDays * 24 * 60 * 60 * 1000;
 
   return historyEntries.some((entry) => {
-    if (!entry.articleTitle || entry.coveredAt < cutoff) return false;
-    return areTopicsSimilar(entry.articleTitle, title);
+    if (entry.coveredAt < cutoff) return false;
+    if (entry.articleTitle && areTopicsSimilar(entry.articleTitle, title)) return true;
+    if (entry.title && areTopicsSimilar(entry.title, title)) return true;
+    return false;
   });
 }
 
@@ -354,8 +373,13 @@ export function isNicheCommunityPost(item = {}) {
   return NICHE_COMMUNITY_PATTERNS.some((pattern) => haystack.includes(pattern));
 }
 
+function hasRedditEngagementMetrics(item = {}) {
+  return item.redditScore != null || item.redditComments != null;
+}
+
 export function meetsEngagementThreshold(item = {}) {
   if (item.sourceKind !== 'reddit') return true;
+  if (!hasRedditEngagementMetrics(item)) return true;
 
   const minScore = item.minScore ?? 50;
   const minComments = item.minComments ?? 10;
@@ -364,6 +388,7 @@ export function meetsEngagementThreshold(item = {}) {
 
 export function meetsHighEngagementThreshold(item = {}) {
   if (item.sourceKind !== 'reddit') return true;
+  if (!hasRedditEngagementMetrics(item)) return true;
 
   const minScore = Math.round((item.minScore ?? 50) * 2.5);
   const minComments = Math.round((item.minComments ?? 10) * 2);
@@ -483,14 +508,16 @@ function extractRssItems(xmlText) {
     const linkMatch = block.match(/<link><!\[CDATA\[([\s\S]*?)\]\]><\/link>|<link>([\s\S]*?)<\/link>/i);
     const descriptionMatch = block.match(/<description><!\[CDATA\[([\s\S]*?)\]\]><\/description>|<description>([\s\S]*?)<\/description>/i);
     const pubDateMatch = block.match(/<pubDate>([\s\S]*?)<\/pubDate>/i);
+    const sourceMatch = block.match(/<source\b[^>]*>([\s\S]*?)<\/source>/i);
 
     const title = cleanText(titleMatch?.[1] || titleMatch?.[2] || '');
     const link = cleanText(linkMatch?.[1] || linkMatch?.[2] || '');
     const description = cleanText(descriptionMatch?.[1] || descriptionMatch?.[2] || '');
     const publishedAt = parseRssDate(pubDateMatch?.[1]);
+    const feedSource = cleanText(sourceMatch?.[1] || '');
 
     if (title) {
-      items.push({ title, link, description, publishedAt });
+      items.push({ title, link, description, publishedAt, feedSource });
     }
   }
 
@@ -561,7 +588,8 @@ const CONFIRMED_PRESS_SIGNALS = [
 
 const REPORTING_OUTLETS = [
   'Bloomberg', 'IGN', 'Kotaku', 'Eurogamer', 'VGC', 'GamesRadar', 'GameSpot', 'Polygon',
-  'The Verge', 'PC Gamer', 'Rock Paper Shotgun', 'Video Games Chronicle'
+  'The Verge', 'PC Gamer', 'PCGamesN', 'Rock Paper Shotgun', 'Shacknews', 'DualShockers',
+  'Video Games Chronicle'
 ];
 
 function scoreItem(item, source) {
@@ -1122,12 +1150,10 @@ async function enrichStoryDetail(item) {
   return item;
 }
 
-async function enrichStories(stories) {
-  const enriched = [];
-  for (const story of stories.slice(0, 3)) {
-    enriched.push(await enrichStoryDetail(story));
-  }
-  return [...enriched, ...stories.slice(3)];
+export async function enrichStories(stories) {
+  const topStories = stories.slice(0, 3);
+  const enrichedTop = await Promise.all(topStories.map((story) => enrichStoryDetail(story)));
+  return [...enrichedTop, ...stories.slice(3)];
 }
 
 async function loadStoryHistory() {
@@ -1201,6 +1227,24 @@ export function getUnhealthyFeedSources(sources = {}, { minFailureStreak = 3 } =
   return Object.entries(sources)
     .filter(([, stats]) => (stats.failureStreak || 0) >= minFailureStreak)
     .map(([name, stats]) => ({ name, failureStreak: stats.failureStreak, lastError: stats.lastError }));
+}
+
+export function shouldSkipFeedSource(sourceName, feedHealth = {}, { minFailureStreak = 3 } = {}) {
+  const stats = feedHealth[sourceName];
+  return (stats?.failureStreak || 0) >= minFailureStreak;
+}
+
+export function resolveFeedItemLink(link, feedUrl) {
+  const trimmed = (link || '').trim();
+  if (!trimmed) return '';
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+
+  try {
+    const feed = new URL(feedUrl);
+    return new URL(trimmed, feed.origin).href;
+  } catch {
+    return trimmed;
+  }
 }
 
 async function saveStoryHistory(existingEntries, selectedStories, article = {}) {
@@ -1324,21 +1368,70 @@ async function callGemini(prompt, { contentType = 'news' } = {}) {
   throw new Error(errors.join(' | '));
 }
 
-async function fetchFeed(url) {
-  const response = await fetch(url, {
-    headers: {
-      'User-Agent': `${BRAND_NAME}Bot/1.0 (daily Fallout editorial automation)`,
-      Accept: 'application/rss+xml, application/atom+xml, application/xml, text/xml;q=0.9, */*;q=0.8'
+function buildFeedRequestHeaders(extraHeaders = {}) {
+  return {
+    'User-Agent': FEED_USER_AGENT,
+    Accept: 'application/rss+xml, application/atom+xml, application/xml, text/xml;q=0.9, */*;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.9',
+    ...extraHeaders
+  };
+}
+
+function isBlockedFeedPayload(text = '') {
+  const sample = text.slice(0, 1200).toLowerCase();
+  return sample.includes('just a moment') || sample.includes('cf-browser-verification') || sample.includes('attention required');
+}
+
+async function fetchFeed(url, { headers = {}, fallbackUrls = [] } = {}) {
+  const candidates = [url, ...fallbackUrls].filter(Boolean);
+  const errors = [];
+
+  for (const candidate of candidates) {
+    try {
+      const response = await fetch(candidate, {
+        headers: buildFeedRequestHeaders(headers)
+      });
+
+      if (!response.ok) {
+        errors.push(`${response.status}`);
+        continue;
+      }
+
+      const text = await response.text();
+      if (isBlockedFeedPayload(text)) {
+        errors.push('blocked by bot protection');
+        continue;
+      }
+
+      return text;
+    } catch (error) {
+      errors.push(error.message || 'network error');
     }
-  });
-  if (!response.ok) {
-    throw new Error(`Feed request failed (${response.status})`);
   }
-  return response.text();
+
+  throw new Error(`Feed request failed (${errors[errors.length - 1] || 'unknown error'})`);
+}
+
+export function isFeedTitleExcluded(title = '', source = {}) {
+  const patterns = Array.isArray(source.excludeTitlePatterns) ? source.excludeTitlePatterns : [];
+  return patterns.some((pattern) => pattern.test(title));
+}
+
+function normalizeSyndicatedTitle(title = '', feedSource = '') {
+  if (!feedSource) return title;
+  const outletSuffix = new RegExp(`\\s+[-–]\\s+${feedSource.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i');
+  return title.replace(outletSuffix, '').trim();
+}
+
+export function formatFeedWarnings(feedErrors = []) {
+  return feedErrors.map((error) => `  - ${error}`);
 }
 
 function isRelevantFalloutItem(item, source) {
-  const haystack = `${item.title} ${item.description} ${item.link || ''}`.toLowerCase();
+  const title = normalizeSyndicatedTitle(item.title || '', item.feedSource || '');
+  if (isFeedTitleExcluded(title, source)) return false;
+
+  const haystack = `${title} ${item.description} ${item.link || ''}`.toLowerCase();
   const hasRelevantKeyword = FALLOUT_KEYWORDS.some((term) => haystack.includes(term)) || haystack.includes('fallout');
   const hasNoise = NOISE_TERMS.some((term) => haystack.includes(term));
 
@@ -1384,8 +1477,16 @@ export function parseRedditListing(payload = {}, source = {}) {
 function mapSourceItem(item, source) {
   const contentType = detectContentType(item, source);
   const trustLevel = detectTrustLevel(item, source);
+  const link = resolveFeedItemLink(item.link, source.url);
+  const title = normalizeSyndicatedTitle(item.title || '', item.feedSource || '');
+  const description = item.feedSource && !(item.description || '').toLowerCase().includes(item.feedSource.toLowerCase())
+    ? `${item.description || ''} Reported by ${item.feedSource}.`.trim()
+    : (item.description || '');
   return {
     ...item,
+    title,
+    description,
+    link,
     source: source.name,
     sourceTier: source.tier,
     sourceKind: source.kind || item.sourceKind || 'rss',
@@ -1395,8 +1496,42 @@ function mapSourceItem(item, source) {
   };
 }
 
+async function loadManualSeedItems() {
+  try {
+    const raw = await fs.readFile(MANUAL_SEEDS_FILE, 'utf8');
+    const parsed = JSON.parse(raw);
+    const items = Array.isArray(parsed?.items) ? parsed.items : [];
+    const cutoff = Date.now() - MANUAL_SEED_RETENTION_DAYS * 24 * 60 * 60 * 1000;
+
+    return items
+      .filter((item) => item?.title && item?.link)
+      .filter((item) => {
+        const publishedAt = item.publishedAt ? parseRssDate(item.publishedAt) : Date.now();
+        return publishedAt >= cutoff;
+      })
+      .map((item) => mapSourceItem({
+        title: item.title,
+        link: item.link,
+        description: item.description || item.title,
+        publishedAt: item.publishedAt ? parseRssDate(item.publishedAt) : Date.now()
+      }, {
+        name: item.source || 'Manual Seed',
+        url: item.link,
+        weight: item.weight || 1.3,
+        category: item.category || 'news',
+        tier: item.tier || 'press',
+        kind: 'rss'
+      }));
+  } catch {
+    return [];
+  }
+}
+
 async function fetchRssSourceItems(source) {
-  const xml = await fetchFeed(source.url);
+  const xml = await fetchFeed(source.url, {
+    headers: source.headers,
+    fallbackUrls: source.fallbackUrls
+  });
   const items = extractFeedItems(xml);
 
   return items
@@ -1406,7 +1541,39 @@ async function fetchRssSourceItems(source) {
     .slice(0, 4);
 }
 
-async function fetchRedditSourceItems(source) {
+const REDDIT_MOD_POST_PATTERNS = [
+  /^a note about\b/i,
+  /^low-effort/i,
+  /^moderator announcement/i,
+  /^announcement:/i
+];
+
+export function parseRedditRssFeed(xmlText = '', source = {}) {
+  return extractFeedItems(xmlText)
+    .map((item) => {
+      const title = cleanText(item.title || '');
+      const link = item.link || '';
+      const description = cleanText(item.description || item.title || '').slice(0, 1200);
+      const isModeratorPost = REDDIT_MOD_POST_PATTERNS.some((pattern) => pattern.test(title));
+
+      return {
+        title,
+        link,
+        description,
+        publishedAt: item.publishedAt,
+        redditScore: null,
+        redditComments: null,
+        isStickied: isModeratorPost,
+        over18: false,
+        sourceKind: 'reddit',
+        minScore: source.minScore,
+        minComments: source.minComments
+      };
+    })
+    .filter((item) => item.title);
+}
+
+async function fetchRedditJsonItems(source) {
   const url = `https://www.reddit.com/r/${source.subreddit}/hot.json?limit=25`;
   const response = await fetch(url, {
     headers: {
@@ -1420,7 +1587,25 @@ async function fetchRedditSourceItems(source) {
   }
 
   const payload = await response.json();
-  const items = parseRedditListing(payload, source);
+  return parseRedditListing(payload, source);
+}
+
+async function fetchRedditRssItems(source) {
+  const url = `https://www.reddit.com/r/${source.subreddit}/hot/.rss`;
+  const xml = await fetchFeed(url, {
+    headers: { 'User-Agent': REDDIT_USER_AGENT }
+  });
+  return parseRedditRssFeed(xml, source);
+}
+
+async function fetchRedditSourceItems(source) {
+  let items = [];
+
+  try {
+    items = await fetchRedditJsonItems(source);
+  } catch {
+    items = await fetchRedditRssItems(source);
+  }
 
   return items
     .filter((item) => isRelevantFalloutItem(item, source))
@@ -1452,9 +1637,22 @@ async function fetchContentItems() {
   ];
 
   let feedHealth = await loadFeedHealth();
+  const skippedFeeds = [];
+
+  const activeJobs = sourceJobs.filter(({ source }) => {
+    if (shouldSkipFeedSource(source.name, feedHealth)) {
+      skippedFeeds.push(source.name);
+      return false;
+    }
+    return true;
+  });
+
+  if (skippedFeeds.length > 0) {
+    console.warn(`Skipping unhealthy feeds (${skippedFeeds.length}): ${skippedFeeds.join(', ')}`);
+  }
 
   const results = await Promise.allSettled(
-    sourceJobs.map(async ({ source, kind }) => {
+    activeJobs.map(async ({ source, kind }) => {
       if (kind === 'reddit') {
         return fetchRedditSourceItems(source);
       }
@@ -1466,7 +1664,7 @@ async function fetchContentItems() {
   const feedErrors = [];
 
   for (const [index, result] of results.entries()) {
-    const sourceName = sourceJobs[index].source.name;
+    const sourceName = activeJobs[index].source.name;
     if (result.status === 'fulfilled') {
       collected.push(...result.value);
       feedHealth = recordFeedHealthResult(feedHealth, sourceName, {
@@ -1486,19 +1684,28 @@ async function fetchContentItems() {
   await saveFeedHealth(feedHealth);
 
   if (feedErrors.length > 0) {
-    console.warn(`Feed warnings (${feedErrors.length}): ${feedErrors.slice(0, 5).join(' | ')}`);
+    console.warn(`Feed warnings (${feedErrors.length}):`);
+    for (const line of formatFeedWarnings(feedErrors)) {
+      console.warn(line);
+    }
   }
 
   const unhealthy = getUnhealthyFeedSources(feedHealth);
   if (unhealthy.length > 0) {
-    console.warn(`Unhealthy feeds (${unhealthy.length}): ${unhealthy.map((entry) => `${entry.name} (${entry.failureStreak}x)`).join(', ')}`);
+    console.warn(`Unhealthy feeds (${unhealthy.length}): ${unhealthy.map((entry) => `${entry.name} (${entry.failureStreak}x, ${entry.lastError})`).join(', ')}`);
+  }
+
+  const manualItems = await loadManualSeedItems();
+  if (manualItems.length > 0) {
+    console.log(`Loaded ${manualItems.length} manual seed item(s).`);
   }
 
   return {
-    items: dedupeCollectedItems(collected),
+    items: dedupeCollectedItems([...collected, ...manualItems]),
     feedHealth,
     feedErrors,
-    unhealthyFeeds: unhealthy
+    unhealthyFeeds: unhealthy,
+    skippedFeeds
   };
 }
 
