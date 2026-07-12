@@ -97,14 +97,6 @@ export function getStoryKey(item = {}) {
   return getStoryFingerprint(item).slice(0, 16);
 }
 
-export function getDedupLabel(item = {}) {
-  return `fallout-story-${getStoryKey(item)}`;
-}
-
-export function getTopicDedupLabel(item = {}) {
-  return `fallout-topic-${getStoryTopicKey(item)}`;
-}
-
 export function parseRssDate(value) {
   if (!value) return null;
   const parsed = Date.parse(String(value).trim());
@@ -872,44 +864,6 @@ async function getBloggerAccessToken() {
   return tokenData.access_token;
 }
 
-async function loadBloggerCoveredTopics() {
-  const blogId = process.env.BLOGGER_BLOG_ID;
-  if (!blogId) return [];
-
-  try {
-    const accessToken = await getBloggerAccessToken();
-    const entries = [];
-
-    for (const labelName of ['fallout-hub', 'auto-generated']) {
-      const response = await fetch(`https://www.googleapis.com/blogger/v3/blogs/${blogId}/posts?labels=${labelName}&maxResults=50`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!response.ok) continue;
-
-      const data = await response.json();
-
-      for (const post of data?.items || []) {
-        for (const label of post?.labels || []) {
-          if (label.startsWith('fallout-topic-')) {
-            entries.push({ topicFingerprint: label.slice('fallout-topic-'.length), coveredAt: Date.parse(post.updated || post.published || '') || Date.now() });
-          }
-          if (label.startsWith('fallout-story-')) {
-            entries.push({ fingerprint: label.slice('fallout-story-'.length), coveredAt: Date.parse(post.updated || post.published || '') || Date.now() });
-          }
-        }
-      }
-    }
-
-    return entries;
-  } catch {
-    return [];
-  }
-}
-
 async function generateArticle(newsItems) {
   const prompt = buildPrompt(newsItems);
   let article = normalizeArticle(await callGemini(prompt), newsItems);
@@ -1039,23 +993,7 @@ async function fetchContentItems() {
   return unique.slice(0, 18);
 }
 
-async function findExistingBloggerPost(blogId, accessToken, label) {
-  const response = await fetch(`https://www.googleapis.com/blogger/v3/blogs/${blogId}/posts?labels=${encodeURIComponent(label)}&maxResults=10`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json'
-    }
-  });
-
-  if (!response.ok) {
-    return null;
-  }
-
-  const data = await response.json();
-  return Array.isArray(data?.items) ? data.items[0] || null : null;
-}
-
-async function createBloggerDraft(article, newsItems = []) {
+async function createBloggerDraft(article) {
   const blogId = process.env.BLOGGER_BLOG_ID;
 
   if (!blogId || !process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET || !process.env.GOOGLE_REFRESH_TOKEN) {
@@ -1064,29 +1002,10 @@ async function createBloggerDraft(article, newsItems = []) {
 
   const accessToken = await getBloggerAccessToken();
 
-  const mainStory = Array.isArray(newsItems) && newsItems.length > 0 ? newsItems[0] : null;
-  const dedupLabel = mainStory ? getDedupLabel(mainStory) : null;
-  const topicLabel = mainStory ? getTopicDedupLabel(mainStory) : null;
-
-  for (const label of [dedupLabel, topicLabel].filter(Boolean)) {
-    const existingPost = await findExistingBloggerPost(blogId, accessToken, label);
-    if (existingPost) {
-      throw new Error('Duplicate story already exists in Blogger');
-    }
-  }
-
   const postBody = {
     kind: 'blogger#post',
     title: article.title,
-    content: buildArticleHtml(article),
-    labels: [
-      'fallout',
-      'fallout-hub',
-      'auto-generated',
-      article.contentType || 'news',
-      dedupLabel,
-      topicLabel
-    ].filter(Boolean)
+    content: buildArticleHtml(article)
   };
 
   const response = await fetch(getBloggerInsertUrl(blogId, { asDraft: true }), {
@@ -1110,9 +1029,7 @@ async function main() {
   await fs.mkdir(OUTPUT_DIR, { recursive: true });
   const contentItems = await fetchContentItems();
   const localHistory = await loadStoryHistory();
-  const bloggerHistory = await loadBloggerCoveredTopics();
-  const storyHistory = [...localHistory, ...bloggerHistory];
-  const featuredItems = pickFeaturedStory(contentItems, storyHistory);
+  const featuredItems = pickFeaturedStory(contentItems, localHistory);
 
   if (featuredItems.length === 0) {
     console.log('No fresh Fallout stories to post; skipping generation.');
@@ -1144,7 +1061,7 @@ async function main() {
   let bloggerError = null;
 
   try {
-    bloggerPost = await createBloggerDraft(article, substantiveItems);
+    bloggerPost = await createBloggerDraft(article);
     if (bloggerPost) {
       console.log('Blogger draft created successfully.');
     }
