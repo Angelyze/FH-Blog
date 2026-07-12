@@ -21,15 +21,10 @@ const SEO_DESCRIPTION_TARGET_CHARS = 150;
 const SEO_DESCRIPTION_MIN_CHARS = 120;
 const SEO_DESCRIPTION_MAX_CHARS = 160;
 const TOPIC_SIMILARITY_THRESHOLD = 0.6;
-const REDDIT_USER_AGENT = 'FalloutHubBlogBot/1.0 (editorial automation; contact: fallout-hub)';
 const REDDIT_FETCH_DELAY_MS = Number.parseInt(process.env.REDDIT_FETCH_DELAY_MS || '3000', 10);
 const REDDIT_RATE_LIMIT_BACKOFF_MS = Number.parseInt(process.env.REDDIT_RATE_LIMIT_BACKOFF_MS || '3000', 10);
 const PERSISTENT_BLOCK_FAILURE_STREAK = 2;
 const FEED_USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
-const NEXUS_FEED_HEADERS = {
-  Referer: 'https://www.nexusmods.com/',
-  Origin: 'https://www.nexusmods.com'
-};
 const BRAND_NAME = 'Fallout Hub';
 
 const CONTENT_TYPES = ['news', 'mods', 'community'];
@@ -48,10 +43,6 @@ const CONTENT_SOURCES = [
   { name: 'Xbox Wire', url: 'https://news.xbox.com/en-us/feed/', weight: 1.45, category: 'news', tier: 'official', kind: 'rss' },
   { name: 'Bethesda — YouTube', url: 'https://www.youtube.com/feeds/videos.xml?channel_id=UCvZHe-SP3xC7DdOk4Ri8QBw', weight: 1.35, category: 'news', tier: 'official', kind: 'rss' },
   { name: 'Amazon Newsroom', url: 'https://www.aboutamazon.com/news/rss', weight: 1.15, category: 'news', tier: 'press', kind: 'rss' },
-  { name: 'Nexus — Fallout 4', url: 'https://www.nexusmods.com/fallout4/rss', weight: 1.15, category: 'mods', tier: 'community', kind: 'rss', headers: NEXUS_FEED_HEADERS, skipInCi: true },
-  { name: 'Nexus — New Vegas', url: 'https://www.nexusmods.com/falloutnewvegas/rss', weight: 1.1, category: 'mods', tier: 'community', kind: 'rss', headers: NEXUS_FEED_HEADERS, skipInCi: true },
-  { name: 'Nexus — Fallout 76', url: 'https://www.nexusmods.com/fallout76/rss', weight: 1.1, category: 'mods', tier: 'community', kind: 'rss', headers: NEXUS_FEED_HEADERS, skipInCi: true },
-  { name: 'Nexus — New Today', url: 'https://www.nexusmods.com/rss/newtoday', weight: 0.95, category: 'mods', tier: 'community', kind: 'rss', requiresFalloutMatch: true, headers: NEXUS_FEED_HEADERS, skipInCi: true },
   { name: 'Kotaku', url: 'https://kotaku.com/rss', weight: 1.05, category: 'news', tier: 'press', kind: 'rss' },
   { name: 'Rock Paper Shotgun', url: 'https://www.rockpapershotgun.com/feed/', weight: 1.0, category: 'news', tier: 'press', kind: 'rss' },
   { name: 'PC Gamer', url: 'https://www.pcgamer.com/feed/', weight: 1.0, category: 'news', tier: 'press', kind: 'rss' },
@@ -1294,11 +1285,22 @@ export function isRateLimitedFeedError(error = '') {
   return message.includes('429') || message.includes('rate limit');
 }
 
+export function hasRedditOAuthCredentials() {
+  return Boolean(process.env.REDDIT_CLIENT_ID?.trim() && process.env.REDDIT_CLIENT_SECRET?.trim());
+}
+
+export function getRedditUserAgent() {
+  if (process.env.REDDIT_USER_AGENT?.trim()) return process.env.REDDIT_USER_AGENT.trim();
+  const username = process.env.REDDIT_USERNAME?.trim() || 'FalloutHubBlog';
+  return `web:fallout-hub-blog:v1.0.0 (by /u/${username})`;
+}
+
 export function getRedditFetchStrategies({
   preferRss = process.env.REDDIT_PREFER_RSS === 'true' || process.env.CI === 'true',
   rssOnly = process.env.REDDIT_RSS_ONLY === 'true' || process.env.CI === 'true',
   source = null
 } = {}) {
+  if (hasRedditOAuthCredentials()) return ['oauth-json', 'rss'];
   if (source?.primary) return ['json', 'rss'];
   if (rssOnly) return ['rss'];
   return preferRss ? ['rss', 'json'] : ['json', 'rss'];
@@ -1315,19 +1317,69 @@ export function getActiveRedditSources() {
   return REDDIT_SOURCES.filter((source) => allowed.has(source.subreddit.toLowerCase()));
 }
 
+let redditOAuthToken = null;
+let redditOAuthExpiresAt = 0;
+
+async function requestRedditAccessToken(grantParams) {
+  const clientId = process.env.REDDIT_CLIENT_ID.trim();
+  const clientSecret = process.env.REDDIT_CLIENT_SECRET.trim();
+  return fetch('https://www.reddit.com/api/v1/access_token', {
+    method: 'POST',
+    headers: {
+      Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`,
+      'User-Agent': getRedditUserAgent(),
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: new URLSearchParams(grantParams)
+  });
+}
+
+async function getRedditOAuthAccessToken({ forceRefresh = false } = {}) {
+  if (!hasRedditOAuthCredentials()) return null;
+  if (!forceRefresh && redditOAuthToken && Date.now() < redditOAuthExpiresAt - 60_000) {
+    return redditOAuthToken;
+  }
+
+  let response = await requestRedditAccessToken({ grant_type: 'client_credentials' });
+
+  if (!response.ok) {
+    const username = process.env.REDDIT_USERNAME?.trim();
+    const password = process.env.REDDIT_PASSWORD?.trim();
+    if (username && password) {
+      response = await requestRedditAccessToken({
+        grant_type: 'password',
+        username,
+        password
+      });
+    }
+  }
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`Reddit OAuth failed (${response.status}): ${text}`);
+  }
+
+  const data = await response.json();
+  redditOAuthToken = data.access_token;
+  redditOAuthExpiresAt = Date.now() + (data.expires_in || 3600) * 1000;
+  return redditOAuthToken;
+}
+
 function buildRedditRequestHeaders() {
   return {
-    'User-Agent': REDDIT_USER_AGENT,
+    'User-Agent': getRedditUserAgent(),
     Accept: 'application/rss+xml, application/atom+xml, application/xml, text/xml;q=0.9, */*;q=0.8',
     'Accept-Language': 'en-US,en;q=0.9'
   };
 }
 
-function getRedditJsonRequestHeaders() {
-  return {
-    'User-Agent': REDDIT_USER_AGENT,
+function getRedditJsonRequestHeaders(accessToken = null) {
+  const headers = {
+    'User-Agent': getRedditUserAgent(),
     Accept: 'application/json'
   };
+  if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
+  return headers;
 }
 
 function getRedditRateLimitBackoffMs(response, attempt = 0) {
@@ -1688,7 +1740,29 @@ export function parseRedditRssFeed(xmlText = '', source = {}) {
     .filter((item) => item.title);
 }
 
-async function fetchRedditJsonItems(source, { maxAttempts = 4 } = {}) {
+async function fetchRedditOAuthJsonItems(source) {
+  const url = `https://oauth.reddit.com/r/${source.subreddit}/hot?limit=25&raw_json=1`;
+
+  const request = async (accessToken) => fetch(url, {
+    headers: getRedditJsonRequestHeaders(accessToken)
+  });
+
+  let accessToken = await getRedditOAuthAccessToken();
+  let response = await request(accessToken);
+
+  if (response.status === 401) {
+    accessToken = await getRedditOAuthAccessToken({ forceRefresh: true });
+    response = await request(accessToken);
+  }
+
+  if (!response.ok) {
+    throw new Error(`Reddit OAuth request failed (${response.status})`);
+  }
+
+  return parseRedditListing(await response.json(), source);
+}
+
+async function fetchRedditJsonItems(source, { maxAttempts = 3 } = {}) {
   const url = `https://www.reddit.com/r/${source.subreddit}/hot.json?limit=25&raw_json=1`;
   let lastError = null;
 
@@ -1718,7 +1792,7 @@ async function fetchRedditJsonItems(source, { maxAttempts = 4 } = {}) {
   throw lastError || new Error('Reddit request failed (unknown error)');
 }
 
-async function fetchRedditRssItems(source, { maxAttempts = 4 } = {}) {
+async function fetchRedditRssItems(source, { maxAttempts = 3 } = {}) {
   const subreddit = source.subreddit;
   const candidates = [
     `https://old.reddit.com/r/${subreddit}/hot/.rss`,
@@ -1779,7 +1853,9 @@ async function enrichRssItemsWithRedditJson(items = [], source, { skipIfJsonAtte
   if (!shouldEnrich || skipIfJsonAttempted) return items;
 
   try {
-    const jsonItems = await fetchRedditJsonItems(source);
+    const jsonItems = hasRedditOAuthCredentials()
+      ? await fetchRedditOAuthJsonItems(source)
+      : await fetchRedditJsonItems(source, { maxAttempts: 2 });
     const metricsByTitle = new Map(
       jsonItems.map((item) => [normalizeRedditTitleKey(item.title), {
         redditScore: item.redditScore,
@@ -1808,11 +1884,16 @@ async function fetchRedditSourceItems(source) {
 
   for (const strategy of strategies) {
     try {
-      let items = strategy === 'rss'
-        ? await fetchRedditRssItems(source, { maxAttempts: source.primary ? 5 : 4 })
-        : await fetchRedditJsonItems(source, { maxAttempts: source.primary ? 5 : 4 });
-
-      if (strategy === 'json') jsonAttempted = true;
+      let items;
+      if (strategy === 'oauth-json') {
+        items = await fetchRedditOAuthJsonItems(source);
+        jsonAttempted = true;
+      } else if (strategy === 'rss') {
+        items = await fetchRedditRssItems(source, { maxAttempts: source.primary ? 3 : 2 });
+      } else {
+        items = await fetchRedditJsonItems(source, { maxAttempts: source.primary ? 3 : 2 });
+        jsonAttempted = true;
+      }
 
       if (strategy === 'rss') {
         items = await enrichRssItemsWithRedditJson(items, source, { skipIfJsonAttempted: jsonAttempted });
@@ -1869,10 +1950,6 @@ async function fetchContentItems() {
   }
 
   const activeJobs = sourceJobs.filter(({ source }) => {
-    if (source.skipInCi && process.env.CI === 'true') {
-      skippedFeeds.push(source.name);
-      return false;
-    }
     if (shouldSkipFeedSource(source.name, feedHealth)) {
       skippedFeeds.push(source.name);
       return false;
@@ -1886,6 +1963,14 @@ async function fetchContentItems() {
 
   const rssJobs = activeJobs.filter((job) => job.kind === 'rss');
   const redditJobs = activeJobs.filter((job) => job.kind === 'reddit');
+
+  if (redditJobs.length > 0) {
+    if (hasRedditOAuthCredentials()) {
+      console.log('Reddit OAuth credentials detected; using authenticated API requests.');
+    } else if (process.env.CI === 'true') {
+      console.warn('No Reddit OAuth credentials configured; unauthenticated Reddit requests are often rate-limited in CI.');
+    }
+  }
   const primaryRedditJobs = redditJobs.filter(({ source }) => source.primary);
   const secondaryRedditJobs = redditJobs.filter(({ source }) => !source.primary);
   const collected = [];

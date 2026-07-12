@@ -19,6 +19,8 @@ import {
   getTitleValidationIssue,
   formatFeedWarnings,
   getRedditFetchStrategies,
+  getRedditUserAgent,
+  hasRedditOAuthCredentials,
   getUnhealthyFeedSources,
   isFeedTitleExcluded,
   isPersistentlyBlockedFeedError,
@@ -503,6 +505,38 @@ test('getRedditFetchStrategies uses JSON first for the primary subreddit even in
     getRedditFetchStrategies({ rssOnly: true, source: { primary: true } }),
     ['json', 'rss']
   );
+});
+
+test('getRedditFetchStrategies prefers OAuth when credentials are configured', () => {
+  const previousId = process.env.REDDIT_CLIENT_ID;
+  const previousSecret = process.env.REDDIT_CLIENT_SECRET;
+
+  process.env.REDDIT_CLIENT_ID = 'test-client-id';
+  process.env.REDDIT_CLIENT_SECRET = 'test-client-secret';
+
+  try {
+    assert.deepEqual(getRedditFetchStrategies({ rssOnly: true }), ['oauth-json', 'rss']);
+    assert.equal(hasRedditOAuthCredentials(), true);
+  } finally {
+    if (previousId === undefined) delete process.env.REDDIT_CLIENT_ID;
+    else process.env.REDDIT_CLIENT_ID = previousId;
+    if (previousSecret === undefined) delete process.env.REDDIT_CLIENT_SECRET;
+    else process.env.REDDIT_CLIENT_SECRET = previousSecret;
+  }
+});
+
+test('getRedditUserAgent follows Reddit platform format', () => {
+  const previous = process.env.REDDIT_USER_AGENT;
+  delete process.env.REDDIT_USER_AGENT;
+  process.env.REDDIT_USERNAME = 'FalloutHubEditor';
+
+  try {
+    assert.match(getRedditUserAgent(), /web:fallout-hub-blog:v1\.0\.0 \(by \/u\/FalloutHubEditor\)/);
+  } finally {
+    if (previous === undefined) delete process.env.REDDIT_USER_AGENT;
+    else process.env.REDDIT_USER_AGENT = previous;
+    delete process.env.REDDIT_USERNAME;
+  }
 });
 
 test('isRateLimitedFeedError detects Reddit throttling', () => {
