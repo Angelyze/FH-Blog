@@ -115,30 +115,78 @@ function extractItems(xmlText) {
   return items;
 }
 
+const FALLOUT_KEYWORDS = [
+  'fallout 76', 'fallout 4', 'fallout 3', 'fallout 5', 'fallout 2', 'fallout 1',
+  'new vegas', 'fo76', 'prime video', 'fallout tv', 'fallout series', 'bethesda',
+  'vault dweller', 'vault-tec', 'appalachia', 'wasteland', 'atomic shop',
+  'expedition', 'season', 'brotherhood', 'ncr', 'institute', 'pip-boy',
+  'nexus mod', 'mod showcase', 'lucy', 'the ghoul', 'vault boy'
+];
+
+const NOISE_TERMS = ['rumor', 'rumour', 'leak', 'leaked', 'speculation', 'datamine', 'insider claims', 'allegedly'];
+
 function scoreItem(item, source) {
   const haystack = `${item.title} ${item.description}`.toLowerCase();
-  const keywordHits = [
-    'fallout', 'fallout 76', 'fo76', 'new vegas', 'prime video', 'bethesda', 'tv series', 'tv show', 'vault', 'game', 'release', 'update'
-  ].filter((keyword) => haystack.includes(keyword));
+  const keywordHits = FALLOUT_KEYWORDS.filter((keyword) => haystack.includes(keyword));
 
-  let score = source.weight + keywordHits.length * 1.3;
+  let score = source.weight + keywordHits.length * 1.4;
 
-  if (haystack.includes('official') || haystack.includes('announced')) score += 1.2;
-  if (haystack.includes('leak') || haystack.includes('rumor')) score -= 3;
-  if (haystack.includes('trailer')) score += 0.6;
-  if (haystack.includes('expansion') || haystack.includes('update')) score += 0.8;
+  if (haystack.includes('fallout')) score += 1.5;
+  if (haystack.includes('official') || haystack.includes('announced') || haystack.includes('confirmed')) score += 1.4;
+  if (haystack.includes('trailer') || haystack.includes('premiere')) score += 0.9;
+  if (haystack.includes('expansion') || haystack.includes('update') || haystack.includes('patch')) score += 0.9;
+  if (haystack.includes('mod') || haystack.includes('nexus')) score += 0.7;
+  if (haystack.includes('season') && haystack.includes('fallout')) score += 1.0;
+  if (NOISE_TERMS.some((term) => haystack.includes(term))) score -= 4;
 
   return score;
 }
 
 function buildPrompt(newsItems) {
   const mainStory = newsItems[0];
-  const contextStories = newsItems.slice(0, 3);
+  const contextStories = newsItems.slice(0, 4);
   const contextText = contextStories
-    .map((item) => `- ${item.title} (${item.source})${item.link ? ` — ${item.link}` : ''}`)
-    .join('\n');
+    .map((item, index) => `${index + 1}. ${item.title}\n   Source: ${item.source}${item.description ? `\n   Summary: ${item.description.slice(0, 220)}` : ''}${item.link ? `\n   URL: ${item.link}` : ''}`)
+    .join('\n\n');
 
-  return `You are writing a high-quality Fallout news article for a fan audience.\nUse the following shortlisted stories as the basis of the post:\n${contextText}\n\nWrite one polished article in English that feels like a real editorial post rather than a generic summary.\nRequirements:\n- Make the title specific, useful, and clickable without being spammy.\n- Focus on one main story and use the other items as supporting context.\n- Explain what happened, why it matters, and what fans should watch next.\n- Keep the tone casual, conversational, confident, and slightly magazine-like.\n- Avoid rumor-heavy language and do not invent facts.\n- Write a strong intro, 4-5 sections, and a short conclusion.\n- Include one compelling quote-like line in the middle of the article, framed as a takeaway or observation.\n- Include one light CTA at the end.\n- Return valid JSON only with these fields: title, intro, sections, conclusion, cta, sources.\n- Each section must have a heading and a body.\n- The article should feel like a helpful explainer and a genuinely interesting read.\n- The main story to focus on is: ${mainStory.title}`;
+  return `You are the lead editor of a Fallout fan blog. Your readers know the games (Fallout 3, New Vegas, Fallout 4, Fallout 76), follow the Prime Video series, care about mods, and track Bethesda's direction for the franchise.
+
+Use ONLY the stories below. Do not invent facts, dates, quotes, patch notes, or unconfirmed details.
+
+SHORTLISTED STORIES:
+${contextText}
+
+MAIN STORY TO LEAD WITH: ${mainStory.title}
+
+Write one polished article in English that feels like premium fan-site journalism — not a generic AI summary or press-release rewrite.
+
+VOICE AND STYLE:
+- Casual, confident, and conversational, like a magazine piece written by someone who actually plays Fallout
+- Assume readers know Vault-Tec, the Brotherhood, NCR, Appalachia, and the TV show cast — explain only when a detail helps newcomers
+- Connect the news to what fans care about: gameplay impact, live-service updates, lore implications, modding, TV tie-ins, and franchise momentum
+- Light Wasteland flavor is fine; forced roleplay or excessive slang is not
+- Lead with the most important fact. Every paragraph must earn its place — no filler
+
+ARTICLE REQUIREMENTS:
+- title: specific, useful, and clickable without being spammy or vague
+- intro: 2-3 sentences that hook readers and explain why this matters today
+- sections: exactly 4 or 5 sections, each with "heading" and "body" (2-4 sentences). Include:
+  * what happened (clear facts)
+  * why Fallout fans should care (player/community impact)
+  * franchise context or lore connection where genuinely relevant
+  * what to watch next (official channels, upcoming beats, community reaction)
+- takeaway: one standout insight sentence (not a fake quote or attributed statement)
+- conclusion: 1-2 sentences wrapping up the story
+- cta: one conversational question inviting comments from the community
+- sources: array of {title, url} for every story you referenced (use provided URLs)
+
+QUALITY BAR:
+- Focus on the main story; use other items as supporting context only
+- Skip rumor framing entirely — if something is unconfirmed, do not present it as news
+- Reference specific games, updates, or show elements when the story touches them
+- Do not repeat the headline verbatim in every paragraph
+
+Return valid JSON only with these fields: title, intro, sections, conclusion, takeaway, cta, sources`;
 }
 
 function buildFallbackArticle(newsItems) {
@@ -147,29 +195,30 @@ function buildFallbackArticle(newsItems) {
   const supportText = supportingStories.map((item) => item.title).join(' and ');
 
   return {
-    title: `Why ${mainStory.title} matters for Fallout fans`,
-    intro: `The latest Fallout headlines are always worth a second look when they hint at where the franchise may be headed. This version uses the strongest available stories to explain the main development clearly and keep the bigger picture in view.`,
+    title: `${mainStory.title}: what it means for the Wasteland right now`,
+    intro: `Fallout fans have no shortage of headlines to track, but some stories cut through the noise more than others. ${mainStory.title} is one of those — worth reading closely whether you mainline Fallout 76, replay New Vegas, or follow the Prime Video series.`,
     sections: [
       {
-        heading: 'What is happening',
-        body: `The core of the story is ${mainStory.title}. That headline matters because it gives fans a clear window into the current direction of Fallout coverage, whether it is tied to a release, a franchise update, or a broader industry development.`
+        heading: 'What happened',
+        body: `The headline driving today's conversation is ${mainStory.title}, reported by ${mainStory.source}. ${mainStory.description ? mainStory.description.slice(0, 200) + (mainStory.description.length > 200 ? '…' : '') : 'It is one of the stronger Fallout-related developments in recent coverage.'}`
       },
       {
-        heading: 'Why this matters',
-        body: `For many fans, the value of a story like this is not just in the headline itself, but in what it suggests about the future. A single update can reshape expectations around timing, tone, and how much new Fallout content is really on the horizon.`
+        heading: 'Why fans should pay attention',
+        body: `Stories like this matter because Fallout is more than a single game now — it is a live franchise spanning classic RPGs, an ongoing online world, a major TV adaptation, and a massive modding community. When official or trusted coverage shifts, it often signals something fans will feel in-game, on-screen, or in the broader conversation around Bethesda's plans.`
       },
       {
-        heading: 'A useful takeaway',
-        body: `The best way to think about it is simple: when the Fallout conversation starts to move, it is often because something bigger is brewing behind the scenes. That is why even a relatively quiet update can become important if it changes the mood of the fandom.`
+        heading: 'How this fits the bigger picture',
+        body: `The Fallout fandom reads between the lines by default, and for good reason. Updates, announcements, and even quiet industry moves can reshape expectations about content cadence, lore direction, and which parts of the IP Bethesda is investing in next. That context is what turns a headline into something genuinely useful.`
       },
       {
         heading: 'What to watch next',
-        body: `The smartest follow-up is to keep an eye on ${supportText || 'the next official update'} and the wider reaction once more details emerge. That usually gives fans a better read on what is real, what is meaningful, and what could still shift.`
+        body: `Keep tabs on ${supportText || 'the next official Bethesda or Fallout channel update'} and how the community responds once more details land. That combination — official word plus fan reaction — is usually the fastest way to separate signal from noise in the Wasteland.`
       }
     ],
-    conclusion: 'The clearest takeaway is that the most useful Fallout coverage is the kind that explains the story behind the headline, helping fans understand what matters now and why it deserves attention.',
-    cta: 'What do you think is the most interesting part of this story?',
-    sources: newsItems.slice(0, 3).map((item) => ({ title: item.title, url: item.link || 'https://fallout.fandom.com/wiki/Fallout_Wiki' }))
+    takeaway: 'When Fallout coverage moves from background noise to front-page news, it is usually because something is about to matter to players — not just pundits.',
+    conclusion: 'For now, the smart play is to follow the story closely, stay skeptical of unconfirmed chatter, and see what official channels confirm next.',
+    cta: 'Which part of this story matters most to you — the games, the show, or the wider franchise?',
+    sources: newsItems.slice(0, 4).map((item) => ({ title: item.title, url: item.link || 'https://fallout.fandom.com/wiki/Fallout_Wiki' }))
   };
 }
 
@@ -183,15 +232,46 @@ function normalizeArticle(article, newsItems) {
       ];
 
   return {
-    title: article?.title || `Why the latest Fallout news matters right now`,
-    intro: article?.intro || `The latest Fallout headlines are worth following because they can shape the conversation around the franchise in the days ahead.`,
+    title: article?.title || 'Why the latest Fallout news matters right now',
+    intro: article?.intro || 'The latest Fallout headlines are worth following because they can shape the conversation around the franchise in the days ahead.',
     sections,
+    takeaway: article?.takeaway || 'The best Fallout coverage explains not just what happened, but why players and fans should care.',
     conclusion: article?.conclusion || 'The best takeaway is to stay close to official updates and trusted coverage until more details arrive.',
     cta: article?.cta || 'What do you think is the most interesting part of this story?',
     sources: Array.isArray(article?.sources) && article.sources.length > 0
       ? article.sources
-      : newsItems.slice(0, 3).map((item) => ({ title: item.title, url: item.link || 'https://fallout.fandom.com/wiki/Fallout_Wiki' }))
+      : newsItems.slice(0, 4).map((item) => ({ title: item.title, url: item.link || 'https://fallout.fandom.com/wiki/Fallout_Wiki' }))
   };
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+export function buildArticleHtml(article) {
+  const introHtml = article.intro ? `<p>${escapeHtml(article.intro)}</p>` : '';
+  const sectionsHtml = Array.isArray(article.sections)
+    ? article.sections.map((section) => `<h3>${escapeHtml(section.heading)}</h3><p>${escapeHtml(section.body)}</p>`).join('')
+    : '';
+  const takeawayHtml = article.takeaway
+    ? `<blockquote><p><strong>Takeaway:</strong> ${escapeHtml(article.takeaway)}</p></blockquote>`
+    : '';
+  const conclusionHtml = article.conclusion ? `<p>${escapeHtml(article.conclusion)}</p>` : '';
+  const ctaHtml = article.cta ? `<p><em>${escapeHtml(article.cta)}</em></p>` : '';
+  const sourcesHtml = Array.isArray(article.sources) && article.sources.length > 0
+    ? `<hr><h3>Sources</h3><ul>${article.sources.map((source) => `<li><a href="${escapeHtml(source.url)}">${escapeHtml(source.title)}</a></li>`).join('')}</ul>`
+    : '';
+
+  return `<article>${introHtml}${sectionsHtml}${takeawayHtml}${conclusionHtml}${ctaHtml}${sourcesHtml}</article>`;
+}
+
+export function getBloggerInsertUrl(blogId, { asDraft = true } = {}) {
+  const base = `https://www.googleapis.com/blogger/v3/blogs/${blogId}/posts`;
+  return asDraft ? `${base}?isDraft=true` : base;
 }
 
 function extractJsonText(text) {
@@ -212,7 +292,7 @@ function parseModelList(value) {
     .filter(Boolean);
 }
 
-async function callGemini(prompt) {
+async function callGemini(prompt, newsItems = []) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     throw new Error('Missing GEMINI_API_KEY');
@@ -230,7 +310,11 @@ async function callGemini(prompt) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }]
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.75,
+            responseMimeType: 'application/json'
+          }
         })
       });
 
@@ -248,7 +332,7 @@ async function callGemini(prompt) {
       }
 
       const jsonText = extractJsonText(text);
-      return normalizeArticle(JSON.parse(jsonText), []);
+      return normalizeArticle(JSON.parse(jsonText), newsItems);
     } catch (error) {
       errors.push(`${model}: ${error.message}`);
     }
@@ -269,8 +353,8 @@ async function fetchNewsItems() {
       const relevant = items
         .filter((item) => {
           const haystack = `${item.title} ${item.description}`.toLowerCase();
-          const hasRelevantKeyword = ['fallout', 'bethesda', 'prime video', 'tv show', 'new vegas', 'fo76', 'vault'].some((term) => haystack.includes(term));
-          const hasNoise = ['rumor', 'leak', 'speculation'].some((term) => haystack.includes(term));
+          const hasRelevantKeyword = FALLOUT_KEYWORDS.some((term) => haystack.includes(term)) || haystack.includes('fallout');
+          const hasNoise = NOISE_TERMS.some((term) => haystack.includes(term));
           return hasRelevantKeyword && !hasNoise;
         })
         .map((item) => ({ ...item, source: source.name, score: scoreItem(item, source) }))
@@ -348,31 +432,14 @@ async function createBloggerDraft(article, newsItems = []) {
     }
   }
 
-  const bodySections = Array.isArray(article.sections)
-    ? article.sections.map((section) => `<h3>${section.heading}</h3><p>${section.body}</p>`).join('')
-    : '';
-  const introHtml = article.intro ? `<p>${article.intro}</p>` : '';
-  const conclusionHtml = article.conclusion ? `<p>${article.conclusion}</p>` : '';
-  const ctaHtml = article.cta ? `<p><em>${article.cta}</em></p>` : '';
-
   const postBody = {
     kind: 'blogger#post',
     title: article.title,
-    content: `
-      <article>
-        <h2>${article.title}</h2>
-        ${introHtml}
-        ${bodySections}
-        ${conclusionHtml}
-        ${ctaHtml}
-      </article>
-    `,
-    labels: ['fallout', 'automation', 'draft', dedupLabel].filter(Boolean),
-    status: 'DRAFT',
-    isDraft: true
+    content: buildArticleHtml(article),
+    labels: ['fallout', 'automation', 'auto-generated', dedupLabel].filter(Boolean)
   };
 
-  const response = await fetch(`https://www.googleapis.com/blogger/v3/blogs/${blogId}/posts`, {
+  const response = await fetch(getBloggerInsertUrl(blogId, { asDraft: true }), {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -416,7 +483,7 @@ async function main() {
   let generationError = null;
 
   try {
-    article = await callGemini(prompt);
+    article = await callGemini(prompt, freshNewsItems);
     article = normalizeArticle(article, freshNewsItems);
     console.log('LLM article generated successfully.');
   } catch (error) {
