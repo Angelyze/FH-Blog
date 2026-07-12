@@ -81,7 +81,7 @@ function buildPrompt(newsItems) {
     .map((item) => `- ${item.title} (${item.source})${item.link ? ` — ${item.link}` : ''}`)
     .join('\n');
 
-  return `You are writing a high-quality Fallout news article for a fan audience.\nUse the following shortlisted stories as the basis of the post:\n${contextText}\n\nWrite one polished article in English that feels like a real editorial post rather than a generic summary.\nRequirements:\n- Make the title specific, useful, and clickable without being spammy.\n- Focus on one main story and use the other items as supporting context.\n- Explain what happened, why it matters, and what fans should watch next.\n- Keep the tone casual, conversational, and confident.\n- Avoid rumor-heavy language and do not invent facts.\n- Write an intro, 3-5 sections, and a short conclusion.\n- Include one light CTA at the end.\n- Return valid JSON only with these fields: title, intro, sections, conclusion, cta, sources.\n- Each section must have a heading and a body.\n- The main story should be the anchor, and the article should feel like a helpful explainer.\n- The main story to focus on is: ${mainStory.title}`;
+  return `You are writing a high-quality Fallout news article for a fan audience.\nUse the following shortlisted stories as the basis of the post:\n${contextText}\n\nWrite one polished article in English that feels like a real editorial post rather than a generic summary.\nRequirements:\n- Make the title specific, useful, and clickable without being spammy.\n- Focus on one main story and use the other items as supporting context.\n- Explain what happened, why it matters, and what fans should watch next.\n- Keep the tone casual, conversational, confident, and slightly magazine-like.\n- Avoid rumor-heavy language and do not invent facts.\n- Write a strong intro, 4-5 sections, and a short conclusion.\n- Include one compelling quote-like line in the middle of the article, framed as a takeaway or observation.\n- Include one light CTA at the end.\n- Return valid JSON only with these fields: title, intro, sections, conclusion, cta, sources.\n- Each section must have a heading and a body.\n- The article should feel like a helpful explainer and a genuinely interesting read.\n- The main story to focus on is: ${mainStory.title}`;
 }
 
 function buildFallbackArticle(newsItems) {
@@ -91,22 +91,26 @@ function buildFallbackArticle(newsItems) {
 
   return {
     title: `Why ${mainStory.title} matters for Fallout fans`,
-    intro: `The latest Fallout news is worth paying attention to because it can shape how fans think about the franchise in the weeks ahead. This draft uses the strongest available stories to give a clear overview of what is happening, why it matters, and what to watch next.`,
+    intro: `The latest Fallout headlines are always worth a second look when they hint at where the franchise may be headed. This version uses the strongest available stories to explain the main development clearly and keep the bigger picture in view.`,
     sections: [
       {
         heading: 'What is happening',
-        body: `The central story here is ${mainStory.title}. That headline matters because it gives fans a useful window into the current direction of Fallout coverage, whether it is tied to a release, a franchise update, or a broader industry development.`
+        body: `The core of the story is ${mainStory.title}. That headline matters because it gives fans a clear window into the current direction of Fallout coverage, whether it is tied to a release, a franchise update, or a broader industry development.`
       },
       {
-        heading: 'Why fans should care',
-        body: `Fallout fans tend to react strongly when a story points to changes in how the franchise is presented, discussed, or expanded. Even a relatively quiet update can matter if it changes expectations about upcoming content, community interest, or the larger conversation around the series.`
+        heading: 'Why this matters',
+        body: `For many fans, the value of a story like this is not just in the headline itself, but in what it suggests about the future. A single update can reshape expectations around timing, tone, and how much new Fallout content is really on the horizon.`
+      },
+      {
+        heading: 'A useful takeaway',
+        body: `The best way to think about it is simple: when the Fallout conversation starts to move, it is often because something bigger is brewing behind the scenes. That is why even a relatively quiet update can become important if it changes the mood of the fandom.`
       },
       {
         heading: 'What to watch next',
-        body: `The smartest follow-up is to keep an eye on ${supportText || 'the next official update'} and the way the wider community reacts once more details emerge. That usually gives fans a better sense of what is real, what is meaningful, and what could still change.`
+        body: `The smartest follow-up is to keep an eye on ${supportText || 'the next official update'} and the wider reaction once more details emerge. That usually gives fans a better read on what is real, what is meaningful, and what could still shift.`
       }
     ],
-    conclusion: 'The biggest takeaway is that the best Fallout stories are often the ones that connect a headline to the bigger picture, giving fans a clearer sense of what matters right now and what could matter next.',
+    conclusion: 'The clearest takeaway is that the most useful Fallout coverage is the kind that explains the story behind the headline, helping fans understand what matters now and why it deserves attention.',
     cta: 'What do you think is the most interesting part of this story?',
     sources: newsItems.slice(0, 3).map((item) => ({ title: item.title, url: item.link || 'https://fallout.fandom.com/wiki/Fallout_Wiki' }))
   };
@@ -265,16 +269,25 @@ async function createBloggerDraft(article) {
   const bodySections = Array.isArray(article.sections)
     ? article.sections.map((section) => `<h3>${section.heading}</h3><p>${section.body}</p>`).join('')
     : '';
+  const introHtml = article.intro ? `<p>${article.intro}</p>` : '';
+  const conclusionHtml = article.conclusion ? `<p>${article.conclusion}</p>` : '';
+  const ctaHtml = article.cta ? `<p><em>${article.cta}</em></p>` : '';
+  const sourceList = Array.isArray(article.sources) && article.sources.length > 0
+    ? `<h3>Sources</h3><ul>${article.sources.map((source) => `<li>${source.title} — <a href="${source.url}" target="_blank" rel="noopener noreferrer">${source.url}</a></li>`).join('')}</ul>`
+    : '';
 
   const postBody = {
     kind: 'blogger#post',
     title: article.title,
     content: `
-      <h2>${article.title}</h2>
-      <p>${article.intro}</p>
-      ${bodySections}
-      <p>${article.conclusion}</p>
-      <p><strong>${article.cta}</strong></p>
+      <article>
+        <h2>${article.title}</h2>
+        ${introHtml}
+        ${bodySections}
+        ${conclusionHtml}
+        ${ctaHtml}
+        ${sourceList}
+      </article>
     `,
     labels: ['fallout', 'automation', 'draft'],
     status: 'DRAFT'
