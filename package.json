@@ -1,0 +1,11 @@
+{
+  "name": "fallout-blog-automation",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "fallout:generate": "node tools/fallout-blog/generate.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
