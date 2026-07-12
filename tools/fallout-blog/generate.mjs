@@ -48,10 +48,10 @@ const CONTENT_SOURCES = [
   { name: 'Xbox Wire', url: 'https://news.xbox.com/en-us/feed/', weight: 1.45, category: 'news', tier: 'official', kind: 'rss' },
   { name: 'Bethesda — YouTube', url: 'https://www.youtube.com/feeds/videos.xml?channel_id=UCvZHe-SP3xC7DdOk4Ri8QBw', weight: 1.35, category: 'news', tier: 'official', kind: 'rss' },
   { name: 'Amazon Newsroom', url: 'https://www.aboutamazon.com/news/rss', weight: 1.15, category: 'news', tier: 'press', kind: 'rss' },
-  { name: 'Nexus — Fallout 4', url: 'https://www.nexusmods.com/fallout4/rss', weight: 1.15, category: 'mods', tier: 'community', kind: 'rss', headers: NEXUS_FEED_HEADERS },
-  { name: 'Nexus — New Vegas', url: 'https://www.nexusmods.com/falloutnewvegas/rss', weight: 1.1, category: 'mods', tier: 'community', kind: 'rss', headers: NEXUS_FEED_HEADERS },
-  { name: 'Nexus — Fallout 76', url: 'https://www.nexusmods.com/fallout76/rss', weight: 1.1, category: 'mods', tier: 'community', kind: 'rss', headers: NEXUS_FEED_HEADERS },
-  { name: 'Nexus — New Today', url: 'https://www.nexusmods.com/rss/newtoday', weight: 0.95, category: 'mods', tier: 'community', kind: 'rss', requiresFalloutMatch: true, headers: NEXUS_FEED_HEADERS },
+  { name: 'Nexus — Fallout 4', url: 'https://www.nexusmods.com/fallout4/rss', weight: 1.15, category: 'mods', tier: 'community', kind: 'rss', headers: NEXUS_FEED_HEADERS, skipInCi: true },
+  { name: 'Nexus — New Vegas', url: 'https://www.nexusmods.com/falloutnewvegas/rss', weight: 1.1, category: 'mods', tier: 'community', kind: 'rss', headers: NEXUS_FEED_HEADERS, skipInCi: true },
+  { name: 'Nexus — Fallout 76', url: 'https://www.nexusmods.com/fallout76/rss', weight: 1.1, category: 'mods', tier: 'community', kind: 'rss', headers: NEXUS_FEED_HEADERS, skipInCi: true },
+  { name: 'Nexus — New Today', url: 'https://www.nexusmods.com/rss/newtoday', weight: 0.95, category: 'mods', tier: 'community', kind: 'rss', requiresFalloutMatch: true, headers: NEXUS_FEED_HEADERS, skipInCi: true },
   { name: 'Kotaku', url: 'https://kotaku.com/rss', weight: 1.05, category: 'news', tier: 'press', kind: 'rss' },
   { name: 'Rock Paper Shotgun', url: 'https://www.rockpapershotgun.com/feed/', weight: 1.0, category: 'news', tier: 'press', kind: 'rss' },
   { name: 'PC Gamer', url: 'https://www.pcgamer.com/feed/', weight: 1.0, category: 'news', tier: 'press', kind: 'rss' },
@@ -371,18 +371,68 @@ const HIGH_VALUE_COMMUNITY_PATTERNS = [
   'theory', 'lore discussion', 'viral', 'breakdown', 'restored', 'museum'
 ];
 
+const RSS_REDDIT_MAX_HOT_RANK = 3;
+
+const LOW_EFFORT_REDDIT_PATTERNS = [
+  'discussion thread', 'megathread', 'daily thread', 'weekly thread', 'rant thread',
+  'thoughts on', 'what do you think', 'anyone else', 'unpopular opinion',
+  'looking for', 'recommend me', 'should i', 'is it worth', 'help me',
+  'question about', 'quick question', 'noob question', 'new player',
+  'rate my', 'roast my', 'fix my', 'bug report', 'glitch thread'
+];
+
+const RSS_MOD_SIGNAL_PATTERNS = [
+  'released', 'release', 'updated', 'update', 'overhaul', 'nexus',
+  'mod showcase', 'new mod', 'texture pack', 'wabbajack', 'load order',
+  'f4se', 'xedit', 'reshade', 'compatibility', 'patch', 'port to'
+];
+
 export function isNicheCommunityPost(item = {}) {
   const haystack = `${item.title} ${item.description}`.toLowerCase();
   return NICHE_COMMUNITY_PATTERNS.some((pattern) => haystack.includes(pattern));
+}
+
+export function isLowEffortRedditPost(item = {}) {
+  const title = item.title || '';
+  const haystack = `${title} ${item.description}`.toLowerCase();
+  if (/\?\s*$/.test(title.trim())) return true;
+  return LOW_EFFORT_REDDIT_PATTERNS.some((pattern) => haystack.includes(pattern));
+}
+
+export function hasRssModSignals(item = {}) {
+  const haystack = `${item.title} ${item.description}`.toLowerCase();
+  return RSS_MOD_SIGNAL_PATTERNS.some((pattern) => haystack.includes(pattern));
+}
+
+export function hasHighValueCommunitySignals(item = {}) {
+  const haystack = `${item.title} ${item.description}`.toLowerCase();
+  return HIGH_VALUE_COMMUNITY_PATTERNS.some((pattern) => haystack.includes(pattern));
 }
 
 function hasRedditEngagementMetrics(item = {}) {
   return item.redditScore != null || item.redditComments != null;
 }
 
+export function passesRssRedditQualityGate(item = {}) {
+  if (item.sourceKind !== 'reddit') return true;
+  if (hasRedditEngagementMetrics(item)) return true;
+
+  const rank = item.redditFeedRank ?? 99;
+  if (rank > RSS_REDDIT_MAX_HOT_RANK) return false;
+  if (isLowEffortRedditPost(item)) return false;
+
+  const contentType = detectContentType(item);
+  if (contentType === 'mods') return hasRssModSignals(item);
+  if (contentType === 'community') {
+    return hasHighValueCommunitySignals(item) && !isNicheCommunityPost(item);
+  }
+
+  return false;
+}
+
 export function meetsEngagementThreshold(item = {}) {
   if (item.sourceKind !== 'reddit') return true;
-  if (!hasRedditEngagementMetrics(item)) return true;
+  if (!hasRedditEngagementMetrics(item)) return passesRssRedditQualityGate(item);
 
   const minScore = item.minScore ?? 50;
   const minComments = item.minComments ?? 10;
@@ -391,7 +441,7 @@ export function meetsEngagementThreshold(item = {}) {
 
 export function meetsHighEngagementThreshold(item = {}) {
   if (item.sourceKind !== 'reddit') return true;
-  if (!hasRedditEngagementMetrics(item)) return true;
+  if (!hasRedditEngagementMetrics(item)) return false;
 
   const minScore = Math.round((item.minScore ?? 50) * 2.5);
   const minComments = Math.round((item.minComments ?? 10) * 2);
@@ -421,6 +471,10 @@ export function engagementBonus(item = {}) {
 }
 
 export function compareCandidatePriority(a, b) {
+  const metricsA = a.sourceKind === 'reddit' && hasRedditEngagementMetrics(a) ? 1 : 0;
+  const metricsB = b.sourceKind === 'reddit' && hasRedditEngagementMetrics(b) ? 1 : 0;
+  if (metricsB !== metricsA) return metricsB - metricsA;
+
   if (b.score !== a.score) return b.score - a.score;
   const engagementA = (a.redditScore ?? 0) + (a.redditComments ?? 0) * 2;
   const engagementB = (b.redditScore ?? 0) + (b.redditComments ?? 0) * 2;
@@ -605,6 +659,7 @@ function scoreItem(item, source) {
   score += freshnessBonus(item.publishedAt);
   score += Math.min((item.description || '').length / 180, 1.8);
   score += engagementBonus(item);
+  if (item.sourceKind === 'reddit' && !hasRedditEngagementMetrics(item)) score -= 2.5;
 
   if (source.tier === 'official') score += 1.8;
   if (haystack.includes('fallout')) score += 1.5;
@@ -1593,7 +1648,7 @@ const REDDIT_MOD_POST_PATTERNS = [
 
 export function parseRedditRssFeed(xmlText = '', source = {}) {
   return extractFeedItems(xmlText)
-    .map((item) => {
+    .map((item, index) => {
       const title = cleanText(item.title || '');
       const link = item.link || '';
       const description = cleanText(item.description || item.title || '').slice(0, 1200);
@@ -1606,6 +1661,7 @@ export function parseRedditRssFeed(xmlText = '', source = {}) {
         publishedAt: item.publishedAt,
         redditScore: null,
         redditComments: null,
+        redditFeedRank: index + 1,
         isStickied: isModeratorPost,
         over18: false,
         sourceKind: 'reddit',
@@ -1652,15 +1708,54 @@ async function fetchRedditRssItems(source) {
   return parseRedditRssFeed(xml, source);
 }
 
+function normalizeRedditTitleKey(title = '') {
+  return normalizeStoryText(title).slice(0, 120);
+}
+
+async function enrichRssItemsWithRedditJson(items = [], source) {
+  if (items.length === 0 || items.every((item) => hasRedditEngagementMetrics(item))) {
+    return items;
+  }
+
+  const shouldEnrich = process.env.REDDIT_ENRICH_ENGAGEMENT !== 'false';
+  if (!shouldEnrich) return items;
+
+  try {
+    const jsonItems = await fetchRedditJsonItems(source);
+    const metricsByTitle = new Map(
+      jsonItems.map((item) => [normalizeRedditTitleKey(item.title), {
+        redditScore: item.redditScore,
+        redditComments: item.redditComments
+      }])
+    );
+
+    return items.map((item) => {
+      const metrics = metricsByTitle.get(normalizeRedditTitleKey(item.title));
+      if (!metrics) return item;
+      return {
+        ...item,
+        redditScore: metrics.redditScore,
+        redditComments: metrics.redditComments
+      };
+    });
+  } catch {
+    return items;
+  }
+}
+
 async function fetchRedditSourceItems(source) {
   const strategies = getRedditFetchStrategies();
   const errors = [];
 
   for (const strategy of strategies) {
     try {
-      const items = strategy === 'rss'
+      let items = strategy === 'rss'
         ? await fetchRedditRssItems(source)
         : await fetchRedditJsonItems(source);
+
+      if (strategy === 'rss') {
+        items = await enrichRssItemsWithRedditJson(items, source);
+      }
 
       return items
         .filter((item) => isRelevantFalloutItem(item, source))
@@ -1705,8 +1800,18 @@ async function fetchContentItems() {
 
   let feedHealth = await loadFeedHealth();
   const skippedFeeds = [];
+  const cachedSourceCount = Object.keys(feedHealth).length;
+
+  if (cachedSourceCount > 0) {
+    const unhealthyOnLoad = getUnhealthyFeedSources(feedHealth);
+    console.log(`Feed health loaded: ${cachedSourceCount} source(s), ${unhealthyOnLoad.length} unhealthy.`);
+  }
 
   const activeJobs = sourceJobs.filter(({ source }) => {
+    if (source.skipInCi && process.env.CI === 'true') {
+      skippedFeeds.push(source.name);
+      return false;
+    }
     if (shouldSkipFeedSource(source.name, feedHealth)) {
       skippedFeeds.push(source.name);
       return false;

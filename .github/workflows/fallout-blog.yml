@@ -17,6 +17,7 @@ jobs:
       GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
       BLOGGER_BLOG_ID: ${{ secrets.BLOGGER_BLOG_ID }}
       REDDIT_FETCH_DELAY_MS: 4500
+      REDDIT_SUBREDDITS: fallout,FalloutMods
     steps:
       - name: Check out repository
         uses: actions/checkout@v4

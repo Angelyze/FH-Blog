@@ -29,8 +29,11 @@ import {
   isDuplicateArticleTitle,
   isPublishableArticle,
   isTitleLengthValid,
+  compareCandidatePriority,
   meetsEngagementThreshold,
   meetsMinimumSourceQuality,
+  passesRssRedditQualityGate,
+  passesCommunityQualityGate,
   parseRedditListing,
   parseRedditRssFeed,
   parseRssDate,
@@ -267,17 +270,93 @@ test('selectStoriesForGeneration skips fuzzy topic matches in history', () => {
   assert.deepEqual(fresh.map((story) => story.title), ['Bethesda teases more Fallout news']);
 });
 
-test('meetsEngagementThreshold allows Reddit RSS items without score metadata', () => {
+test('meetsEngagementThreshold rejects Reddit RSS items without score metadata by default', () => {
   assert.equal(
     meetsEngagementThreshold({
       sourceKind: 'reddit',
       redditScore: null,
       redditComments: null,
       minScore: 150,
-      minComments: 35
+      minComments: 35,
+      title: 'Random Fallout 76 chat thread',
+      description: 'Just sharing some thoughts.'
+    }),
+    false
+  );
+});
+
+test('passesRssRedditQualityGate allows top hot mod posts with release signals', () => {
+  assert.equal(
+    passesRssRedditQualityGate({
+      sourceKind: 'reddit',
+      redditFeedRank: 2,
+      title: 'New Appalachia overhaul mod released on Nexus',
+      description: 'A major visual overhaul with updated textures and lighting.'
     }),
     true
   );
+});
+
+test('passesRssRedditQualityGate rejects discussion threads and low-effort posts', () => {
+  assert.equal(
+    passesRssRedditQualityGate({
+      sourceKind: 'reddit',
+      redditFeedRank: 1,
+      title: 'Fallout 76 Season 18 discussion thread',
+      description: 'Players are comparing the new seasonal rewards.'
+    }),
+    false
+  );
+  assert.equal(
+    passesRssRedditQualityGate({
+      sourceKind: 'reddit',
+      redditFeedRank: 1,
+      title: 'Thoughts on the latest Fallout update?',
+      description: 'What do you think about the changes?'
+    }),
+    false
+  );
+});
+
+test('passesRssRedditQualityGate allows high-value community posts in the top hot slots', () => {
+  assert.equal(
+    passesRssRedditQualityGate({
+      sourceKind: 'reddit',
+      redditFeedRank: 1,
+      title: 'Incredible Vault Dweller cosplay [OC]',
+      description: 'Built over six months with a working Pip-Boy.'
+    }),
+    true
+  );
+});
+
+test('passesCommunityQualityGate blocks RSS Reddit posts beyond the top hot slots', () => {
+  assert.equal(
+    passesCommunityQualityGate({
+      sourceKind: 'reddit',
+      redditFeedRank: 5,
+      title: 'New Appalachia overhaul mod released on Nexus',
+      description: 'A major visual overhaul with updated textures and lighting.'
+    }),
+    false
+  );
+});
+
+test('compareCandidatePriority prefers Reddit items with engagement metrics', () => {
+  const withMetrics = {
+    sourceKind: 'reddit',
+    score: 8,
+    redditScore: 420,
+    redditComments: 55
+  };
+  const withoutMetrics = {
+    sourceKind: 'reddit',
+    score: 12,
+    redditScore: null,
+    redditComments: null
+  };
+
+  assert.ok(compareCandidatePriority(withMetrics, withoutMetrics) < 0);
 });
 
 test('parseRedditRssFeed maps subreddit RSS into story items', () => {
@@ -295,6 +374,7 @@ test('parseRedditRssFeed maps subreddit RSS into story items', () => {
   assert.equal(items.length, 1);
   assert.equal(items[0].sourceKind, 'reddit');
   assert.equal(items[0].redditScore, null);
+  assert.equal(items[0].redditFeedRank, 1);
   assert.match(items[0].description, /seasonal rewards/);
 });
 
