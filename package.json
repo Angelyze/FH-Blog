@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "fallout:generate": "node tools/fallout-blog/generate.mjs"
+    "fallout:generate": "node tools/fallout-blog/generate.mjs",
+    "test": "node --test tools/fallout-blog/generate.test.mjs"
   },
   "engines": {
     "node": ">=20"

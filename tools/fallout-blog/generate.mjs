@@ -8,7 +8,11 @@ const ROOT = process.cwd();
 const OUTPUT_DIR = path.join(ROOT, 'artifacts');
 const OUTPUT_FILE = path.join(OUTPUT_DIR, 'latest-draft.json');
 const HISTORY_FILE = path.join(ROOT, 'data', 'story-history.json');
+const FEED_HEALTH_FILE = path.join(ROOT, 'data', 'feed-health.json');
 const HISTORY_RETENTION_DAYS = 21;
+const TITLE_HISTORY_DAYS = 14;
+const MIN_TITLE_CHARS = 20;
+const MAX_TITLE_CHARS = 70;
 const MIN_DESCRIPTION_LENGTH = 80;
 const MIN_ARTICLE_WORDS = 650;
 const SEO_DESCRIPTION_TARGET_CHARS = 150;
@@ -31,7 +35,15 @@ const CONTENT_SOURCES = [
   { name: 'The Verge', url: 'https://www.theverge.com/rss/index.xml', weight: 1.1, category: 'news', tier: 'press', kind: 'rss' },
   { name: 'Steam — Fallout 76', url: 'https://store.steampowered.com/feeds/news/app/22370/?l=english&cc=US', weight: 1.2, category: 'news', tier: 'official', kind: 'rss' },
   { name: 'Steam — Fallout 4', url: 'https://store.steampowered.com/feeds/news/app/377160/?l=english&cc=US', weight: 1.1, category: 'news', tier: 'official', kind: 'rss' },
+  { name: 'Steam — New Vegas', url: 'https://store.steampowered.com/feeds/news/app/22380/?l=english&cc=US', weight: 1.05, category: 'news', tier: 'official', kind: 'rss' },
+  { name: 'Xbox Wire', url: 'https://news.xbox.com/en-us/feed/', weight: 1.4, category: 'news', tier: 'official', kind: 'rss' },
+  { name: 'Bethesda — YouTube', url: 'https://www.youtube.com/feeds/videos.xml?channel_id=UCvBewYc8vMf5RsSMQsoGv8g', weight: 1.35, category: 'news', tier: 'official', kind: 'rss' },
+  { name: 'Amazon Newsroom', url: 'https://press.aboutamazon.com/news-releases/rss', weight: 1.15, category: 'news', tier: 'press', kind: 'rss' },
   { name: 'Nexus Mods', url: 'https://www.nexusmods.com/news/rss', weight: 1.35, category: 'mods', tier: 'community', kind: 'rss' },
+  { name: 'Nexus — Fallout 4', url: 'https://www.nexusmods.com/fallout4/rss', weight: 1.45, category: 'mods', tier: 'community', kind: 'rss' },
+  { name: 'Nexus — New Vegas', url: 'https://www.nexusmods.com/falloutnewvegas/rss', weight: 1.4, category: 'mods', tier: 'community', kind: 'rss' },
+  { name: 'Nexus — Fallout 76', url: 'https://www.nexusmods.com/fallout76/rss', weight: 1.4, category: 'mods', tier: 'community', kind: 'rss' },
+  { name: 'Nexus — New Today', url: 'https://www.nexusmods.com/rss/newtoday', weight: 1.2, category: 'mods', tier: 'community', kind: 'rss', requiresFalloutMatch: true },
   { name: 'Kotaku', url: 'https://kotaku.com/rss', weight: 1.05, category: 'news', tier: 'press', kind: 'rss' },
   { name: 'Rock Paper Shotgun', url: 'https://www.rockpapershotgun.com/feed/', weight: 1.0, category: 'news', tier: 'press', kind: 'rss' },
   { name: 'PC Gamer', url: 'https://www.pcgamer.com/feed/', weight: 1.0, category: 'news', tier: 'press', kind: 'rss' }
@@ -235,10 +247,36 @@ export function isVagueTitle(title = '') {
   return VAGUE_TITLE_PATTERNS.some((pattern) => pattern.test(normalized));
 }
 
-export function isPublishableArticle(article = {}, { mode = 'llm-generated' } = {}) {
+export function isTitleLengthValid(title = '') {
+  const chars = countChars(title);
+  return chars >= MIN_TITLE_CHARS && chars <= MAX_TITLE_CHARS;
+}
+
+export function isDuplicateArticleTitle(title = '', historyEntries = [], { withinDays = TITLE_HISTORY_DAYS } = {}) {
+  const cutoff = Date.now() - withinDays * 24 * 60 * 60 * 1000;
+
+  return historyEntries.some((entry) => {
+    if (!entry.articleTitle || entry.coveredAt < cutoff) return false;
+    return areTopicsSimilar(entry.articleTitle, title);
+  });
+}
+
+export function getTitleValidationIssue(title = '', historyEntries = []) {
+  if (!String(title).trim()) return 'empty-title';
+  if (isVagueTitle(title)) return 'vague-title';
+  if (!isTitleLengthValid(title)) return 'title-length';
+  if (isDuplicateArticleTitle(title, historyEntries)) return 'duplicate-title';
+  return null;
+}
+
+export function isValidArticleTitle(title = '', historyEntries = []) {
+  return getTitleValidationIssue(title, historyEntries) === null;
+}
+
+export function isPublishableArticle(article = {}, { mode = 'llm-generated', historyEntries = [] } = {}) {
   if (mode !== 'llm-generated') return false;
   if (!isArticleSubstantive(article)) return false;
-  if (isVagueTitle(article.title)) return false;
+  if (!isValidArticleTitle(article.title, historyEntries)) return false;
   return true;
 }
 
@@ -735,16 +773,8 @@ function getContentTypeLabel(contentType, trustLevel = 'confirmed') {
   }
 }
 
-function buildPrompt(newsItems, { expansion = false, previousArticle = null } = {}) {
-  const mainStory = newsItems[0];
-  const contentType = mainStory.contentType || 'news';
-  const trustLevel = mainStory.trustLevel || detectTrustLevel(mainStory, {
-    tier: mainStory.sourceTier,
-    category: contentType
-  });
-  const reportingOutlet = resolveReportingOutlet(mainStory);
-  const contextStories = newsItems.slice(0, 5);
-  const contextText = contextStories
+function buildPromptContext(newsItems = []) {
+  return newsItems.slice(0, 5)
     .map((item, index) => {
       const ageLabel = item.publishedAt
         ? `${Math.max(1, Math.round((Date.now() - item.publishedAt) / (1000 * 60 * 60)))}h ago`
@@ -759,21 +789,10 @@ function buildPrompt(newsItems, { expansion = false, previousArticle = null } = 
    Summary: ${summary}${item.link ? `\n   URL: ${item.link}` : ''}`;
     })
     .join('\n\n');
+}
 
-  const expansionNote = expansion
-    ? `\nIMPORTANT: The previous draft was too short and too generic. Rewrite it as a substantially deeper article.
-Previous draft title: ${previousArticle?.title || 'unknown'}
-Previous word count: ${getArticleWordCount(previousArticle || {})}
-You must exceed ${MIN_ARTICLE_WORDS} words and include more concrete detail from the summaries below.\n`
-    : '';
-
-  return `${expansionNote}You are the lead editor of ${BRAND_NAME}, a Fallout fan blog built to be a trusted daily destination — accurate, useful, and worth sharing.
-
-Your mission: help Fallout fans quickly understand what happened (or what is worth seeing), why it matters, and where to look next. Readers should feel confident sharing ${BRAND_NAME} posts because the facts are sourced, the framing is honest, and the value is clear.
-
-${getContentTypeGuidance(contentType, trustLevel)}
-
-TRUST AND EDITORIAL STANDARDS:
+function buildPromptTrustSection(trustLevel, reportingOutlet) {
+  return `TRUST AND EDITORIAL STANDARDS:
 - Use ONLY the material below. Never invent facts, dates, quotes, patch notes, or creator names.
 - trustLevel for this post: ${trustLevel} (${getTrustLabel(trustLevel)})
 - Primary reporting outlet to attribute: ${reportingOutlet}
@@ -781,25 +800,13 @@ TRUST AND EDITORIAL STANDARDS:
 - If trustLevel is "confirmed", write about established facts but still cite sources
 - If trustLevel is "community-highlight", make clear this is fan-created content
 - If a detail is missing from the sources, say "details are still limited" instead of guessing
-- Include a keyFacts array with 3-5 bullet points a busy reader can scan in 10 seconds
+- Include a keyFacts array with 3-5 bullet points a busy reader can scan in 10 seconds`;
+}
 
-SHORTLISTED STORIES:
-${contextText}
-
-MAIN STORY TO LEAD WITH: ${mainStory.title}
-
-Write one polished article in English that fans would genuinely click, read, and share.
-
-VOICE AND STYLE:
-- Confident, warm, and knowledgeable — like a trusted fan-site editor, not a content farm
-- Assume readers know Fallout, but explain enough context that newcomers still get value
-- Lead with the single most compelling fact or hook, with honest framing about what is confirmed vs reported
-- Every paragraph must deliver insight, not filler
-- Make the post feel organically shareable: specific, useful, and clearly worth 3 minutes
-
-ARTICLE REQUIREMENTS:
-- seoDescription: a standalone meta description of 120-160 characters (target exactly 150). One or two tight sentences for Blogger/Google search snippets — summarize the story hook and why Fallout fans should care. Include honest framing if press-report. No bullet points.
-- title: specific and click-worthy without clickbait — make fans want to know more
+function buildSharedArticleRequirements(contentType, trustLevel, reportingOutlet) {
+  return `ARTICLE REQUIREMENTS:
+- seoDescription: a standalone meta description of 120-160 characters (target exactly 150). One or two tight sentences for Blogger/Google search snippets.
+- title: specific, ${MIN_TITLE_CHARS}-${MAX_TITLE_CHARS} characters, click-worthy without clickbait — name the game, mod, event, or creator when possible
 - subtitle: one sentence explaining the value proposition; for press-report, mention it is based on reporting
 - intro: 3-4 sentences with a strong hook; if press-report, clearly state this is reported by ${reportingOutlet} and not confirmed by the developer/publisher
 - keyFacts: 3-5 short scannable bullet points (only facts supported by sources)
@@ -812,6 +819,112 @@ ARTICLE REQUIREMENTS:
 - sources: array of {title, url, type} where type is "official", "press", or "community"
 
 Return valid JSON only with these fields: title, seoDescription, subtitle, intro, keyFacts, sections, conclusion, takeaway, cta, contentType, trustLevel, sources`;
+}
+
+function buildNewsPrompt(newsItems, context) {
+  const mainStory = newsItems[0];
+  const trustLevel = mainStory.trustLevel || detectTrustLevel(mainStory, { tier: mainStory.sourceTier, category: 'news' });
+  const reportingOutlet = resolveReportingOutlet(mainStory);
+
+  return `You are the lead editor of ${BRAND_NAME}, writing a Fallout NEWS brief fans will trust and share.
+
+${getContentTypeGuidance('news', trustLevel)}
+
+NEWS WRITING RULES:
+- Lead with the most newsworthy confirmed or reported fact first
+- Name the game, platform, studio, or show when known from sources
+- Separate official facts from press reports and fan reaction
+- Use an informative newsroom tone — not hype, not rumor-chasing
+- Help readers understand timing, scope, and why the franchise conversation shifted
+
+${buildPromptTrustSection(trustLevel, reportingOutlet)}
+
+SHORTLISTED STORIES:
+${context}
+
+MAIN STORY TO LEAD WITH: ${mainStory.title}
+
+${buildSharedArticleRequirements('news', trustLevel, reportingOutlet)}`;
+}
+
+function buildModsPrompt(newsItems, context) {
+  const mainStory = newsItems[0];
+  const trustLevel = mainStory.trustLevel || detectTrustLevel(mainStory, { tier: mainStory.sourceTier, category: 'mods' });
+  const reportingOutlet = resolveReportingOutlet(mainStory);
+
+  return `You are the lead editor of ${BRAND_NAME}, writing a MOD SPOTLIGHT for Fallout players deciding what to install next.
+
+${getContentTypeGuidance('mods', trustLevel)}
+
+MOD SPOTLIGHT RULES:
+- Open with what the mod changes in practical gameplay or visuals
+- Credit the creator/mod page and make clear this is community-made, not official Bethesda content
+- Mention game, platform, requirements, or compatibility only if present in sources
+- Explain who should care: returning players, screenshot fans, survivalists, lore hunters, etc.
+- Avoid breaking-news tone — this is a useful recommendation, not an announcement
+
+${buildPromptTrustSection(trustLevel, reportingOutlet)}
+
+SHORTLISTED STORIES:
+${context}
+
+MAIN MOD TO SPOTLIGHT: ${mainStory.title}
+
+${buildSharedArticleRequirements('mods', trustLevel, reportingOutlet)}`;
+}
+
+function buildCommunityPrompt(newsItems, context) {
+  const mainStory = newsItems[0];
+  const trustLevel = mainStory.trustLevel || detectTrustLevel(mainStory, { tier: mainStory.sourceTier, category: 'community' });
+  const reportingOutlet = resolveReportingOutlet(mainStory);
+
+  return `You are the lead editor of ${BRAND_NAME}, spotlighting something the Fallout community created and would enjoy sharing.
+
+${getContentTypeGuidance('community', trustLevel)}
+
+COMMUNITY HIGHLIGHT RULES:
+- Celebrate the creator, build, artwork, cosplay, lore thread, or project clearly
+- Make the opening feel human and shareable, not like a press release
+- Explain why this stands out in the fandom and who will appreciate it
+- Credit the source thread or creator path from the summaries
+- Never frame fan work as official news or a Bethesda announcement
+
+${buildPromptTrustSection(trustLevel, reportingOutlet)}
+
+SHORTLISTED STORIES:
+${context}
+
+MAIN COMMUNITY STORY TO LEAD WITH: ${mainStory.title}
+
+${buildSharedArticleRequirements('community', trustLevel, reportingOutlet)}`;
+}
+
+function buildPrompt(newsItems, { expansion = false, previousArticle = null } = {}) {
+  const mainStory = newsItems[0];
+  const contentType = mainStory.contentType || 'news';
+  const contextText = buildPromptContext(newsItems);
+
+  const expansionNote = expansion
+    ? `IMPORTANT: The previous draft was too short and too generic. Rewrite it as a substantially deeper article.
+Previous draft title: ${previousArticle?.title || 'unknown'}
+Previous word count: ${getArticleWordCount(previousArticle || {})}
+You must exceed ${MIN_ARTICLE_WORDS} words and include more concrete detail from the summaries below.\n\n`
+    : '';
+
+  let body;
+  switch (contentType) {
+    case 'mods':
+      body = buildModsPrompt(newsItems, contextText);
+      break;
+    case 'community':
+      body = buildCommunityPrompt(newsItems, contextText);
+      break;
+    default:
+      body = buildNewsPrompt(newsItems, contextText);
+      break;
+  }
+
+  return `${expansionNote}${body}`;
 }
 
 function buildFallbackArticle(newsItems) {
@@ -1028,13 +1141,76 @@ async function loadStoryHistory() {
   }
 }
 
-async function saveStoryHistory(existingEntries, selectedStories) {
+async function loadFeedHealth() {
+  try {
+    const raw = await fs.readFile(FEED_HEALTH_FILE, 'utf8');
+    const parsed = JSON.parse(raw);
+    return parsed?.sources && typeof parsed.sources === 'object' ? parsed.sources : {};
+  } catch {
+    return {};
+  }
+}
+
+async function saveFeedHealth(sources = {}) {
+  await fs.mkdir(path.dirname(FEED_HEALTH_FILE), { recursive: true });
+  await fs.writeFile(FEED_HEALTH_FILE, JSON.stringify({
+    updatedAt: new Date().toISOString(),
+    sources
+  }, null, 2));
+}
+
+export function recordFeedHealthResult(existing = {}, sourceName, { success, itemCount = 0, error = null } = {}) {
+  const previous = existing[sourceName] || {
+    successStreak: 0,
+    failureStreak: 0,
+    lastSuccessAt: null,
+    lastErrorAt: null,
+    lastError: null,
+    lastItemCount: 0
+  };
+  const now = Date.now();
+
+  if (success) {
+    return {
+      ...existing,
+      [sourceName]: {
+        ...previous,
+        successStreak: previous.failureStreak > 0 ? 1 : previous.successStreak + 1,
+        failureStreak: 0,
+        lastSuccessAt: now,
+        lastError: null,
+        lastItemCount: itemCount
+      }
+    };
+  }
+
+  return {
+    ...existing,
+    [sourceName]: {
+      ...previous,
+      successStreak: 0,
+      failureStreak: previous.successStreak > 0 ? 1 : previous.failureStreak + 1,
+      lastErrorAt: now,
+      lastError: error || 'unknown error',
+      lastItemCount: 0
+    }
+  };
+}
+
+export function getUnhealthyFeedSources(sources = {}, { minFailureStreak = 3 } = {}) {
+  return Object.entries(sources)
+    .filter(([, stats]) => (stats.failureStreak || 0) >= minFailureStreak)
+    .map(([name, stats]) => ({ name, failureStreak: stats.failureStreak, lastError: stats.lastError }));
+}
+
+async function saveStoryHistory(existingEntries, selectedStories, article = {}) {
   const now = Date.now();
   const newEntries = selectedStories.map((item) => ({
     fingerprint: getStoryKey(item),
     topicFingerprint: getStoryTopicKey(item),
     contentType: item.contentType || 'news',
     title: item.title,
+    articleTitle: article.title || null,
     source: item.source,
     coveredAt: now
   }));
@@ -1162,9 +1338,13 @@ async function fetchFeed(url) {
 }
 
 function isRelevantFalloutItem(item, source) {
-  const haystack = `${item.title} ${item.description}`.toLowerCase();
+  const haystack = `${item.title} ${item.description} ${item.link || ''}`.toLowerCase();
   const hasRelevantKeyword = FALLOUT_KEYWORDS.some((term) => haystack.includes(term)) || haystack.includes('fallout');
   const hasNoise = NOISE_TERMS.some((term) => haystack.includes(term));
+
+  if (source.requiresFalloutMatch) {
+    return hasRelevantKeyword && !hasNoise;
+  }
 
   if (source.kind === 'reddit' || source.category === 'community' || source.category === 'mods') {
     return !hasNoise;
@@ -1271,6 +1451,8 @@ async function fetchContentItems() {
     ...REDDIT_SOURCES.map((source) => ({ source, kind: 'reddit' }))
   ];
 
+  let feedHealth = await loadFeedHealth();
+
   const results = await Promise.allSettled(
     sourceJobs.map(async ({ source, kind }) => {
       if (kind === 'reddit') {
@@ -1287,16 +1469,37 @@ async function fetchContentItems() {
     const sourceName = sourceJobs[index].source.name;
     if (result.status === 'fulfilled') {
       collected.push(...result.value);
+      feedHealth = recordFeedHealthResult(feedHealth, sourceName, {
+        success: true,
+        itemCount: result.value.length
+      });
     } else {
-      feedErrors.push(`${sourceName}: ${result.reason?.message || 'unknown error'}`);
+      const message = result.reason?.message || 'unknown error';
+      feedErrors.push(`${sourceName}: ${message}`);
+      feedHealth = recordFeedHealthResult(feedHealth, sourceName, {
+        success: false,
+        error: message
+      });
     }
   }
+
+  await saveFeedHealth(feedHealth);
 
   if (feedErrors.length > 0) {
     console.warn(`Feed warnings (${feedErrors.length}): ${feedErrors.slice(0, 5).join(' | ')}`);
   }
 
-  return dedupeCollectedItems(collected);
+  const unhealthy = getUnhealthyFeedSources(feedHealth);
+  if (unhealthy.length > 0) {
+    console.warn(`Unhealthy feeds (${unhealthy.length}): ${unhealthy.map((entry) => `${entry.name} (${entry.failureStreak}x)`).join(', ')}`);
+  }
+
+  return {
+    items: dedupeCollectedItems(collected),
+    feedHealth,
+    feedErrors,
+    unhealthyFeeds: unhealthy
+  };
 }
 
 function getBloggerLabels(article = {}) {
@@ -1348,7 +1551,7 @@ async function createBloggerDraft(article) {
 
 async function main() {
   await fs.mkdir(OUTPUT_DIR, { recursive: true });
-  const contentItems = await fetchContentItems();
+  const { items: contentItems, feedHealth, feedErrors, unhealthyFeeds } = await fetchContentItems();
   const localHistory = await loadStoryHistory();
   const featuredItems = pickFeaturedStory(contentItems, localHistory);
 
@@ -1380,7 +1583,7 @@ async function main() {
     console.warn(`LLM generation failed, using fallback article: ${error.message}`);
   }
 
-  const publishable = isPublishableArticle(article, { mode });
+  const publishable = isPublishableArticle(article, { mode, historyEntries: localHistory });
   let bloggerPost = null;
   let bloggerError = null;
   let publishSkippedReason = null;
@@ -1390,10 +1593,8 @@ async function main() {
       publishSkippedReason = 'fallback-template';
     } else if (!isArticleSubstantive(article)) {
       publishSkippedReason = 'article-not-substantive';
-    } else if (isVagueTitle(article.title)) {
-      publishSkippedReason = 'vague-title';
     } else {
-      publishSkippedReason = 'not-publishable';
+      publishSkippedReason = getTitleValidationIssue(article.title, localHistory) || 'not-publishable';
     }
     console.warn(`Blogger draft skipped: ${publishSkippedReason}`);
   } else {
@@ -1401,7 +1602,7 @@ async function main() {
       bloggerPost = await createBloggerDraft(article);
       if (bloggerPost) {
         console.log('Blogger draft created successfully.');
-        await saveStoryHistory(localHistory, substantiveItems.slice(0, 1));
+        await saveStoryHistory(localHistory, substantiveItems.slice(0, 1), article);
       }
     } catch (error) {
       bloggerError = error;
@@ -1418,9 +1619,15 @@ async function main() {
     article,
     articleWordCount: getArticleWordCount(article),
     seoDescriptionCharCount: countChars(article.seoDescription),
+    titleCharCount: countChars(article.title),
     isSubstantive: isArticleSubstantive(article),
     publishable,
     publishSkippedReason,
+    feedHealthSummary: {
+      totalSources: Object.keys(feedHealth).length,
+      errorsToday: feedErrors.length,
+      unhealthyFeeds
+    },
     bloggerPost,
     generationError: generationError ? generationError.message : null,
     bloggerError: bloggerError ? bloggerError.message : null,

@@ -16,12 +16,17 @@ import {
   getStoryFingerprint,
   getStoryTopicFingerprint,
   getStoryTopicKey,
+  getTitleValidationIssue,
+  getUnhealthyFeedSources,
   isArticleSubstantive,
+  isDuplicateArticleTitle,
   isPublishableArticle,
+  isTitleLengthValid,
   meetsMinimumSourceQuality,
   parseRedditListing,
   parseRssDate,
   pickFeaturedStory,
+  recordFeedHealthResult,
   resolveReportingOutlet,
   selectStoriesForGeneration,
   trimToCharCount
@@ -280,6 +285,48 @@ test('parseRedditListing maps hot posts into story items', () => {
   assert.match(items[0].description, /working Pip-Boy/);
 });
 
+test('isTitleLengthValid enforces SEO-friendly title bounds', () => {
+  assert.equal(isTitleLengthValid('Fallout 76 Season 18 adds new daily challenges'), true);
+  assert.equal(isTitleLengthValid('Short'), false);
+  assert.equal(isTitleLengthValid('A'.repeat(71)), false);
+});
+
+test('isDuplicateArticleTitle catches near-duplicate published titles', () => {
+  const history = [{
+    articleTitle: 'Fallout 76 Season 18 adds new daily challenges',
+    coveredAt: Date.now() - (2 * 24 * 60 * 60 * 1000)
+  }];
+
+  assert.equal(
+    isDuplicateArticleTitle('Season 18 brings new daily challenges to Fallout 76', history),
+    true
+  );
+  assert.equal(
+    isDuplicateArticleTitle('New Fallout TV season 2 teaser breakdown', history),
+    false
+  );
+});
+
+test('getTitleValidationIssue reports specific title problems', () => {
+  const history = [{ articleTitle: 'Fallout 76 Season 18 goes live', coveredAt: Date.now() }];
+  assert.equal(getTitleValidationIssue('Why the latest Fallout news matters right now', history), 'vague-title');
+  assert.equal(getTitleValidationIssue('Tiny', history), 'title-length');
+  assert.equal(getTitleValidationIssue('Fallout 76 Season 18 goes live today', history), 'duplicate-title');
+});
+
+test('recordFeedHealthResult tracks streaks and unhealthy feeds', () => {
+  let health = {};
+  health = recordFeedHealthResult(health, 'IGN', { success: true, itemCount: 2 });
+  health = recordFeedHealthResult(health, 'IGN', { success: false, error: 'timeout' });
+  health = recordFeedHealthResult(health, 'IGN', { success: false, error: 'timeout' });
+  health = recordFeedHealthResult(health, 'IGN', { success: false, error: 'timeout' });
+
+  const unhealthy = getUnhealthyFeedSources(health);
+  assert.equal(unhealthy.length, 1);
+  assert.equal(unhealthy[0].name, 'IGN');
+  assert.equal(unhealthy[0].failureStreak, 3);
+});
+
 test('isPublishableArticle rejects fallback and thin drafts', () => {
   const sectionBody = 'Fallout 76 players are getting new seasonal rewards, revised daily challenges, and quality-of-life fixes that make the live-service loop feel fresher for returning vault dwellers across Appalachia this week. The update also reshapes how fans farm cores, complete dailies, and talk about endgame pacing online. '.repeat(4);
   const substantive = {
@@ -294,10 +341,14 @@ test('isPublishableArticle rejects fallback and thin drafts', () => {
   };
 
   assert.ok(getArticleWordCount(substantive) >= 650);
-  assert.equal(isPublishableArticle(substantive, { mode: 'llm-generated' }), true);
-  assert.equal(isPublishableArticle(substantive, { mode: 'fallback-template' }), false);
+  assert.equal(isPublishableArticle(substantive, { mode: 'llm-generated', historyEntries: [] }), true);
+  assert.equal(isPublishableArticle(substantive, { mode: 'fallback-template', historyEntries: [] }), false);
   assert.equal(
-    isPublishableArticle({ ...substantive, title: 'Why the latest Fallout news matters right now' }, { mode: 'llm-generated' }),
+    isPublishableArticle({ ...substantive, title: 'Why the latest Fallout news matters right now' }, { mode: 'llm-generated', historyEntries: [] }),
+    false
+  );
+  assert.equal(
+    isPublishableArticle({ ...substantive, title: 'A'.repeat(71) }, { mode: 'llm-generated', historyEntries: [] }),
     false
   );
 });
