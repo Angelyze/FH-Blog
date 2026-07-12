@@ -272,9 +272,6 @@ async function createBloggerDraft(article) {
   const introHtml = article.intro ? `<p>${article.intro}</p>` : '';
   const conclusionHtml = article.conclusion ? `<p>${article.conclusion}</p>` : '';
   const ctaHtml = article.cta ? `<p><em>${article.cta}</em></p>` : '';
-  const sourceList = Array.isArray(article.sources) && article.sources.length > 0
-    ? `<h3>Sources</h3><ul>${article.sources.map((source) => `<li>${source.title} — <a href="${source.url}" target="_blank" rel="noopener noreferrer">${source.url}</a></li>`).join('')}</ul>`
-    : '';
 
   const postBody = {
     kind: 'blogger#post',
@@ -286,11 +283,11 @@ async function createBloggerDraft(article) {
         ${bodySections}
         ${conclusionHtml}
         ${ctaHtml}
-        ${sourceList}
       </article>
     `,
     labels: ['fallout', 'automation', 'draft'],
-    status: 'DRAFT'
+    status: 'DRAFT',
+    isDraft: true
   };
 
   const response = await fetch(`https://www.googleapis.com/blogger/v3/blogs/${blogId}/posts`, {
