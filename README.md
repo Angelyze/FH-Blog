@@ -1,33 +1,33 @@
-# Fallout Blogger automation
+# Fallout Hub Blog automation
 
-This repository contains a starter automation for generating one daily Fallout news draft article and sending it to Blogger as a draft.
+Daily editorial automation for the **Fallout Hub Blog** — a trusted Fallout fan destination covering news, mods, and community highlights.
 
 ## What it does
-- collects recent Fallout-related headlines from a small list of approved RSS feeds
-- ranks the stories by relevance and freshness
-- uses an LLM to turn the best story into a casual, conversational article draft
-- creates a Blogger draft when the required credentials are available
-- writes the result locally as a JSON file for manual review
+- Collects Fallout-related content from press, official channels, Reddit, and Nexus Mods
+- Rotates daily between **news**, **mod spotlights**, and **community highlights**
+- Ranks stories by relevance, freshness, and source quality
+- Enriches top stories with additional page context when available
+- Uses Gemini to write substantive, shareable articles with key facts and sourced trust markers
+- Creates a Blogger **draft** for manual review before publishing
+- Tracks a 21-day story history to avoid repeats
 
 ## Local setup
-1. Copy .env.example to .env and fill in your values.
+1. Copy `.env.example` to `.env` and fill in your values.
 2. Run `npm run fallout:generate`.
+3. Review the output in `artifacts/latest-draft.json`.
 
 ## Required secrets for GitHub Actions
-- GEMINI_API_KEY
-- GOOGLE_CLIENT_ID
-- GOOGLE_CLIENT_SECRET
-- GOOGLE_REFRESH_TOKEN
-- BLOGGER_BLOG_ID
+- `GEMINI_API_KEY`
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`
+- `GOOGLE_REFRESH_TOKEN`
+- `BLOGGER_BLOG_ID`
 
-## Blogger API setup
-Follow the step-by-step OAuth flow described in the earlier instructions:
-1. Create a Google Cloud project.
-2. Enable the Blogger API.
-3. Create OAuth Client ID credentials.
-4. Configure the OAuth consent screen.
-5. Authorize the Blogger scope using Google OAuth Playground.
-6. Save the refresh token and blog ID as GitHub secrets.
+## Editorial standards
+Fallout Hub posts are designed to be:
+- **Trustworthy** — facts sourced, rumors excluded, community content clearly labeled
+- **Useful** — key facts up front, clear explanation of why fans should care
+- **Shareable** — specific titles, strong hooks, and insight worth passing along
 
 ## LLM setup
 Use a Gemini API key from Google AI Studio and store it as `GEMINI_API_KEY`.
