@@ -1,7 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  areTopicsSimilar,
   buildArticleHtml,
+  countChars,
   countWords,
   detectContentType,
   detectTrustLevel,
@@ -15,11 +17,14 @@ import {
   getStoryTopicFingerprint,
   getStoryTopicKey,
   isArticleSubstantive,
+  isPublishableArticle,
   meetsMinimumSourceQuality,
+  parseRedditListing,
   parseRssDate,
   pickFeaturedStory,
   resolveReportingOutlet,
-  selectStoriesForGeneration
+  selectStoriesForGeneration,
+  trimToCharCount
 } from './generate.mjs';
 
 test('selectStoriesForGeneration skips previously covered topics across sources', () => {
@@ -133,11 +138,12 @@ test('buildArticleHtml includes trust markers, key facts, and linked sources', (
     cta: 'Are you jumping back in?',
     contentType: 'news',
     trustLevel: 'confirmed',
-    seoDescription: 'Fallout 76 Season 18 is live with new daily challenges, refreshed rewards, quality-of-life fixes, and a revised progression track designed to make the seasonal loop feel more rewarding for returning players. This update matters because Fallout 76 remains Bethesda\'s ongoing live-service entry in the franchise, and each season shapes how fans engage with Appalachia week to week. For players who stepped away, this is a useful moment to see what changed, what is worth logging in for, and whether the update improves the core loop. The patch also continues Bethesda\'s broader effort to keep Fallout 76 active between larger content beats, which makes it important for anyone tracking the franchise\'s direction. If you follow Fallout for news, builds, or seasonal completions, this is the kind of update that can quietly change your routine. Fallout Hub breaks down what changed, why fans care, and what to watch next as the community reacts and more details emerge from official channels.',
+    seoDescription: 'Fallout 76 Season 18 is live with new daily challenges, refreshed rewards, and quality-of-life fixes that could bring returning players back to Appalachia this week.',
     sources: [{ title: 'IGN', url: 'https://example.com/story', type: 'press' }]
   });
 
-  assert.match(html, /Search description — copy into Blogger/);
+  assert.match(html, /Search description — copy into Blogger \(150 characters\)/);
+  assert.match(html, /<!-- SEARCH_DESCRIPTION \(\d+ chars\):/);
   assert.match(html, /Fallout Hub · News Brief/);
   assert.match(html, /<h3>Key facts<\/h3>/);
   assert.match(html, /editorial standard/);
@@ -157,7 +163,7 @@ test('buildArticleHtml shows press-report disclaimer and label', () => {
     cta: 'What would you want from a new Obsidian Fallout game?',
     contentType: 'news',
     trustLevel: 'press-report',
-    seoDescription: 'According to Bloomberg, Obsidian Entertainment may be refocusing on a new Fallout project, though neither Obsidian nor Xbox has confirmed the report. The story matters because Obsidian directed Fallout: New Vegas, one of the most beloved entries in the franchise, and any credible sign of a return carries enormous weight with RPG fans. Bloomberg also reports that other Obsidian projects may be shelved to make room for the shift, which would signal how seriously Xbox is prioritizing Fallout within its portfolio. For now, fans should treat this as important reporting rather than an official announcement. The details that remain unconfirmed include the exact scope of the project and whether it would be a mainline Fallout game or a spin-off. Fallout Hub explains what the report says, why fans are paying attention, and what official confirmation would need to clarify before this becomes more than speculation grounded in credible journalism.',
+    seoDescription: 'Bloomberg reports Obsidian may refocus on Fallout, but neither Obsidian nor Xbox has confirmed the story yet — here is what fans should know for now.',
     sources: [{ title: 'Bloomberg report', url: 'https://example.com/bloomberg', type: 'press' }]
   });
 
@@ -201,17 +207,99 @@ test('ensureTrustKeyFacts adds disclaimer for press-report stories', () => {
   assert.match(facts[0], /Reported by Bloomberg; not yet confirmed/);
 });
 
-test('ensureSeoDescription builds a fallback near 150 words', () => {
+test('ensureSeoDescription builds a fallback near 150 characters', () => {
   const description = ensureSeoDescription({
+    title: 'Fallout 76 Season 18 launches with new rewards',
     intro: 'A short intro.',
     sections: [
-      { heading: 'Details', body: 'Fallout fans are watching a major update that changes seasonal rewards, daily challenges, and progression pacing across Appalachia. The update also includes balance changes and bug fixes that could affect builds, farming routes, and endgame activities for returning players.' },
-      { heading: 'Impact', body: 'Because Fallout 76 remains the live arm of the franchise, even mid-season updates can reshape how the community plays, trades, and discusses the game online.' }
+      { heading: 'Details', body: 'Fallout fans are watching a major update that changes seasonal rewards, daily challenges, and progression pacing across Appalachia.' }
     ]
   });
 
-  assert.ok(countWords(description) >= 135);
-  assert.ok(countWords(description) <= 165);
+  assert.ok(countChars(description) >= 120);
+  assert.ok(countChars(description) <= 160);
+});
+
+test('trimToCharCount trims at a word boundary', () => {
+  const trimmed = trimToCharCount('Fallout 76 Season 18 is live with new daily challenges, refreshed rewards, and quality-of-life fixes for returning players in Appalachia this week.', 150);
+  assert.ok(countChars(trimmed) <= 150);
+  assert.doesNotMatch(trimmed, /\s$/);
+});
+
+test('areTopicsSimilar matches paraphrased headlines', () => {
+  assert.equal(
+    areTopicsSimilar('Fallout 76 Season 18 goes live', 'Season 18 is now live in Fallout 76'),
+    true
+  );
+  assert.equal(
+    areTopicsSimilar('Fallout 76 Season 18 goes live', 'Bethesda announces new Fallout TV details'),
+    false
+  );
+});
+
+test('selectStoriesForGeneration skips fuzzy topic matches in history', () => {
+  const history = [{
+    title: 'Fallout 76 Season 18 goes live',
+    topicFingerprint: 'deadbeef',
+    coveredAt: Date.now()
+  }];
+
+  const items = [
+    { source: 'IGN', title: 'Season 18 is now live in Fallout 76', link: 'https://example.com/1', contentType: 'news', description: 'Bethesda has rolled out Fallout 76 Season 18 with new seasonal rewards, daily challenges, quality-of-life fixes, and progression updates for returning players.' },
+    { source: 'Eurogamer', title: 'Bethesda teases more Fallout news', link: 'https://example.com/2', contentType: 'news', description: 'Bethesda has hinted at more Fallout announcements coming later this year, including possible updates for Fallout 76 and broader franchise plans.' }
+  ];
+
+  const fresh = selectStoriesForGeneration(items, history);
+  assert.deepEqual(fresh.map((story) => story.title), ['Bethesda teases more Fallout news']);
+});
+
+test('parseRedditListing maps hot posts into story items', () => {
+  const payload = {
+    data: {
+      children: [{
+        kind: 't3',
+        data: {
+          title: 'Incredible Vault Dweller cosplay [OC]',
+          selftext: 'Built over six months with a working Pip-Boy.',
+          url: 'https://www.reddit.com/r/fallout/comments/abc/test/',
+          permalink: '/r/fallout/comments/abc/test/',
+          score: 420,
+          num_comments: 55,
+          created_utc: 1_700_000_000,
+          stickied: false,
+          over_18: false
+        }
+      }]
+    }
+  };
+
+  const items = parseRedditListing(payload, { minScore: 100, minComments: 20 });
+  assert.equal(items.length, 1);
+  assert.equal(items[0].redditScore, 420);
+  assert.equal(items[0].sourceKind, 'reddit');
+  assert.match(items[0].description, /working Pip-Boy/);
+});
+
+test('isPublishableArticle rejects fallback and thin drafts', () => {
+  const sectionBody = 'Fallout 76 players are getting new seasonal rewards, revised daily challenges, and quality-of-life fixes that make the live-service loop feel fresher for returning vault dwellers across Appalachia this week. The update also reshapes how fans farm cores, complete dailies, and talk about endgame pacing online. '.repeat(4);
+  const substantive = {
+    title: 'Fallout 76 Season 18 adds new daily challenges and rewards',
+    intro: 'Season 18 is live with enough changes to matter for returning players who follow Bethesda\'s live-service roadmap and seasonal progression across Appalachia.',
+    sections: Array.from({ length: 5 }).map((_, index) => ({
+      heading: `Section ${index + 1}`,
+      body: `${sectionBody} Section ${index + 1} adds more context about why this seasonal shift matters for builds, public events, and the broader Fallout 76 conversation right now.`
+    })),
+    conclusion: 'Worth watching as the community digests the full patch notes and reward track over the next few days.',
+    takeaway: 'Cadence matters for live-service Fallout more than most fans admit between major expansions.'
+  };
+
+  assert.ok(getArticleWordCount(substantive) >= 650);
+  assert.equal(isPublishableArticle(substantive, { mode: 'llm-generated' }), true);
+  assert.equal(isPublishableArticle(substantive, { mode: 'fallback-template' }), false);
+  assert.equal(
+    isPublishableArticle({ ...substantive, title: 'Why the latest Fallout news matters right now' }, { mode: 'llm-generated' }),
+    false
+  );
 });
 
 test('resolveReportingOutlet prefers outlet named in the story', () => {

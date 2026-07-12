@@ -11,9 +11,11 @@ const HISTORY_FILE = path.join(ROOT, 'data', 'story-history.json');
 const HISTORY_RETENTION_DAYS = 21;
 const MIN_DESCRIPTION_LENGTH = 80;
 const MIN_ARTICLE_WORDS = 650;
-const SEO_DESCRIPTION_TARGET_WORDS = 150;
-const SEO_DESCRIPTION_MIN_WORDS = 135;
-const SEO_DESCRIPTION_MAX_WORDS = 165;
+const SEO_DESCRIPTION_TARGET_CHARS = 150;
+const SEO_DESCRIPTION_MIN_CHARS = 120;
+const SEO_DESCRIPTION_MAX_CHARS = 160;
+const TOPIC_SIMILARITY_THRESHOLD = 0.6;
+const REDDIT_USER_AGENT = 'FalloutHubBlogBot/1.0 (editorial automation; contact: fallout-hub)';
 const BRAND_NAME = 'Fallout Hub';
 
 const CONTENT_TYPES = ['news', 'mods', 'community'];
@@ -28,6 +30,7 @@ const CONTENT_SOURCES = [
   { name: 'Polygon', url: 'https://www.polygon.com/rss/index.xml', weight: 1.15, category: 'news', tier: 'press', kind: 'rss' },
   { name: 'The Verge', url: 'https://www.theverge.com/rss/index.xml', weight: 1.1, category: 'news', tier: 'press', kind: 'rss' },
   { name: 'Steam — Fallout 76', url: 'https://store.steampowered.com/feeds/news/app/22370/?l=english&cc=US', weight: 1.2, category: 'news', tier: 'official', kind: 'rss' },
+  { name: 'Steam — Fallout 4', url: 'https://store.steampowered.com/feeds/news/app/377160/?l=english&cc=US', weight: 1.1, category: 'news', tier: 'official', kind: 'rss' },
   { name: 'Nexus Mods', url: 'https://www.nexusmods.com/news/rss', weight: 1.35, category: 'mods', tier: 'community', kind: 'rss' },
   { name: 'Kotaku', url: 'https://kotaku.com/rss', weight: 1.05, category: 'news', tier: 'press', kind: 'rss' },
   { name: 'Rock Paper Shotgun', url: 'https://www.rockpapershotgun.com/feed/', weight: 1.0, category: 'news', tier: 'press', kind: 'rss' },
@@ -123,10 +126,21 @@ export function countWords(value = '') {
   return String(value).split(/\s+/).filter(Boolean).length;
 }
 
-export function trimToWordCount(value = '', targetWords = SEO_DESCRIPTION_TARGET_WORDS) {
-  const words = String(value).split(/\s+/).filter(Boolean);
-  if (words.length <= targetWords) return words.join(' ').trim();
-  return words.slice(0, targetWords).join(' ').trim();
+export function countChars(value = '') {
+  return String(value).trim().length;
+}
+
+export function trimToCharCount(value = '', targetChars = SEO_DESCRIPTION_TARGET_CHARS) {
+  const text = String(value).trim();
+  if (text.length <= targetChars) return text;
+
+  let trimmed = text.slice(0, targetChars);
+  const lastSpace = trimmed.lastIndexOf(' ');
+  if (lastSpace > targetChars * 0.6) {
+    trimmed = trimmed.slice(0, lastSpace);
+  }
+
+  return trimmed.trim();
 }
 
 export function buildSeoDescriptionFallback(article = {}) {
@@ -134,52 +148,98 @@ export function buildSeoDescriptionFallback(article = {}) {
     article.title,
     article.subtitle,
     article.intro,
-    ...(Array.isArray(article.keyFacts) ? article.keyFacts : []),
-    article.takeaway,
-    article.conclusion,
-    ...(Array.isArray(article.sections) ? article.sections.map((section) => `${section.heading}. ${section.body}`) : [])
+    ...(Array.isArray(article.keyFacts) ? article.keyFacts.slice(0, 2) : []),
+    article.takeaway
   ].filter(Boolean);
 
-  let text = chunks.join(' ');
-  let words = countWords(text);
+  let text = chunks.join(' ').replace(/\s+/g, ' ').trim();
 
-  if (words > SEO_DESCRIPTION_MAX_WORDS) {
-    return trimToWordCount(text, SEO_DESCRIPTION_TARGET_WORDS);
+  if (countChars(text) > SEO_DESCRIPTION_MAX_CHARS) {
+    return trimToCharCount(text, SEO_DESCRIPTION_TARGET_CHARS);
   }
 
-  if (words < SEO_DESCRIPTION_MIN_WORDS) {
-    const paddingSentences = [
-      `${BRAND_NAME} explains what happened, why Fallout fans should care, and what to watch next as more details emerge from official channels and trusted coverage.`,
-      `Whether you follow Fallout 76, New Vegas, Fallout 4, mods, or the Prime Video series, this is the kind of story that can shape daily conversations across the fandom.`,
-      `We focus on sourced details, honest framing, and practical takeaways so you can quickly decide why the story matters and whether it deserves a closer look today.`
+  if (countChars(text) < SEO_DESCRIPTION_MIN_CHARS) {
+    const paddingChunks = [
+      `${BRAND_NAME} explains what Fallout fans need to know.`,
+      'Sourced details and honest framing for the Wasteland.',
+      'What happened, why it matters, and what to watch next.'
     ];
 
-    for (const sentence of paddingSentences) {
-      text = `${text} ${sentence}`.trim();
-      if (countWords(text) >= SEO_DESCRIPTION_MIN_WORDS) break;
+    for (const chunk of paddingChunks) {
+      text = `${text} ${chunk}`.replace(/\s+/g, ' ').trim();
+      if (countChars(text) >= SEO_DESCRIPTION_MIN_CHARS) break;
     }
   }
 
-  if (words > SEO_DESCRIPTION_MAX_WORDS) {
-    return trimToWordCount(text, SEO_DESCRIPTION_TARGET_WORDS);
-  }
-
-  return text.trim();
+  return trimToCharCount(text, SEO_DESCRIPTION_TARGET_CHARS);
 }
 
 export function ensureSeoDescription(article = {}) {
   const candidate = (article.seoDescription || '').trim();
-  const words = countWords(candidate);
+  const chars = countChars(candidate);
 
-  if (words >= SEO_DESCRIPTION_MIN_WORDS && words <= SEO_DESCRIPTION_MAX_WORDS) {
+  if (chars >= SEO_DESCRIPTION_MIN_CHARS && chars <= SEO_DESCRIPTION_MAX_CHARS) {
     return candidate;
   }
 
-  if (words > SEO_DESCRIPTION_MAX_WORDS) {
-    return trimToWordCount(candidate, SEO_DESCRIPTION_TARGET_WORDS);
+  if (chars > SEO_DESCRIPTION_MAX_CHARS) {
+    return trimToCharCount(candidate, SEO_DESCRIPTION_TARGET_CHARS);
   }
 
   return buildSeoDescriptionFallback(article);
+}
+
+export function getTopicTokens(title = '') {
+  return new Set(
+    normalizeStoryText(title)
+      .split(' ')
+      .filter((token) => token.length > 2)
+  );
+}
+
+export function areTopicsSimilar(titleA = '', titleB = '') {
+  const tokensA = getTopicTokens(titleA);
+  const tokensB = getTopicTokens(titleB);
+  if (tokensA.size === 0 || tokensB.size === 0) return false;
+
+  const intersection = [...tokensA].filter((token) => tokensB.has(token)).length;
+  const union = new Set([...tokensA, ...tokensB]).size;
+  return intersection / union >= TOPIC_SIMILARITY_THRESHOLD;
+}
+
+export function isTopicCovered(item = {}, historyEntries = []) {
+  const fingerprint = getStoryKey(item);
+  const topicFingerprint = getStoryTopicKey(item);
+
+  for (const entry of historyEntries) {
+    if (entry.fingerprint === fingerprint || entry.topicFingerprint === topicFingerprint) {
+      return true;
+    }
+    if (entry.title && item.title && areTopicsSimilar(entry.title, item.title)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+const VAGUE_TITLE_PATTERNS = [
+  /^why the latest fallout news matters/i,
+  /^what it means for the wasteland/i,
+  /^fallout fans have no shortage/i
+];
+
+export function isVagueTitle(title = '') {
+  const normalized = String(title).trim();
+  if (!normalized) return true;
+  return VAGUE_TITLE_PATTERNS.some((pattern) => pattern.test(normalized));
+}
+
+export function isPublishableArticle(article = {}, { mode = 'llm-generated' } = {}) {
+  if (mode !== 'llm-generated') return false;
+  if (!isArticleSubstantive(article)) return false;
+  if (isVagueTitle(article.title)) return false;
+  return true;
 }
 
 export function getArticleWordCount(article = {}) {
@@ -341,22 +401,9 @@ export function pickFeaturedStory(candidates = [], historyEntries = []) {
 }
 
 export function selectStoriesForGeneration(candidates = [], historyEntries = [], { storyLimit = 5 } = {}) {
-  const coveredFingerprints = new Set();
-  const coveredTopics = new Set();
-
-  for (const entry of historyEntries) {
-    if (entry.fingerprint) coveredFingerprints.add(entry.fingerprint);
-    if (entry.topicFingerprint) coveredTopics.add(entry.topicFingerprint);
-    if (typeof entry === 'string') coveredFingerprints.add(entry);
-  }
-
   const eligible = candidates
     .filter((item) => {
-      const fingerprint = getStoryKey(item);
-      const topicFingerprint = getStoryTopicKey(item);
-      if (coveredFingerprints.has(fingerprint) || coveredTopics.has(topicFingerprint)) return false;
-
-      const descriptionLength = (item.description || '').length;
+      if (isTopicCovered(item, historyEntries)) return false;
       if (!meetsMinimumSourceQuality(item)) return false;
 
       if (item.publishedAt && item.publishedAt < Date.now() - HISTORY_RETENTION_DAYS * 24 * 60 * 60 * 1000) {
@@ -751,7 +798,7 @@ VOICE AND STYLE:
 - Make the post feel organically shareable: specific, useful, and clearly worth 3 minutes
 
 ARTICLE REQUIREMENTS:
-- seoDescription: a standalone search-engine description of exactly 135-165 words (target 150). Write it as a compelling meta description for Blogger and Google — summarize the story, its significance for Fallout fans, and include honest framing if press-report. Do not use bullet points.
+- seoDescription: a standalone meta description of 120-160 characters (target exactly 150). One or two tight sentences for Blogger/Google search snippets — summarize the story hook and why Fallout fans should care. Include honest framing if press-report. No bullet points.
 - title: specific and click-worthy without clickbait — make fans want to know more
 - subtitle: one sentence explaining the value proposition; for press-report, mention it is based on reporting
 - intro: 3-4 sentences with a strong hook; if press-report, clearly state this is reported by ${reportingOutlet} and not confirmed by the developer/publisher
@@ -860,7 +907,8 @@ export function buildArticleHtml(article) {
   const trustNote = getTrustNote(trustLevel);
 
   const seoDescription = ensureSeoDescription(article);
-  const seoHtml = `<p><strong>Search description — copy into Blogger (~${SEO_DESCRIPTION_TARGET_WORDS} words):</strong></p><p>${escapeHtml(seoDescription)}</p><hr>`;
+  const seoCharCount = countChars(seoDescription);
+  const seoHtml = `<!-- SEARCH_DESCRIPTION (${seoCharCount} chars): ${seoDescription} --><p><strong>Search description — copy into Blogger (${SEO_DESCRIPTION_TARGET_CHARS} characters):</strong></p><p>${escapeHtml(seoDescription)}</p><hr>`;
 
   const badgeHtml = `<p><em>${escapeHtml(BRAND_NAME)} · ${escapeHtml(contentLabel)}</em></p>`;
   const disclaimerHtml = trustLevel === 'press-report'
@@ -913,6 +961,17 @@ function parseModelList(value) {
     .filter(Boolean);
 }
 
+export function extractArticleBodyText(html = '') {
+  const articleMatch = html.match(/<article[^>]*>([\s\S]*?)<\/article>/i);
+  const contentMatch = html.match(/<div[^>]+class=["'][^"']*(?:entry-content|article-body|post-content)[^"']*["'][^>]*>([\s\S]*?)<\/div>/i);
+  const block = articleMatch?.[1] || contentMatch?.[1] || html;
+  const paragraphs = [...block.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/gi)]
+    .map((match) => cleanText(match[1]))
+    .filter((paragraph) => paragraph.length > 80);
+
+  return paragraphs.slice(0, 3).join(' ').slice(0, 2000);
+}
+
 async function enrichStoryDetail(item) {
   if (!item.link) return item;
 
@@ -922,7 +981,7 @@ async function enrichStoryDetail(item) {
     const response = await fetch(item.link, {
       signal: controller.signal,
       headers: {
-        'User-Agent': 'FalloutBlogBot/1.0 (+https://github.com/)',
+        'User-Agent': `${BRAND_NAME}Bot/1.0 (editorial enrichment)`,
         Accept: 'text/html,application/xhtml+xml'
       }
     });
@@ -936,9 +995,12 @@ async function enrichStoryDetail(item) {
     const metaDescription = html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i)
       || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+name=["']description["']/i);
     const excerpt = cleanText(ogDescription?.[1] || metaDescription?.[1] || '');
+    const bodyText = extractArticleBodyText(html);
+    const combined = [excerpt, bodyText].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
+    const currentLength = (item.description || '').length;
 
-    if (excerpt.length > (item.description || '').length) {
-      return { ...item, description: excerpt.slice(0, 1200), enriched: true };
+    if (combined.length > currentLength) {
+      return { ...item, description: combined.slice(0, 2000), enriched: true };
     }
   } catch {
     // Ignore enrichment failures and keep RSS summary.
@@ -1017,20 +1079,27 @@ async function getBloggerAccessToken() {
   return tokenData.access_token;
 }
 
+function getGeminiTemperature(contentType = 'news') {
+  if (contentType === 'community') return 0.65;
+  if (contentType === 'mods') return 0.55;
+  return 0.45;
+}
+
 async function generateArticle(newsItems) {
+  const contentType = newsItems[0]?.contentType || 'news';
   const prompt = buildPrompt(newsItems);
-  let article = normalizeArticle(await callGemini(prompt), newsItems);
+  let article = normalizeArticle(await callGemini(prompt, { contentType }), newsItems);
 
   if (!isArticleSubstantive(article)) {
     console.warn(`Article too thin (${getArticleWordCount(article)} words). Requesting expanded version...`);
     const expansionPrompt = buildPrompt(newsItems, { expansion: true, previousArticle: article });
-    article = normalizeArticle(await callGemini(expansionPrompt), newsItems);
+    article = normalizeArticle(await callGemini(expansionPrompt, { contentType }), newsItems);
   }
 
   return article;
 }
 
-async function callGemini(prompt) {
+async function callGemini(prompt, { contentType = 'news' } = {}) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     throw new Error('Missing GEMINI_API_KEY');
@@ -1050,7 +1119,7 @@ async function callGemini(prompt) {
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
-            temperature: 0.8,
+            temperature: getGeminiTemperature(contentType),
             responseMimeType: 'application/json'
           }
         })
@@ -1097,53 +1166,151 @@ function isRelevantFalloutItem(item, source) {
   const hasRelevantKeyword = FALLOUT_KEYWORDS.some((term) => haystack.includes(term)) || haystack.includes('fallout');
   const hasNoise = NOISE_TERMS.some((term) => haystack.includes(term));
 
-  if (source.category === 'community' || source.category === 'mods') {
+  if (source.kind === 'reddit' || source.category === 'community' || source.category === 'mods') {
     return !hasNoise;
   }
 
   return hasRelevantKeyword && !hasNoise;
 }
 
-async function fetchContentItems() {
-  const collected = [];
+export function parseRedditListing(payload = {}, source = {}) {
+  const children = Array.isArray(payload?.data?.children) ? payload.data.children : [];
 
-  for (const source of CONTENT_SOURCES) {
-    try {
-      const xml = await fetchFeed(source.url);
-      const items = extractFeedItems(xml);
-      const relevant = items
-        .filter((item) => isRelevantFalloutItem(item, source))
-        .map((item) => {
-          const contentType = detectContentType(item, source);
-          const trustLevel = detectTrustLevel(item, source);
-          return {
-            ...item,
-            source: source.name,
-            sourceTier: source.tier,
-            contentType,
-            trustLevel,
-            score: scoreItem({ ...item, contentType }, source)
-          };
-        })
-        .sort((a, b) => b.score - a.score);
+  return children
+    .filter((child) => child?.kind === 't3' && child.data)
+    .map((child) => {
+      const post = child.data;
+      const permalink = post.permalink ? `https://www.reddit.com${post.permalink}` : '';
+      const link = post.url && /^https?:\/\//i.test(post.url) ? post.url : permalink;
+      const description = cleanText(post.selftext || post.title || '').slice(0, 1200);
 
-      collected.push(...relevant.slice(0, 4));
-    } catch {
-      // Ignore individual feed failures and continue.
+      return {
+        title: cleanText(post.title || ''),
+        link,
+        description,
+        publishedAt: post.created_utc ? post.created_utc * 1000 : null,
+        redditScore: post.score ?? 0,
+        redditComments: post.num_comments ?? 0,
+        isStickied: Boolean(post.stickied),
+        over18: Boolean(post.over_18),
+        sourceKind: 'reddit',
+        minScore: source.minScore,
+        minComments: source.minComments
+      };
+    })
+    .filter((item) => item.title);
+}
+
+function mapSourceItem(item, source) {
+  const contentType = detectContentType(item, source);
+  const trustLevel = detectTrustLevel(item, source);
+  return {
+    ...item,
+    source: source.name,
+    sourceTier: source.tier,
+    sourceKind: source.kind || item.sourceKind || 'rss',
+    contentType,
+    trustLevel,
+    score: scoreItem({ ...item, contentType }, source)
+  };
+}
+
+async function fetchRssSourceItems(source) {
+  const xml = await fetchFeed(source.url);
+  const items = extractFeedItems(xml);
+
+  return items
+    .filter((item) => isRelevantFalloutItem(item, source))
+    .map((item) => mapSourceItem(item, source))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 4);
+}
+
+async function fetchRedditSourceItems(source) {
+  const url = `https://www.reddit.com/r/${source.subreddit}/hot.json?limit=25`;
+  const response = await fetch(url, {
+    headers: {
+      'User-Agent': REDDIT_USER_AGENT,
+      Accept: 'application/json'
     }
+  });
+
+  if (!response.ok) {
+    throw new Error(`Reddit request failed (${response.status})`);
   }
 
+  const payload = await response.json();
+  const items = parseRedditListing(payload, source);
+
+  return items
+    .filter((item) => isRelevantFalloutItem(item, source))
+    .filter((item) => passesCommunityQualityGate(item))
+    .map((item) => mapSourceItem(item, source))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 4);
+}
+
+function dedupeCollectedItems(collected = []) {
   const unique = [];
   const seenTopics = new Set();
+
   for (const item of collected.sort((a, b) => b.score - a.score)) {
     const topicKey = getStoryTopicKey(item);
-    if (!seenTopics.has(topicKey)) {
-      seenTopics.add(topicKey);
-      unique.push(item);
+    if (seenTopics.has(topicKey)) continue;
+    if (unique.some((existing) => areTopicsSimilar(existing.title, item.title))) continue;
+    seenTopics.add(topicKey);
+    unique.push(item);
+  }
+
+  return unique.slice(0, 24);
+}
+
+async function fetchContentItems() {
+  const sourceJobs = [
+    ...CONTENT_SOURCES.map((source) => ({ source, kind: 'rss' })),
+    ...REDDIT_SOURCES.map((source) => ({ source, kind: 'reddit' }))
+  ];
+
+  const results = await Promise.allSettled(
+    sourceJobs.map(async ({ source, kind }) => {
+      if (kind === 'reddit') {
+        return fetchRedditSourceItems(source);
+      }
+      return fetchRssSourceItems(source);
+    })
+  );
+
+  const collected = [];
+  const feedErrors = [];
+
+  for (const [index, result] of results.entries()) {
+    const sourceName = sourceJobs[index].source.name;
+    if (result.status === 'fulfilled') {
+      collected.push(...result.value);
+    } else {
+      feedErrors.push(`${sourceName}: ${result.reason?.message || 'unknown error'}`);
     }
   }
 
-  return unique.slice(0, 18);
+  if (feedErrors.length > 0) {
+    console.warn(`Feed warnings (${feedErrors.length}): ${feedErrors.slice(0, 5).join(' | ')}`);
+  }
+
+  return dedupeCollectedItems(collected);
+}
+
+function getBloggerLabels(article = {}) {
+  const labels = [BRAND_NAME];
+  const contentType = article.contentType || 'news';
+
+  if (contentType === 'mods') labels.push('Mod Spotlight');
+  else if (contentType === 'community') labels.push('Community Highlight');
+  else labels.push('News');
+
+  if (article.trustLevel === 'press-report') labels.push('Press Report');
+  if (article.trustLevel === 'official') labels.push('Official');
+
+  return [...new Set(labels)];
 }
 
 async function createBloggerDraft(article) {
@@ -1158,7 +1325,8 @@ async function createBloggerDraft(article) {
   const postBody = {
     kind: 'blogger#post',
     title: article.title,
-    content: buildArticleHtml(article)
+    content: buildArticleHtml(article),
+    labels: getBloggerLabels(article)
   };
 
   const response = await fetch(getBloggerInsertUrl(blogId, { asDraft: true }), {
@@ -1199,6 +1367,7 @@ async function main() {
 
   let article;
   let generationError = null;
+  let mode = 'llm-generated';
 
   try {
     article = await generateArticle(substantiveItems);
@@ -1206,24 +1375,39 @@ async function main() {
     console.log(`LLM article generated successfully (${getArticleWordCount(article)} words, ${article.contentType}, ${article.trustLevel}).`);
   } catch (error) {
     generationError = error;
+    mode = 'fallback-template';
     article = normalizeArticle(buildFallbackArticle(substantiveItems), substantiveItems);
     console.warn(`LLM generation failed, using fallback article: ${error.message}`);
   }
 
+  const publishable = isPublishableArticle(article, { mode });
   let bloggerPost = null;
   let bloggerError = null;
+  let publishSkippedReason = null;
 
-  try {
-    bloggerPost = await createBloggerDraft(article);
-    if (bloggerPost) {
-      console.log('Blogger draft created successfully.');
+  if (!publishable) {
+    if (mode === 'fallback-template') {
+      publishSkippedReason = 'fallback-template';
+    } else if (!isArticleSubstantive(article)) {
+      publishSkippedReason = 'article-not-substantive';
+    } else if (isVagueTitle(article.title)) {
+      publishSkippedReason = 'vague-title';
+    } else {
+      publishSkippedReason = 'not-publishable';
     }
-  } catch (error) {
-    bloggerError = error;
-    console.warn(`Blogger draft skipped: ${error.message}`);
+    console.warn(`Blogger draft skipped: ${publishSkippedReason}`);
+  } else {
+    try {
+      bloggerPost = await createBloggerDraft(article);
+      if (bloggerPost) {
+        console.log('Blogger draft created successfully.');
+        await saveStoryHistory(localHistory, substantiveItems.slice(0, 1));
+      }
+    } catch (error) {
+      bloggerError = error;
+      console.warn(`Blogger draft skipped: ${error.message}`);
+    }
   }
-
-  await saveStoryHistory(localHistory, substantiveItems.slice(0, 1));
 
   const output = {
     generatedAt: new Date().toISOString(),
@@ -1233,12 +1417,14 @@ async function main() {
     selectedNews: substantiveItems,
     article,
     articleWordCount: getArticleWordCount(article),
-    seoDescriptionWordCount: countWords(article.seoDescription),
+    seoDescriptionCharCount: countChars(article.seoDescription),
     isSubstantive: isArticleSubstantive(article),
+    publishable,
+    publishSkippedReason,
     bloggerPost,
     generationError: generationError ? generationError.message : null,
     bloggerError: bloggerError ? bloggerError.message : null,
-    mode: generationError ? 'fallback-template' : 'llm-generated'
+    mode
   };
 
   await fs.writeFile(OUTPUT_FILE, JSON.stringify(output, null, 2));
