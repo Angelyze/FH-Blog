@@ -239,6 +239,9 @@ export function isTopicCovered(item = {}, historyEntries = []) {
     if (entry.title && item.title && areTopicsSimilar(entry.title, item.title)) {
       return true;
     }
+    if (entry.articleTitle && item.title && areTopicsSimilar(entry.articleTitle, item.title)) {
+      return true;
+    }
   }
 
   return false;
@@ -1427,14 +1430,20 @@ async function saveStoryHistory(existingEntries, selectedStories, article = {}) 
 
   const merged = [...existingEntries, ...newEntries];
   const cutoff = Date.now() - HISTORY_RETENTION_DAYS * 24 * 60 * 60 * 1000;
-  const byFingerprint = new Map();
+  const latestByTopic = new Map();
 
   for (const entry of merged.filter((item) => item.coveredAt >= cutoff)) {
-    byFingerprint.set(entry.fingerprint, entry);
+    const topicKey = entry.topicFingerprint || entry.fingerprint;
+    const previous = latestByTopic.get(topicKey);
+    if (!previous || entry.coveredAt >= previous.coveredAt) {
+      latestByTopic.set(topicKey, entry);
+    }
   }
 
+  const entries = [...latestByTopic.values()];
   await fs.mkdir(path.dirname(HISTORY_FILE), { recursive: true });
-  await fs.writeFile(HISTORY_FILE, JSON.stringify({ entries: [...byFingerprint.values()] }, null, 2));
+  await fs.writeFile(HISTORY_FILE, JSON.stringify({ entries }, null, 2));
+  console.log(`Story history saved: ${entries.length} entr${entries.length === 1 ? 'y' : 'ies'}.`);
 }
 
 async function getBloggerAccessToken() {
@@ -2148,9 +2157,9 @@ async function main() {
       publishSkippedReason = getTitleValidationIssue(article.title, localHistory) || 'not-publishable';
     }
     console.warn(`Blogger draft skipped: ${publishSkippedReason}`);
-  } else if (isTopicCovered(substantiveItems[0], localHistory)) {
+  } else if (isTopicCovered(substantiveItems[0], localHistory) || isDuplicateArticleTitle(article.title, localHistory)) {
     publishSkippedReason = 'already-covered';
-    console.warn(`Blogger draft skipped: featured story "${substantiveItems[0].title}" was already covered.`);
+    console.warn(`Blogger draft skipped: "${article.title}" matches a recently covered story.`);
   } else {
     try {
       bloggerPost = await createBloggerDraft(article);

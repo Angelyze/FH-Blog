@@ -29,6 +29,7 @@ import {
   shouldSkipFeedSource,
   isArticleSubstantive,
   isDuplicateArticleTitle,
+  isTopicCovered,
   isPublishableArticle,
   isTitleLengthValid,
   compareCandidatePriority,
@@ -411,6 +412,21 @@ test('isTitleLengthValid enforces SEO-friendly title bounds', () => {
   assert.equal(isTitleLengthValid('Fallout 76 Season 18 adds new daily challenges'), true);
   assert.equal(isTitleLengthValid('Short'), false);
   assert.equal(isTitleLengthValid('A'.repeat(71)), false);
+});
+
+test('isTopicCovered matches source headlines against prior article titles', () => {
+  const history = [{
+    articleTitle: 'Obsidian reportedly shifts focus back to Fallout',
+    coveredAt: Date.now() - (2 * 24 * 60 * 60 * 1000)
+  }];
+
+  assert.equal(
+    isTopicCovered({
+      title: 'Bloomberg: Obsidian refocusing on a new Fallout game',
+      link: 'https://example.com/report'
+    }, history),
+    true
+  );
 });
 
 test('isDuplicateArticleTitle catches near-duplicate published titles', () => {

@@ -5,6 +5,13 @@ on:
   schedule:
     - cron: '0 6 * * *'
 
+concurrency:
+  group: fallout-blog-${{ github.repository }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
 jobs:
   generate-draft:
     runs-on: ubuntu-latest
@@ -27,22 +34,6 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Restore story history
-        uses: actions/cache@v4
-        with:
-          path: data/story-history.json
-          key: story-history-v1-${{ github.repository }}
-          restore-keys: |
-            story-history-v1-${{ github.repository }}
-
-      - name: Restore feed health
-        uses: actions/cache@v4
-        with:
-          path: data/feed-health.json
-          key: feed-health-v1-${{ github.repository }}
-          restore-keys: |
-            feed-health-v1-${{ github.repository }}
-
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -51,16 +42,17 @@ jobs:
       - name: Generate Fallout draft
         run: npm run fallout:generate
 
-      - name: Save story history cache
+      - name: Commit pipeline state
         if: always()
-        uses: actions/cache/save@v4
-        with:
-          path: data/story-history.json
-          key: story-history-v1-${{ github.repository }}
-
-      - name: Save feed health cache
-        if: always()
-        uses: actions/cache/save@v4
-        with:
-          path: data/feed-health.json
-          key: feed-health-v1-${{ github.repository }}
+        run: |
+          if ! git diff --quiet -- data/story-history.json data/feed-health.json 2>/dev/null; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add data/story-history.json data/feed-health.json
+            git commit -m "chore(blog): update pipeline state"
+            git pull --rebase origin "${{ github.ref_name }}"
+            git push
+            echo "Pipeline state committed to repository."
+          else
+            echo "No pipeline data changes to commit."
+          fi
