@@ -44,6 +44,7 @@ import {
   parseRssDate,
   pickFeaturedStory,
   recordFeedHealthResult,
+  resolveArticleSources,
   resolveReportingOutlet,
   selectStoriesForGeneration,
   trimToCharCount
@@ -166,7 +167,7 @@ test('buildArticleHtml includes trust markers, key facts, and linked sources', (
 
   assert.match(html, /Search description — copy into Blogger \(150 characters\)/);
   assert.match(html, /<!-- SEARCH_DESCRIPTION \(\d+ chars\):/);
-  assert.match(html, /Fallout Hub · News Brief/);
+  assert.doesNotMatch(html, /Fallout Hub · News Brief/);
   assert.match(html, /<h3>Key facts<\/h3>/);
   assert.match(html, /editorial standard/);
   assert.match(html, /<a href="https:\/\/example.com\/story">IGN<\/a>/);
@@ -189,10 +190,43 @@ test('buildArticleHtml shows press-report disclaimer and label', () => {
     sources: [{ title: 'Bloomberg report', url: 'https://example.com/bloomberg', type: 'press' }]
   });
 
-  assert.match(html, /Fallout Hub · Press Report/);
+  assert.doesNotMatch(html, /Fallout Hub · Press Report/);
   assert.match(html, /Editorial note:/);
   assert.match(html, /not<\/strong> been confirmed by the developer or publisher/);
-  assert.match(html, /Press report — based on journalism cited below/);
+  assert.doesNotMatch(html, /editorial standard/);
+});
+
+test('resolveArticleSources drops tangential supporting links', () => {
+  const newsItems = [
+    {
+      title: 'Xbox layoffs hit Bethesda Game Studios and ZeniMax',
+      link: 'https://example.com/layoffs',
+      sourceTier: 'press'
+    },
+    {
+      title: 'Elder Scrolls Online roadmap shifts after Xbox layoffs',
+      link: 'https://example.com/eso',
+      description: 'ZeniMax Online Studios changed its roadmap following the latest round of layoffs.',
+      sourceTier: 'press'
+    },
+    {
+      title: 'What will another Obsidian Fallout game even look like?',
+      link: 'https://example.com/opinion',
+      sourceTier: 'press'
+    }
+  ];
+
+  const sources = resolveArticleSources([
+    { title: 'Layoffs story', url: 'https://example.com/layoffs', type: 'press' },
+    { title: 'ESO roadmap', url: 'https://example.com/eso', type: 'press' },
+    { title: 'Obsidian opinion', url: 'https://example.com/opinion', type: 'press' }
+  ], newsItems);
+
+  assert.equal(sources.length, 2);
+  assert.deepEqual(sources.map((source) => source.url), [
+    'https://example.com/layoffs',
+    'https://example.com/eso'
+  ]);
 });
 
 test('detectTrustLevel marks industry reports as press-report', () => {

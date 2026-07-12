@@ -819,6 +819,55 @@ export function ensurePrimarySource(sources = [], mainStory = {}) {
   return list;
 }
 
+function isSupportingSourceRelevant(item = {}, mainStory = {}) {
+  if (areTopicsSimilar(item.title || '', mainStory.title || '')) return true;
+
+  const mainHaystack = `${mainStory.title} ${mainStory.description}`.toLowerCase();
+  const itemHaystack = `${item.title} ${item.description}`.toLowerCase();
+  const eventSignals = ['layoff', 'zenimax', 'bethesda', 'xbox', 'studio cut', 'warn act', 'restructur', 'job cut'];
+  const mainHasEvent = eventSignals.some((signal) => mainHaystack.includes(signal));
+  if (!mainHasEvent) return true;
+
+  return eventSignals.some((signal) => itemHaystack.includes(signal));
+}
+
+export function resolveArticleSources(sources = [], newsItems = []) {
+  const mainStory = newsItems[0] || {};
+  const allowedItems = newsItems.filter((item) => item?.link);
+  const allowedUrls = new Map(allowedItems.map((item) => [item.link, item]));
+  const seenUrls = new Set();
+  const resolved = [];
+
+  for (const source of Array.isArray(sources) ? sources : []) {
+    const url = source?.url;
+    if (!url || !allowedUrls.has(url) || seenUrls.has(url)) continue;
+    const item = allowedUrls.get(url);
+    if (url !== mainStory.link && !isSupportingSourceRelevant(item, mainStory)) continue;
+
+    seenUrls.add(url);
+    resolved.push({
+      title: source.title || item.title,
+      url,
+      type: source.type || item.sourceTier || 'press'
+    });
+  }
+
+  for (const item of allowedItems) {
+    if (resolved.length >= 4) break;
+    if (!item.link || seenUrls.has(item.link)) continue;
+    if (item.link !== mainStory.link && !isSupportingSourceRelevant(item, mainStory)) continue;
+
+    seenUrls.add(item.link);
+    resolved.push({
+      title: item.title,
+      url: item.link,
+      type: item.sourceTier || 'press'
+    });
+  }
+
+  return ensurePrimarySource(resolved, mainStory).slice(0, 4);
+}
+
 export function validateArticleTrust(article = {}, newsItems = []) {
   const mainStory = newsItems[0] || {};
   const trustLevel = detectTrustLevel(mainStory, {
@@ -831,7 +880,7 @@ export function validateArticleTrust(article = {}, newsItems = []) {
     trustLevel,
     contentType: article.contentType || mainStory.contentType || 'news',
     keyFacts: ensureTrustKeyFacts(article.keyFacts, mainStory, trustLevel),
-    sources: ensurePrimarySource(article.sources, mainStory),
+    sources: resolveArticleSources(article.sources, newsItems),
     seoDescription: ensureSeoDescription({ ...article, trustLevel, contentType: article.contentType || mainStory.contentType || 'news' })
   };
 }
@@ -841,8 +890,9 @@ function getContentTypeGuidance(contentType, trustLevel = 'confirmed') {
     ? `TRUST LEVEL: PRESS REPORT (unconfirmed by developer/publisher)
 - This story is based on journalism, NOT an official announcement
 - The intro MUST state that this is reported by [outlet] and not confirmed by the developer/publisher
-- Attribute claims throughout with "according to [outlet]" or "the report states" — never present claims as settled fact
+- Attribute claims clearly but vary phrasing — do not open more than two sections with "According to the report"
 - Use hedging language: "reportedly", "is said to", "the report claims" where appropriate
+- When Bethesda or Xbox news affects Fallout, keep the franchise impact in every section — not just Elder Scrolls
 - Do NOT invent background details, past quotes, or related rumors not present in the source summaries
 - keyFacts MUST include: "Reported by [outlet]; not yet confirmed by the developer or publisher."
 - The conclusion MUST remind readers that official confirmation is still pending`
@@ -943,7 +993,7 @@ function buildSharedArticleRequirements(contentType, trustLevel, reportingOutlet
 - cta: one conversational question that fits the content type
 - contentType: "${contentType}"
 - trustLevel: "${trustLevel}"
-- sources: array of {title, url, type} where type is "official", "press", or "community"
+- sources: array of {title, url, type} using ONLY URLs from SOURCE MATERIAL below — omit tangential supporting links
 
 Return valid JSON only with these fields: title, seoDescription, subtitle, intro, keyFacts, sections, conclusion, takeaway, cta, contentType, trustLevel, sources`;
 }
@@ -1127,9 +1177,7 @@ function normalizeArticle(article, newsItems) {
     cta: article?.cta || 'What do you think is the most interesting part of this story?',
     contentType,
     trustLevel: article?.trustLevel || trustLevel,
-    sources: Array.isArray(article?.sources) && article.sources.length > 0
-      ? article.sources
-      : newsItems.slice(0, 4).map((item) => ({ title: item.title, url: item.link || 'https://fallout.fandom.com/wiki/Fallout_Wiki', type: item.sourceTier || 'press' }))
+    sources: resolveArticleSources(article?.sources, newsItems)
   }, newsItems);
 }
 
@@ -1143,14 +1191,12 @@ function escapeHtml(value) {
 
 export function buildArticleHtml(article) {
   const trustLevel = article.trustLevel || 'confirmed';
-  const contentLabel = getContentTypeLabel(article.contentType || 'news', trustLevel);
   const trustNote = getTrustNote(trustLevel);
 
   const seoDescription = ensureSeoDescription(article);
   const seoCharCount = countChars(seoDescription);
   const seoHtml = `<!-- SEARCH_DESCRIPTION (${seoCharCount} chars): ${seoDescription} --><p><strong>Search description — copy into Blogger (${SEO_DESCRIPTION_TARGET_CHARS} characters):</strong></p><p>${escapeHtml(seoDescription)}</p><hr>`;
 
-  const badgeHtml = `<p><em>${escapeHtml(BRAND_NAME)} · ${escapeHtml(contentLabel)}</em></p>`;
   const disclaimerHtml = trustLevel === 'press-report'
     ? `<p><strong>Editorial note:</strong> This article is based on press reporting and has <strong>not</strong> been confirmed by the developer or publisher.</p>`
     : '';
@@ -1168,14 +1214,15 @@ export function buildArticleHtml(article) {
   const conclusionHtml = article.conclusion ? `<p>${escapeHtml(article.conclusion)}</p>` : '';
   const ctaHtml = article.cta ? `<p><em>${escapeHtml(article.cta)}</em></p>` : '';
   const sourcesHtml = Array.isArray(article.sources) && article.sources.length > 0
-    ? `<hr><h3>Sources</h3><ul>${article.sources.map((source) => {
-      const typeLabel = source.type ? ` (${source.type})` : '';
-      return `<li><a href="${escapeHtml(source.url)}">${escapeHtml(source.title)}</a>${escapeHtml(typeLabel)}</li>`;
-    }).join('')}</ul>`
+    ? `<hr><h3>Sources</h3><ul>${article.sources.map((source) => (
+      `<li><a href="${escapeHtml(source.url)}">${escapeHtml(source.title)}</a></li>`
+    )).join('')}</ul>`
     : '';
-  const editorialHtml = `<hr><p><strong>${escapeHtml(BRAND_NAME)} editorial standard:</strong> ${escapeHtml(trustNote)} We do not publish unconfirmed rumors as fact.</p>`;
+  const editorialHtml = trustLevel === 'press-report'
+    ? ''
+    : `<hr><p><strong>${escapeHtml(BRAND_NAME)} editorial standard:</strong> ${escapeHtml(trustNote)}</p>`;
 
-  return `<article>${seoHtml}${badgeHtml}${disclaimerHtml}${subtitleHtml}${introHtml}${keyFactsHtml}${sectionsHtml}${takeawayHtml}${conclusionHtml}${ctaHtml}${sourcesHtml}${editorialHtml}</article>`;
+  return `<article>${seoHtml}${disclaimerHtml}${subtitleHtml}${introHtml}${keyFactsHtml}${sectionsHtml}${takeawayHtml}${conclusionHtml}${ctaHtml}${sourcesHtml}${editorialHtml}</article>`;
 }
 
 export function getBloggerInsertUrl(blogId, { asDraft = true } = {}) {
@@ -2110,18 +2157,8 @@ async function fetchContentItems() {
   };
 }
 
-function getBloggerLabels(article = {}) {
-  const labels = [BRAND_NAME];
-  const contentType = article.contentType || 'news';
-
-  if (contentType === 'mods') labels.push('Mod Spotlight');
-  else if (contentType === 'community') labels.push('Community Highlight');
-  else labels.push('News');
-
-  if (article.trustLevel === 'press-report') labels.push('Press Report');
-  if (article.trustLevel === 'official') labels.push('Official');
-
-  return [...new Set(labels)];
+function getBloggerLabels() {
+  return [];
 }
 
 async function createBloggerDraft(article) {
