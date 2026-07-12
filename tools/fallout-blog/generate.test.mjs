@@ -2,8 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   buildArticleHtml,
+  countWords,
   detectContentType,
   detectTrustLevel,
+  ensureSeoDescription,
   ensureTrustKeyFacts,
   extractFeedItems,
   freshnessBonus,
@@ -131,9 +133,11 @@ test('buildArticleHtml includes trust markers, key facts, and linked sources', (
     cta: 'Are you jumping back in?',
     contentType: 'news',
     trustLevel: 'confirmed',
+    seoDescription: 'Fallout 76 Season 18 is live with new daily challenges, refreshed rewards, quality-of-life fixes, and a revised progression track designed to make the seasonal loop feel more rewarding for returning players. This update matters because Fallout 76 remains Bethesda\'s ongoing live-service entry in the franchise, and each season shapes how fans engage with Appalachia week to week. For players who stepped away, this is a useful moment to see what changed, what is worth logging in for, and whether the update improves the core loop. The patch also continues Bethesda\'s broader effort to keep Fallout 76 active between larger content beats, which makes it important for anyone tracking the franchise\'s direction. If you follow Fallout for news, builds, or seasonal completions, this is the kind of update that can quietly change your routine. Fallout Hub breaks down what changed, why fans care, and what to watch next as the community reacts and more details emerge from official channels.',
     sources: [{ title: 'IGN', url: 'https://example.com/story', type: 'press' }]
   });
 
+  assert.match(html, /Search description — copy into Blogger/);
   assert.match(html, /Fallout Hub · News Brief/);
   assert.match(html, /<h3>Key facts<\/h3>/);
   assert.match(html, /editorial standard/);
@@ -153,6 +157,7 @@ test('buildArticleHtml shows press-report disclaimer and label', () => {
     cta: 'What would you want from a new Obsidian Fallout game?',
     contentType: 'news',
     trustLevel: 'press-report',
+    seoDescription: 'According to Bloomberg, Obsidian Entertainment may be refocusing on a new Fallout project, though neither Obsidian nor Xbox has confirmed the report. The story matters because Obsidian directed Fallout: New Vegas, one of the most beloved entries in the franchise, and any credible sign of a return carries enormous weight with RPG fans. Bloomberg also reports that other Obsidian projects may be shelved to make room for the shift, which would signal how seriously Xbox is prioritizing Fallout within its portfolio. For now, fans should treat this as important reporting rather than an official announcement. The details that remain unconfirmed include the exact scope of the project and whether it would be a mainline Fallout game or a spin-off. Fallout Hub explains what the report says, why fans are paying attention, and what official confirmation would need to clarify before this becomes more than speculation grounded in credible journalism.',
     sources: [{ title: 'Bloomberg report', url: 'https://example.com/bloomberg', type: 'press' }]
   });
 
@@ -194,6 +199,19 @@ test('ensureTrustKeyFacts adds disclaimer for press-report stories', () => {
   );
 
   assert.match(facts[0], /Reported by Bloomberg; not yet confirmed/);
+});
+
+test('ensureSeoDescription builds a fallback near 150 words', () => {
+  const description = ensureSeoDescription({
+    intro: 'A short intro.',
+    sections: [
+      { heading: 'Details', body: 'Fallout fans are watching a major update that changes seasonal rewards, daily challenges, and progression pacing across Appalachia. The update also includes balance changes and bug fixes that could affect builds, farming routes, and endgame activities for returning players.' },
+      { heading: 'Impact', body: 'Because Fallout 76 remains the live arm of the franchise, even mid-season updates can reshape how the community plays, trades, and discusses the game online.' }
+    ]
+  });
+
+  assert.ok(countWords(description) >= 135);
+  assert.ok(countWords(description) <= 165);
 });
 
 test('resolveReportingOutlet prefers outlet named in the story', () => {

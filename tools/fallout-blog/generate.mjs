@@ -11,29 +11,35 @@ const HISTORY_FILE = path.join(ROOT, 'data', 'story-history.json');
 const HISTORY_RETENTION_DAYS = 21;
 const MIN_DESCRIPTION_LENGTH = 80;
 const MIN_ARTICLE_WORDS = 650;
+const SEO_DESCRIPTION_TARGET_WORDS = 150;
+const SEO_DESCRIPTION_MIN_WORDS = 135;
+const SEO_DESCRIPTION_MAX_WORDS = 165;
 const BRAND_NAME = 'Fallout Hub';
 
 const CONTENT_TYPES = ['news', 'mods', 'community'];
 
 const CONTENT_SOURCES = [
-  { name: 'Bethesda Softworks', url: 'https://bethesda.net/en/rss', weight: 1.65, category: 'news', tier: 'official' },
-  { name: 'IGN', url: 'https://www.ign.com/rss/articles', weight: 1.45, category: 'news', tier: 'press' },
-  { name: 'VGC', url: 'https://www.videogameschronicle.com/feed/', weight: 1.35, category: 'news', tier: 'press' },
-  { name: 'GamesRadar', url: 'https://www.gamesradar.com/rss', weight: 1.3, category: 'news', tier: 'press' },
-  { name: 'Eurogamer', url: 'https://www.eurogamer.net/rss', weight: 1.25, category: 'news', tier: 'press' },
-  { name: 'GameSpot', url: 'https://www.gamespot.com/feeds/news/', weight: 1.2, category: 'news', tier: 'press' },
-  { name: 'Polygon', url: 'https://www.polygon.com/rss/index.xml', weight: 1.15, category: 'news', tier: 'press' },
-  { name: 'The Verge', url: 'https://www.theverge.com/rss/index.xml', weight: 1.1, category: 'news', tier: 'press' },
-  { name: 'Steam — Fallout 76', url: 'https://store.steampowered.com/feeds/news/app/22370/?l=english&cc=US', weight: 1.2, category: 'news', tier: 'official' },
-  { name: 'Nexus Mods', url: 'https://www.nexusmods.com/news/rss', weight: 1.35, category: 'mods', tier: 'community' },
-  { name: 'r/FalloutMods', url: 'https://www.reddit.com/r/FalloutMods/.rss', weight: 1.3, category: 'mods', tier: 'community' },
-  { name: 'r/fo4', url: 'https://www.reddit.com/r/fo4/.rss', weight: 1.15, category: 'mods', tier: 'community' },
-  { name: 'r/fallout', url: 'https://www.reddit.com/r/fallout/.rss', weight: 1.25, category: 'community', tier: 'community' },
-  { name: 'r/fo76', url: 'https://www.reddit.com/r/fo76/.rss', weight: 1.2, category: 'community', tier: 'community' },
-  { name: 'r/falloutlore', url: 'https://www.reddit.com/r/falloutlore/.rss', weight: 1.1, category: 'community', tier: 'community' },
-  { name: 'Kotaku', url: 'https://kotaku.com/rss', weight: 1.05, category: 'news', tier: 'press' },
-  { name: 'Rock Paper Shotgun', url: 'https://www.rockpapershotgun.com/feed/', weight: 1.0, category: 'news', tier: 'press' },
-  { name: 'PC Gamer', url: 'https://www.pcgamer.com/feed/', weight: 1.0, category: 'news', tier: 'press' }
+  { name: 'Bethesda Softworks', url: 'https://bethesda.net/en/rss', weight: 1.65, category: 'news', tier: 'official', kind: 'rss' },
+  { name: 'IGN', url: 'https://www.ign.com/rss/articles', weight: 1.45, category: 'news', tier: 'press', kind: 'rss' },
+  { name: 'VGC', url: 'https://www.videogameschronicle.com/feed/', weight: 1.35, category: 'news', tier: 'press', kind: 'rss' },
+  { name: 'GamesRadar', url: 'https://www.gamesradar.com/rss', weight: 1.3, category: 'news', tier: 'press', kind: 'rss' },
+  { name: 'Eurogamer', url: 'https://www.eurogamer.net/rss', weight: 1.25, category: 'news', tier: 'press', kind: 'rss' },
+  { name: 'GameSpot', url: 'https://www.gamespot.com/feeds/news/', weight: 1.2, category: 'news', tier: 'press', kind: 'rss' },
+  { name: 'Polygon', url: 'https://www.polygon.com/rss/index.xml', weight: 1.15, category: 'news', tier: 'press', kind: 'rss' },
+  { name: 'The Verge', url: 'https://www.theverge.com/rss/index.xml', weight: 1.1, category: 'news', tier: 'press', kind: 'rss' },
+  { name: 'Steam — Fallout 76', url: 'https://store.steampowered.com/feeds/news/app/22370/?l=english&cc=US', weight: 1.2, category: 'news', tier: 'official', kind: 'rss' },
+  { name: 'Nexus Mods', url: 'https://www.nexusmods.com/news/rss', weight: 1.35, category: 'mods', tier: 'community', kind: 'rss' },
+  { name: 'Kotaku', url: 'https://kotaku.com/rss', weight: 1.05, category: 'news', tier: 'press', kind: 'rss' },
+  { name: 'Rock Paper Shotgun', url: 'https://www.rockpapershotgun.com/feed/', weight: 1.0, category: 'news', tier: 'press', kind: 'rss' },
+  { name: 'PC Gamer', url: 'https://www.pcgamer.com/feed/', weight: 1.0, category: 'news', tier: 'press', kind: 'rss' }
+];
+
+const REDDIT_SOURCES = [
+  { name: 'r/fallout', subreddit: 'fallout', weight: 1.25, category: 'community', tier: 'community', kind: 'reddit', minScore: 150, minComments: 35 },
+  { name: 'r/fo76', subreddit: 'fo76', weight: 1.2, category: 'community', tier: 'community', kind: 'reddit', minScore: 75, minComments: 20 },
+  { name: 'r/falloutlore', subreddit: 'falloutlore', weight: 1.1, category: 'community', tier: 'community', kind: 'reddit', minScore: 100, minComments: 25 },
+  { name: 'r/FalloutMods', subreddit: 'FalloutMods', weight: 1.3, category: 'mods', tier: 'community', kind: 'reddit', minScore: 80, minComments: 18 },
+  { name: 'r/fo4', subreddit: 'fo4', weight: 1.15, category: 'mods', tier: 'community', kind: 'reddit', minScore: 60, minComments: 15 }
 ];
 
 function decodeHtmlEntities(value) {
@@ -113,6 +119,69 @@ export function freshnessBonus(publishedAt) {
   return 0;
 }
 
+export function countWords(value = '') {
+  return String(value).split(/\s+/).filter(Boolean).length;
+}
+
+export function trimToWordCount(value = '', targetWords = SEO_DESCRIPTION_TARGET_WORDS) {
+  const words = String(value).split(/\s+/).filter(Boolean);
+  if (words.length <= targetWords) return words.join(' ').trim();
+  return words.slice(0, targetWords).join(' ').trim();
+}
+
+export function buildSeoDescriptionFallback(article = {}) {
+  const chunks = [
+    article.title,
+    article.subtitle,
+    article.intro,
+    ...(Array.isArray(article.keyFacts) ? article.keyFacts : []),
+    article.takeaway,
+    article.conclusion,
+    ...(Array.isArray(article.sections) ? article.sections.map((section) => `${section.heading}. ${section.body}`) : [])
+  ].filter(Boolean);
+
+  let text = chunks.join(' ');
+  let words = countWords(text);
+
+  if (words > SEO_DESCRIPTION_MAX_WORDS) {
+    return trimToWordCount(text, SEO_DESCRIPTION_TARGET_WORDS);
+  }
+
+  if (words < SEO_DESCRIPTION_MIN_WORDS) {
+    const paddingSentences = [
+      `${BRAND_NAME} explains what happened, why Fallout fans should care, and what to watch next as more details emerge from official channels and trusted coverage.`,
+      `Whether you follow Fallout 76, New Vegas, Fallout 4, mods, or the Prime Video series, this is the kind of story that can shape daily conversations across the fandom.`,
+      `We focus on sourced details, honest framing, and practical takeaways so you can quickly decide why the story matters and whether it deserves a closer look today.`
+    ];
+
+    for (const sentence of paddingSentences) {
+      text = `${text} ${sentence}`.trim();
+      if (countWords(text) >= SEO_DESCRIPTION_MIN_WORDS) break;
+    }
+  }
+
+  if (words > SEO_DESCRIPTION_MAX_WORDS) {
+    return trimToWordCount(text, SEO_DESCRIPTION_TARGET_WORDS);
+  }
+
+  return text.trim();
+}
+
+export function ensureSeoDescription(article = {}) {
+  const candidate = (article.seoDescription || '').trim();
+  const words = countWords(candidate);
+
+  if (words >= SEO_DESCRIPTION_MIN_WORDS && words <= SEO_DESCRIPTION_MAX_WORDS) {
+    return candidate;
+  }
+
+  if (words > SEO_DESCRIPTION_MAX_WORDS) {
+    return trimToWordCount(candidate, SEO_DESCRIPTION_TARGET_WORDS);
+  }
+
+  return buildSeoDescriptionFallback(article);
+}
+
 export function getArticleWordCount(article = {}) {
   const chunks = [
     article.subtitle,
@@ -122,12 +191,7 @@ export function getArticleWordCount(article = {}) {
     ...(Array.isArray(article.keyFacts) ? article.keyFacts : []),
     ...(Array.isArray(article.sections) ? article.sections.map((section) => `${section.heading} ${section.body}`) : [])
   ];
-  return chunks
-    .filter(Boolean)
-    .join(' ')
-    .split(/\s+/)
-    .filter(Boolean)
-    .length;
+  return countWords(chunks.filter(Boolean).join(' '));
 }
 
 export function isArticleSubstantive(article, { minWords = MIN_ARTICLE_WORDS, minSections = 4 } = {}) {
@@ -163,11 +227,78 @@ export function meetsMinimumSourceQuality(item = {}) {
   const descriptionLength = (item.description || '').length;
   const titleLength = (item.title || '').length;
 
+  if (item.sourceKind === 'reddit' && !passesCommunityQualityGate(item)) {
+    return false;
+  }
+
   if (item.enriched && descriptionLength >= MIN_DESCRIPTION_LENGTH) return true;
   if (item.contentType === 'community' || item.contentType === 'mods') {
     return descriptionLength >= 40 || titleLength >= 30;
   }
   return descriptionLength >= MIN_DESCRIPTION_LENGTH;
+}
+
+const NICHE_COMMUNITY_PATTERNS = [
+  'load order', 'ini tweak', 'help me', 'any fix', 'crash fix', 'bug help', 'tech support',
+  'mouse sensitivity', 'stutter', 'fps fix', 'vanilla plus', 'game pass question',
+  'am i the only', 'does anyone else', 'is it just me', 'unpopular opinion', 'rate my',
+  'which mod', 'best settings', 'how do i fix', 'why is my', 'question about'
+];
+
+const HIGH_VALUE_COMMUNITY_PATTERNS = [
+  'cosplay', 'fan art', '[oc]', 'camp build', 'settlement build', 'screenshot', 'photo mode',
+  'just finished', 'years in the making', 'life-size', 'prop build', 'costume', 'painted',
+  'theory', 'lore discussion', 'viral', 'breakdown', 'restored', 'museum'
+];
+
+export function isNicheCommunityPost(item = {}) {
+  const haystack = `${item.title} ${item.description}`.toLowerCase();
+  return NICHE_COMMUNITY_PATTERNS.some((pattern) => haystack.includes(pattern));
+}
+
+export function meetsEngagementThreshold(item = {}) {
+  if (item.sourceKind !== 'reddit') return true;
+
+  const minScore = item.minScore ?? 50;
+  const minComments = item.minComments ?? 10;
+  return (item.redditScore ?? 0) >= minScore && (item.redditComments ?? 0) >= minComments;
+}
+
+export function meetsHighEngagementThreshold(item = {}) {
+  if (item.sourceKind !== 'reddit') return true;
+
+  const minScore = Math.round((item.minScore ?? 50) * 2.5);
+  const minComments = Math.round((item.minComments ?? 10) * 2);
+  return (item.redditScore ?? 0) >= minScore && (item.redditComments ?? 0) >= minComments;
+}
+
+export function passesCommunityQualityGate(item = {}) {
+  if (item.sourceKind !== 'reddit') return true;
+  if (item.isStickied || item.over18) return false;
+  if (!meetsEngagementThreshold(item)) return false;
+  if (isNicheCommunityPost(item) && !meetsHighEngagementThreshold(item)) return false;
+  return true;
+}
+
+export function engagementBonus(item = {}) {
+  const score = item.redditScore ?? 0;
+  const comments = item.redditComments ?? 0;
+  if (!score && !comments) return 0;
+
+  let bonus = Math.log10(Math.max(score, 1)) * 2.4 + Math.log10(Math.max(comments, 1)) * 1.8;
+  if (score >= 250) bonus += 1.2;
+  if (score >= 500) bonus += 1.5;
+  if (score >= 1000) bonus += 2;
+  if (comments >= 75) bonus += 1;
+  if (comments >= 150) bonus += 1.5;
+  return bonus;
+}
+
+export function compareCandidatePriority(a, b) {
+  if (b.score !== a.score) return b.score - a.score;
+  const engagementA = (a.redditScore ?? 0) + (a.redditComments ?? 0) * 2;
+  const engagementB = (b.redditScore ?? 0) + (b.redditComments ?? 0) * 2;
+  return engagementB - engagementA;
 }
 
 export function pickFeaturedStory(candidates = [], historyEntries = []) {
@@ -189,13 +320,22 @@ export function pickFeaturedStory(candidates = [], historyEntries = []) {
   let mainStory = null;
 
   for (const contentType of preferredOrder) {
-    mainStory = eligible.find((item) => item.contentType === contentType);
-    if (mainStory) break;
+    const matches = eligible
+      .filter((item) => item.contentType === contentType)
+      .sort(compareCandidatePriority);
+
+    if (matches.length === 0) continue;
+
+    mainStory = matches[0];
+    break;
   }
 
-  mainStory = mainStory || eligible[0];
+  mainStory = mainStory || eligible.sort(compareCandidatePriority)[0];
   const mainTopic = getStoryTopicKey(mainStory);
-  const supporting = eligible.filter((item) => getStoryTopicKey(item) !== mainTopic).slice(0, 4);
+  const supporting = eligible
+    .filter((item) => getStoryTopicKey(item) !== mainTopic)
+    .sort(compareCandidatePriority)
+    .slice(0, 4);
 
   return [mainStory, ...supporting];
 }
@@ -220,6 +360,10 @@ export function selectStoriesForGeneration(candidates = [], historyEntries = [],
       if (!meetsMinimumSourceQuality(item)) return false;
 
       if (item.publishedAt && item.publishedAt < Date.now() - HISTORY_RETENTION_DAYS * 24 * 60 * 60 * 1000) {
+        return false;
+      }
+
+      if (item.sourceKind === 'reddit' && !passesCommunityQualityGate(item)) {
         return false;
       }
 
@@ -344,6 +488,7 @@ function scoreItem(item, source) {
 
   score += freshnessBonus(item.publishedAt);
   score += Math.min((item.description || '').length / 180, 1.8);
+  score += engagementBonus(item);
 
   if (source.tier === 'official') score += 1.8;
   if (haystack.includes('fallout')) score += 1.5;
@@ -351,8 +496,10 @@ function scoreItem(item, source) {
   if (haystack.includes('trailer') || haystack.includes('premiere')) score += 0.9;
   if (haystack.includes('expansion') || haystack.includes('update') || haystack.includes('patch')) score += 0.9;
   if (contentType === 'mods' && (haystack.includes('release') || haystack.includes('update') || haystack.includes('overhaul'))) score += 1.2;
+  if (HIGH_VALUE_COMMUNITY_PATTERNS.some((pattern) => haystack.includes(pattern))) score += 2.2;
   if (contentType === 'community' && (haystack.includes('cosplay') || haystack.includes('[oc]') || haystack.includes('fan art'))) score += 1.3;
   if (haystack.includes('season') && haystack.includes('fallout')) score += 1.0;
+  if (isNicheCommunityPost(item)) score -= 3.5;
   if (NOISE_TERMS.some((term) => haystack.includes(term))) score -= 4;
 
   return score;
@@ -472,7 +619,8 @@ export function validateArticleTrust(article = {}, newsItems = []) {
     trustLevel,
     contentType: article.contentType || mainStory.contentType || 'news',
     keyFacts: ensureTrustKeyFacts(article.keyFacts, mainStory, trustLevel),
-    sources: ensurePrimarySource(article.sources, mainStory)
+    sources: ensurePrimarySource(article.sources, mainStory),
+    seoDescription: ensureSeoDescription({ ...article, trustLevel, contentType: article.contentType || mainStory.contentType || 'news' })
   };
 }
 
@@ -603,6 +751,7 @@ VOICE AND STYLE:
 - Make the post feel organically shareable: specific, useful, and clearly worth 3 minutes
 
 ARTICLE REQUIREMENTS:
+- seoDescription: a standalone search-engine description of exactly 135-165 words (target 150). Write it as a compelling meta description for Blogger and Google — summarize the story, its significance for Fallout fans, and include honest framing if press-report. Do not use bullet points.
 - title: specific and click-worthy without clickbait — make fans want to know more
 - subtitle: one sentence explaining the value proposition; for press-report, mention it is based on reporting
 - intro: 3-4 sentences with a strong hook; if press-report, clearly state this is reported by ${reportingOutlet} and not confirmed by the developer/publisher
@@ -615,7 +764,7 @@ ARTICLE REQUIREMENTS:
 - trustLevel: "${trustLevel}"
 - sources: array of {title, url, type} where type is "official", "press", or "community"
 
-Return valid JSON only with these fields: title, subtitle, intro, keyFacts, sections, conclusion, takeaway, cta, contentType, trustLevel, sources`;
+Return valid JSON only with these fields: title, seoDescription, subtitle, intro, keyFacts, sections, conclusion, takeaway, cta, contentType, trustLevel, sources`;
 }
 
 function buildFallbackArticle(newsItems) {
@@ -681,6 +830,7 @@ function normalizeArticle(article, newsItems) {
 
   return validateArticleTrust({
     title: article?.title || 'Why the latest Fallout news matters right now',
+    seoDescription: article?.seoDescription || '',
     subtitle: article?.subtitle || `Your daily ${getContentTypeLabel(contentType, trustLevel).toLowerCase()} from ${BRAND_NAME}.`,
     intro: article?.intro || 'The latest Fallout headlines are worth following because they can shape the conversation around the franchise in the days ahead.',
     keyFacts,
@@ -709,6 +859,9 @@ export function buildArticleHtml(article) {
   const contentLabel = getContentTypeLabel(article.contentType || 'news', trustLevel);
   const trustNote = getTrustNote(trustLevel);
 
+  const seoDescription = ensureSeoDescription(article);
+  const seoHtml = `<p><strong>Search description — copy into Blogger (~${SEO_DESCRIPTION_TARGET_WORDS} words):</strong></p><p>${escapeHtml(seoDescription)}</p><hr>`;
+
   const badgeHtml = `<p><em>${escapeHtml(BRAND_NAME)} · ${escapeHtml(contentLabel)}</em></p>`;
   const disclaimerHtml = trustLevel === 'press-report'
     ? `<p><strong>Editorial note:</strong> This article is based on press reporting and has <strong>not</strong> been confirmed by the developer or publisher.</p>`
@@ -734,7 +887,7 @@ export function buildArticleHtml(article) {
     : '';
   const editorialHtml = `<hr><p><strong>${escapeHtml(BRAND_NAME)} editorial standard:</strong> ${escapeHtml(trustNote)} We do not publish unconfirmed rumors as fact.</p>`;
 
-  return `<article>${badgeHtml}${disclaimerHtml}${subtitleHtml}${introHtml}${keyFactsHtml}${sectionsHtml}${takeawayHtml}${conclusionHtml}${ctaHtml}${sourcesHtml}${editorialHtml}</article>`;
+  return `<article>${seoHtml}${badgeHtml}${disclaimerHtml}${subtitleHtml}${introHtml}${keyFactsHtml}${sectionsHtml}${takeawayHtml}${conclusionHtml}${ctaHtml}${sourcesHtml}${editorialHtml}</article>`;
 }
 
 export function getBloggerInsertUrl(blogId, { asDraft = true } = {}) {
@@ -1080,6 +1233,7 @@ async function main() {
     selectedNews: substantiveItems,
     article,
     articleWordCount: getArticleWordCount(article),
+    seoDescriptionWordCount: countWords(article.seoDescription),
     isSubstantive: isArticleSubstantive(article),
     bloggerPost,
     generationError: generationError ? generationError.message : null,
