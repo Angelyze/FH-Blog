@@ -16,6 +16,7 @@ jobs:
       GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
       GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
       BLOGGER_BLOG_ID: ${{ secrets.BLOGGER_BLOG_ID }}
+      REDDIT_FETCH_DELAY_MS: 4500
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -43,3 +44,17 @@ jobs:
 
       - name: Generate Fallout draft
         run: npm run fallout:generate
+
+      - name: Save story history cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: data/story-history.json
+          key: story-history-v1-${{ github.repository }}
+
+      - name: Save feed health cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: data/feed-health.json
+          key: feed-health-v1-${{ github.repository }}

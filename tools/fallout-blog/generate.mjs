@@ -22,7 +22,7 @@ const SEO_DESCRIPTION_MIN_CHARS = 120;
 const SEO_DESCRIPTION_MAX_CHARS = 160;
 const TOPIC_SIMILARITY_THRESHOLD = 0.6;
 const REDDIT_USER_AGENT = 'FalloutHubBlogBot/1.0 (editorial automation; contact: fallout-hub)';
-const REDDIT_FETCH_DELAY_MS = Number.parseInt(process.env.REDDIT_FETCH_DELAY_MS || '1500', 10);
+const REDDIT_FETCH_DELAY_MS = Number.parseInt(process.env.REDDIT_FETCH_DELAY_MS || '3000', 10);
 const REDDIT_RATE_LIMIT_BACKOFF_MS = Number.parseInt(process.env.REDDIT_RATE_LIMIT_BACKOFF_MS || '3000', 10);
 const PERSISTENT_BLOCK_FAILURE_STREAK = 2;
 const FEED_USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
@@ -1241,8 +1241,27 @@ export function isRateLimitedFeedError(error = '') {
   return message.includes('429') || message.includes('rate limit');
 }
 
-export function getRedditFetchStrategies({ preferRss = process.env.REDDIT_PREFER_RSS === 'true' || process.env.CI === 'true' } = {}) {
+export function getRedditFetchStrategies({
+  preferRss = process.env.REDDIT_PREFER_RSS === 'true' || process.env.CI === 'true',
+  rssOnly = process.env.REDDIT_RSS_ONLY === 'true' || process.env.CI === 'true'
+} = {}) {
+  if (rssOnly) return ['rss'];
   return preferRss ? ['rss', 'json'] : ['json', 'rss'];
+}
+
+export function getActiveRedditSources() {
+  const override = (process.env.REDDIT_SUBREDDITS || '').trim();
+  if (!override) return REDDIT_SOURCES;
+
+  const allowed = new Set(
+    override.split(',').map((entry) => entry.trim().toLowerCase()).filter(Boolean)
+  );
+
+  return REDDIT_SOURCES.filter((source) => allowed.has(source.subreddit.toLowerCase()));
+}
+
+function buildRedditRequestHeaders() {
+  return buildFeedRequestHeaders();
 }
 
 export function shouldSkipFeedSource(sourceName, feedHealth = {}, { minFailureStreak = 3 } = {}) {
@@ -1622,9 +1641,13 @@ async function fetchRedditJsonItems(source) {
 }
 
 async function fetchRedditRssItems(source) {
-  const url = `https://www.reddit.com/r/${source.subreddit}/hot/.rss`;
-  const xml = await fetchFeed(url, {
-    headers: { 'User-Agent': REDDIT_USER_AGENT }
+  const subreddit = source.subreddit;
+  const xml = await fetchFeed(`https://old.reddit.com/r/${subreddit}/hot/.rss`, {
+    headers: buildRedditRequestHeaders(),
+    fallbackUrls: [
+      `https://www.reddit.com/r/${subreddit}/hot/.rss`,
+      `https://old.reddit.com/r/${subreddit}/.rss`
+    ]
   });
   return parseRedditRssFeed(xml, source);
 }
@@ -1650,6 +1673,8 @@ async function fetchRedditSourceItems(source) {
       errors.push(message);
       if (isRateLimitedFeedError(message)) {
         await sleep(REDDIT_RATE_LIMIT_BACKOFF_MS);
+      } else if (isPersistentlyBlockedFeedError(message)) {
+        await sleep(Math.max(REDDIT_FETCH_DELAY_MS, 2000));
       }
     }
   }
@@ -1675,7 +1700,7 @@ function dedupeCollectedItems(collected = []) {
 async function fetchContentItems() {
   const sourceJobs = [
     ...CONTENT_SOURCES.map((source) => ({ source, kind: 'rss' })),
-    ...REDDIT_SOURCES.map((source) => ({ source, kind: 'reddit' }))
+    ...getActiveRedditSources().map((source) => ({ source, kind: 'reddit' }))
   ];
 
   let feedHealth = await loadFeedHealth();
@@ -1814,8 +1839,9 @@ async function createBloggerDraft(article) {
 
 async function main() {
   await fs.mkdir(OUTPUT_DIR, { recursive: true });
-  const { items: contentItems, feedHealth, feedErrors, unhealthyFeeds } = await fetchContentItems();
+  const { items: contentItems, feedHealth, feedErrors, unhealthyFeeds, skippedFeeds } = await fetchContentItems();
   const localHistory = await loadStoryHistory();
+  console.log(`Story history loaded: ${localHistory.length} entr${localHistory.length === 1 ? 'y' : 'ies'}.`);
   const featuredItems = pickFeaturedStory(contentItems, localHistory);
 
   if (featuredItems.length === 0) {
@@ -1860,6 +1886,9 @@ async function main() {
       publishSkippedReason = getTitleValidationIssue(article.title, localHistory) || 'not-publishable';
     }
     console.warn(`Blogger draft skipped: ${publishSkippedReason}`);
+  } else if (isTopicCovered(substantiveItems[0], localHistory)) {
+    publishSkippedReason = 'already-covered';
+    console.warn(`Blogger draft skipped: featured story "${substantiveItems[0].title}" was already covered.`);
   } else {
     try {
       bloggerPost = await createBloggerDraft(article);
@@ -1889,8 +1918,10 @@ async function main() {
     feedHealthSummary: {
       totalSources: Object.keys(feedHealth).length,
       errorsToday: feedErrors.length,
+      skippedFeeds,
       unhealthyFeeds
     },
+    storyHistoryCount: localHistory.length,
     bloggerPost,
     generationError: generationError ? generationError.message : null,
     bloggerError: bloggerError ? bloggerError.message : null,

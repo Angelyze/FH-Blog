@@ -415,6 +415,7 @@ test('shouldSkipFeedSource skips persistently blocked feeds after two failures',
 test('getRedditFetchStrategies prefers RSS in CI environments', () => {
   assert.deepEqual(getRedditFetchStrategies({ preferRss: true }), ['rss', 'json']);
   assert.deepEqual(getRedditFetchStrategies({ preferRss: false }), ['json', 'rss']);
+  assert.deepEqual(getRedditFetchStrategies({ rssOnly: true }), ['rss']);
 });
 
 test('isRateLimitedFeedError detects Reddit throttling', () => {
