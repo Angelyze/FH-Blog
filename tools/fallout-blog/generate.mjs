@@ -1377,6 +1377,56 @@ function parseModelList(value) {
     .filter(Boolean);
 }
 
+let geminiKeyCursor = 0;
+
+export function getGeminiApiKeys() {
+  const keys = [
+    process.env.GEMINI_API_KEY,
+    process.env.GEMINI_API_KEY_FALLBACK,
+    process.env.GEMINI_API_KEY_FALLBACK_2
+  ].map((entry) => entry?.trim()).filter(Boolean);
+
+  const unique = [...new Set(keys)];
+  if (unique.length === 0) {
+    throw new Error('Missing GEMINI_API_KEY');
+  }
+
+  return unique;
+}
+
+export function rotateApiKeys(keys = [], offset = 0) {
+  if (!Array.isArray(keys) || keys.length === 0) return [];
+  const normalizedOffset = ((offset % keys.length) + keys.length) % keys.length;
+  return [...keys.slice(normalizedOffset), ...keys.slice(0, normalizedOffset)];
+}
+
+function advanceGeminiKeyCursor(keyCount = 1) {
+  const offset = geminiKeyCursor;
+  geminiKeyCursor = (geminiKeyCursor + 1) % Math.max(keyCount, 1);
+  return offset;
+}
+
+export function isGeminiQuotaError(status = 0, body = '') {
+  const sample = String(body).toLowerCase();
+  return status === 429
+    || /resource_exhausted|quota exceeded|exceeded your current quota|rate limit/i.test(sample)
+    || (status === 403 && /quota|rate limit/i.test(sample));
+}
+
+function isGeminiRetryableError(status = 0, body = '') {
+  return isGeminiQuotaError(status, body) || status === 500 || status === 503 || status === 502;
+}
+
+function shouldTryNextGeminiKey(status = 0, body = '') {
+  return isGeminiRetryableError(status, body);
+}
+
+const GEMINI_KEY_LABELS = ['main', 'fallback', 'fallback-2'];
+
+function getGeminiKeyLabel(index = 0) {
+  return GEMINI_KEY_LABELS[index] || `key-${index + 1}`;
+}
+
 export function buildStorySummaryForPrompt(item = {}, { maxChars = MAX_PROMPT_SUMMARY_CHARS } = {}) {
   const text = String(item.description || '').trim();
   if (!text) return 'No summary available.';
@@ -1848,6 +1898,9 @@ function getGeminiTemperature(contentType = 'news') {
 
 async function generateArticle(newsItems) {
   const contentType = newsItems[0]?.contentType || 'news';
+  const apiKeys = getGeminiApiKeys();
+  console.log(`Gemini key pool: ${apiKeys.length} configured key(s), ${apiKeys.length > 1 ? 'using round-robin across generation calls' : 'single-key mode'}.`);
+
   const prompt = buildPrompt(newsItems);
   let article = normalizeArticle(await callGemini(prompt, { contentType }), newsItems);
 
@@ -1861,10 +1914,9 @@ async function generateArticle(newsItems) {
 }
 
 async function callGemini(prompt, { contentType = 'news' } = {}) {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    throw new Error('Missing GEMINI_API_KEY');
-  }
+  const apiKeys = getGeminiApiKeys();
+  const keyOffset = advanceGeminiKeyCursor(apiKeys.length);
+  const rotatedKeys = rotateApiKeys(apiKeys, keyOffset);
 
   const primaryModels = parseModelList(process.env.GEMINI_MODEL || 'gemini-2.0-flash');
   const fallbackModels = parseModelList(process.env.GEMINI_MODEL_FALLBACK || 'gemini-2.0-flash-lite');
@@ -1872,37 +1924,46 @@ async function callGemini(prompt, { contentType = 'news' } = {}) {
   const models = [...primaryModels, ...fallbackModels, ...tertiaryModels].filter((model, index, all) => model && all.indexOf(model) === index);
   const errors = [];
 
-  for (const model of models) {
-    try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: getGeminiTemperature(contentType),
-            responseMimeType: 'application/json'
-          }
-        })
-      });
+  for (const [keyIndex, apiKey] of rotatedKeys.entries()) {
+    const keyLabel = getGeminiKeyLabel((keyOffset + keyIndex) % apiKeys.length);
 
-      if (!response.ok) {
-        const text = await response.text();
-        const message = `Gemini API error ${response.status}: ${text}`;
-        errors.push(`${model}: ${message}`);
-        continue;
+    for (const model of models) {
+      try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: {
+              temperature: getGeminiTemperature(contentType),
+              responseMimeType: 'application/json'
+            }
+          })
+        });
+
+        if (!response.ok) {
+          const text = await response.text();
+          const message = `Gemini API error ${response.status}: ${text}`;
+          errors.push(`${keyLabel}/${model}: ${message}`);
+          if (shouldTryNextGeminiKey(response.status, text)) continue;
+          break;
+        }
+
+        const data = await response.json();
+        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        if (!text) {
+          errors.push(`${keyLabel}/${model}: Gemini returned empty content`);
+          continue;
+        }
+
+        const jsonText = extractJsonText(text);
+        if (keyIndex > 0 || model !== models[0]) {
+          console.log(`Gemini succeeded with ${keyLabel} on ${model}.`);
+        }
+        return JSON.parse(jsonText);
+      } catch (error) {
+        errors.push(`${keyLabel}/${model}: ${error.message}`);
       }
-
-      const data = await response.json();
-      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-      if (!text) {
-        throw new Error('Gemini returned empty content');
-      }
-
-      const jsonText = extractJsonText(text);
-      return JSON.parse(jsonText);
-    } catch (error) {
-      errors.push(`${model}: ${error.message}`);
     }
   }
 

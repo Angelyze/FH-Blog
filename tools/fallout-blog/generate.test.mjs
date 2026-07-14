@@ -39,8 +39,11 @@ import {
   trimTitleToMaxChars,
   compareCandidatePriority,
   getAdjustedCandidateScore,
+  getGeminiApiKeys,
   getSourceDiversityAdjustment,
   getRedditPostJsonUrl,
+  isGeminiQuotaError,
+  rotateApiKeys,
   isRedditPostLink,
   parseRedditPostDetailPayload,
   meetsEngagementThreshold,
@@ -877,4 +880,39 @@ test('buildStorySummaryForPrompt keeps long enriched summaries for article gener
 
   assert.ok(summary.length > 3000);
   assert.match(summary, /community reaction/);
+});
+
+test('getGeminiApiKeys uses main, fallback, and fallback-2 secret names', () => {
+  const previous = {
+    GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+    GEMINI_API_KEY_FALLBACK: process.env.GEMINI_API_KEY_FALLBACK,
+    GEMINI_API_KEY_FALLBACK_2: process.env.GEMINI_API_KEY_FALLBACK_2
+  };
+
+  process.env.GEMINI_API_KEY = 'main-key';
+  process.env.GEMINI_API_KEY_FALLBACK = 'fallback-key';
+  delete process.env.GEMINI_API_KEY_FALLBACK_2;
+
+  assert.deepEqual(getGeminiApiKeys(), ['main-key', 'fallback-key']);
+
+  process.env.GEMINI_API_KEY_FALLBACK_2 = 'fallback-key-2';
+  assert.deepEqual(getGeminiApiKeys(), ['main-key', 'fallback-key', 'fallback-key-2']);
+
+  for (const [name, value] of Object.entries(previous)) {
+    if (value === undefined) delete process.env[name];
+    else process.env[name] = value;
+  }
+});
+
+test('rotateApiKeys preserves order while starting from the cursor offset', () => {
+  assert.deepEqual(rotateApiKeys(['a', 'b', 'c'], 0), ['a', 'b', 'c']);
+  assert.deepEqual(rotateApiKeys(['a', 'b', 'c'], 1), ['b', 'c', 'a']);
+  assert.deepEqual(rotateApiKeys(['a', 'b', 'c'], 4), ['b', 'c', 'a']);
+});
+
+test('isGeminiQuotaError detects quota and rate-limit responses', () => {
+  assert.equal(isGeminiQuotaError(429, ''), true);
+  assert.equal(isGeminiQuotaError(403, 'Quota exceeded for metric'), true);
+  assert.equal(isGeminiQuotaError(500, 'RESOURCE_EXHAUSTED'), true);
+  assert.equal(isGeminiQuotaError(400, 'invalid argument'), false);
 });
