@@ -1377,6 +1377,38 @@ function parseModelList(value) {
     .filter(Boolean);
 }
 
+function dedupeModelList(models = []) {
+  return models.filter((model, index, all) => model && all.indexOf(model) === index);
+}
+
+// Text-only Flash models for generateContent, best quality → most budget (no Pro/TTS/image/video).
+const DEFAULT_GEMINI_TEXT_MODELS = [
+  'gemini-3.5-flash',
+  'gemini-flash-latest',
+  'gemini-3-flash-preview',
+  'gemini-2.5-flash',
+  'gemini-3.1-flash-lite',
+  'gemini-2.5-flash-lite',
+  'gemini-2.0-flash',
+  'gemini-2.0-flash-lite',
+  'gemini-1.5-flash',
+  'gemini-1.5-flash-8b'
+];
+
+export function getGeminiModelChain() {
+  const fromChain = parseModelList(process.env.GEMINI_MODEL_CHAIN);
+  if (fromChain.length > 0) return dedupeModelList(fromChain);
+
+  const legacy = [
+    ...parseModelList(process.env.GEMINI_MODEL),
+    ...parseModelList(process.env.GEMINI_MODEL_FALLBACK),
+    ...parseModelList(process.env.GEMINI_MODEL_FALLBACK_2)
+  ];
+
+  if (legacy.length > 0) return dedupeModelList(legacy);
+  return [...DEFAULT_GEMINI_TEXT_MODELS];
+}
+
 let geminiKeyCursor = 0;
 
 export function getGeminiApiKeys() {
@@ -1419,6 +1451,12 @@ function isGeminiRetryableError(status = 0, body = '') {
 
 function shouldTryNextGeminiKey(status = 0, body = '') {
   return isGeminiRetryableError(status, body);
+}
+
+function shouldTryNextGeminiModel(status = 0, body = '') {
+  const sample = String(body).toLowerCase();
+  if (shouldTryNextGeminiKey(status, body)) return true;
+  return status === 404 || /not found|not supported|unknown model/i.test(sample);
 }
 
 const GEMINI_KEY_LABELS = ['main', 'fallback', 'fallback-2'];
@@ -1899,7 +1937,9 @@ function getGeminiTemperature(contentType = 'news') {
 async function generateArticle(newsItems) {
   const contentType = newsItems[0]?.contentType || 'news';
   const apiKeys = getGeminiApiKeys();
+  const models = getGeminiModelChain();
   console.log(`Gemini key pool: ${apiKeys.length} configured key(s), ${apiKeys.length > 1 ? 'using round-robin across generation calls' : 'single-key mode'}.`);
+  console.log(`Gemini model chain (${models.length}): ${models.join(' → ')}`);
 
   const prompt = buildPrompt(newsItems);
   let article = normalizeArticle(await callGemini(prompt, { contentType }), newsItems);
@@ -1918,10 +1958,7 @@ async function callGemini(prompt, { contentType = 'news' } = {}) {
   const keyOffset = advanceGeminiKeyCursor(apiKeys.length);
   const rotatedKeys = rotateApiKeys(apiKeys, keyOffset);
 
-  const primaryModels = parseModelList(process.env.GEMINI_MODEL || 'gemini-2.0-flash');
-  const fallbackModels = parseModelList(process.env.GEMINI_MODEL_FALLBACK || 'gemini-2.0-flash-lite');
-  const tertiaryModels = parseModelList(process.env.GEMINI_MODEL_FALLBACK_2 || 'gemini-flash-latest');
-  const models = [...primaryModels, ...fallbackModels, ...tertiaryModels].filter((model, index, all) => model && all.indexOf(model) === index);
+  const models = getGeminiModelChain();
   const errors = [];
 
   for (const [keyIndex, apiKey] of rotatedKeys.entries()) {
@@ -1945,7 +1982,7 @@ async function callGemini(prompt, { contentType = 'news' } = {}) {
           const text = await response.text();
           const message = `Gemini API error ${response.status}: ${text}`;
           errors.push(`${keyLabel}/${model}: ${message}`);
-          if (shouldTryNextGeminiKey(response.status, text)) continue;
+          if (shouldTryNextGeminiModel(response.status, text)) continue;
           break;
         }
 

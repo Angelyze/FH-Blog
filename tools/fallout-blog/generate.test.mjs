@@ -40,6 +40,7 @@ import {
   compareCandidatePriority,
   getAdjustedCandidateScore,
   getGeminiApiKeys,
+  getGeminiModelChain,
   getSourceDiversityAdjustment,
   getRedditPostJsonUrl,
   isGeminiQuotaError,
@@ -915,4 +916,41 @@ test('isGeminiQuotaError detects quota and rate-limit responses', () => {
   assert.equal(isGeminiQuotaError(403, 'Quota exceeded for metric'), true);
   assert.equal(isGeminiQuotaError(500, 'RESOURCE_EXHAUSTED'), true);
   assert.equal(isGeminiQuotaError(400, 'invalid argument'), false);
+});
+
+test('getGeminiModelChain defaults to all non-pro Flash models best to worst', () => {
+  const previous = {
+    GEMINI_MODEL_CHAIN: process.env.GEMINI_MODEL_CHAIN,
+    GEMINI_MODEL: process.env.GEMINI_MODEL,
+    GEMINI_MODEL_FALLBACK: process.env.GEMINI_MODEL_FALLBACK,
+    GEMINI_MODEL_FALLBACK_2: process.env.GEMINI_MODEL_FALLBACK_2
+  };
+
+  delete process.env.GEMINI_MODEL_CHAIN;
+  delete process.env.GEMINI_MODEL;
+  delete process.env.GEMINI_MODEL_FALLBACK;
+  delete process.env.GEMINI_MODEL_FALLBACK_2;
+
+  const models = getGeminiModelChain();
+  assert.deepEqual(models, [
+    'gemini-3.5-flash',
+    'gemini-flash-latest',
+    'gemini-3-flash-preview',
+    'gemini-2.5-flash',
+    'gemini-3.1-flash-lite',
+    'gemini-2.5-flash-lite',
+    'gemini-2.0-flash',
+    'gemini-2.0-flash-lite',
+    'gemini-1.5-flash',
+    'gemini-1.5-flash-8b'
+  ]);
+  assert.ok(!models.some((model) => /pro/i.test(model)));
+
+  process.env.GEMINI_MODEL_CHAIN = 'gemini-flash-latest,gemini-2.0-flash-lite';
+  assert.deepEqual(getGeminiModelChain(), ['gemini-flash-latest', 'gemini-2.0-flash-lite']);
+
+  for (const [name, value] of Object.entries(previous)) {
+    if (value === undefined) delete process.env[name];
+    else process.env[name] = value;
+  }
 });
