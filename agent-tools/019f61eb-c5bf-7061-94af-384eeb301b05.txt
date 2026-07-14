@@ -1,0 +1,519 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:media="http://search.yahoo.com/mrss/">
+
+<channel>
+	<title>Wccftech</title>
+	<atom:link href="https://wccftech.com/feed/" rel="self" type="application/rss+xml" />
+	<link>https://wccftech.com/</link>
+	<description>We bring you the latest from hardware, mobile and gaming industries in news, reviews, and guides.</description>
+	<lastBuildDate>Tue, 14 Jul 2026 18:30:54 +0000</lastBuildDate>
+	<language>en-US</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=7.0</generator>
+	<item>
+		<title><![CDATA[Meta’s AI Layoff Algorithm Reportedly Ranked Workers With Medical Conditions For Termination, And 26 Employees Are Now Suing To Block It]]></title>
+		<link>https://wccftech.com/metas-ai-layoff-algorithm-reportedly-ranked-workers-with-medical-conditions-for-termination-and-26-employees-are-now-suing-to-block-it/</link>
+		
+		<dc:creator><![CDATA[Rohail Saleem]]></dc:creator>
+		<pubDate>Tue, 14 Jul 2026 18:30:49 +0000</pubDate>
+				<category><![CDATA[News]]></category>
+		<category><![CDATA[AI]]></category>
+		<category><![CDATA[lawsuit]]></category>
+		<category><![CDATA[Meta]]></category>
+		<guid isPermaLink="false">https://wccftech.com/?p=1733942</guid>
+
+					<description><![CDATA[In what is likely to be the first of many such lawsuits that target silicon valley bigwigs, a number of Meta employees who were recently laid off are now accusing an AI-powered algorithm for disproportionately targeting workers with pre-existing medical conditions. Around 26 Meta employees are now alleging that the tech giant relied on factors such as productivity and AI use in deciding which workers get axed, disadvantaging those who missed work due to medical complications As many as 26 Meta employees have now anonymously filed a lawsuit in a federal court in Oakland, California, accusing the company of disproportionately [&#8230;]]]></description>
+										<content:encoded><![CDATA[<p><a href="https://wccftech.com/metas-ai-layoff-algorithm-reportedly-ranked-workers-with-medical-conditions-for-termination-and-26-employees-are-now-suing-to-block-it/"><img width="728" height="364" src="https://cdn.wccftech.com/wp-content/uploads/2026/07/Meta-AI-1-728x364.jpeg" class="attachment-large size-large wp-post-image" alt="The Meta logo with an infinity symbol is displayed above a digital landscape of colorful grid lines under a starry sky." decoding="async" fetchpriority="high" srcset="https://cdn.wccftech.com/wp-content/uploads/2026/07/Meta-AI-1-728x364.jpeg 728w, https://cdn.wccftech.com/wp-content/uploads/2026/07/Meta-AI-1-564x282.jpeg 564w, https://cdn.wccftech.com/wp-content/uploads/2026/07/Meta-AI-1-1456x727.jpeg 1456w, https://cdn.wccftech.com/wp-content/uploads/2026/07/Meta-AI-1-1920x959.jpeg 1920w" sizes="(max-width: 728px) 100vw, 728px" /></a></p><p>In what is likely to be the first of many such lawsuits that target silicon valley bigwigs, a number of Meta employees who were recently laid off are now accusing an AI-powered algorithm for disproportionately targeting workers with pre-existing medical conditions. Around 26 Meta employees are now alleging that the tech giant relied on factors such as productivity and AI use in deciding which workers get axed, disadvantaging those who missed work due to medical complications As many as 26 Meta employees have now anonymously filed a lawsuit in a federal court in Oakland, California, accusing the company of disproportionately [&hellip;]</p><p>Read full article at <a href="https://wccftech.com/metas-ai-layoff-algorithm-reportedly-ranked-workers-with-medical-conditions-for-termination-and-26-employees-are-now-suing-to-block-it/">https://wccftech.com/metas-ai-layoff-algorithm-reportedly-ranked-workers-with-medical-conditions-for-termination-and-26-employees-are-now-suing-to-block-it/</a></p>]]></content:encoded>
+					
+		
+		
+		<category><![CDATA[AI]]></category>
+<category><![CDATA[Mobile]]></category>
+<media:content medium="image" url="https://cdn.wccftech.com/wp-content/uploads/2026/07/Meta-AI-1-1456x727.jpeg" width="1456" height="727" />	</item>
+		<item>
+		<title><![CDATA[Xbox Can’t Be Both Platform and World’s Biggest Publisher, Warn Ex-Sony and Microsoft Execs After 3,200 Layoffs]]></title>
+		<link>https://wccftech.com/xbox-cant-be-both-platform-and-worlds-biggest-publisher/</link>
+		
+		<dc:creator><![CDATA[Alessio Palumbo]]></dc:creator>
+		<pubDate>Tue, 14 Jul 2026 18:00:00 +0000</pubDate>
+				<category><![CDATA[Featured]]></category>
+		<category><![CDATA[News]]></category>
+		<category><![CDATA[Asha Sharma]]></category>
+		<category><![CDATA[Jon Kimmich]]></category>
+		<category><![CDATA[Shawn Layden]]></category>
+		<category><![CDATA[Xbox]]></category>
+		<category><![CDATA[Xbox layoffs]]></category>
+		<guid isPermaLink="false">https://wccftech.com/?p=1733931</guid>
+
+					<description><![CDATA[Amid all the problems that besiege Microsoft's Xbox division, the studio divestitures, the layoffs, the declining business, and even the loss of a few million Game Pass subscribers, lies one lingering question: what actually is Xbox? A platform or the biggest third-party publisher? Microsoft certainly tried its damnedest to confuse consumers with its constantly shifting strategy regarding first-party content, as well as the delirious "This Is an Xbox" campaign. Xbox CEO Asha Sharma quickly tossed it in the trash after taking over from&#160;Phil Spencer, seeking a return to the brand's core values. But even she admitted that there's a fundamental [&#8230;]]]></description>
+										<content:encoded><![CDATA[<p><a href="https://wccftech.com/xbox-cant-be-both-platform-and-worlds-biggest-publisher/"><img width="728" height="408" src="https://cdn.wccftech.com/wp-content/uploads/2026/07/asha-sharma-xbox-series-x-HD-728x408.jpeg" class="attachment-large size-large wp-post-image" alt="CEO Asha Sharma smiling beside an Xbox Series X against a large green Xbox logo backdrop." decoding="async" srcset="https://cdn.wccftech.com/wp-content/uploads/2026/07/asha-sharma-xbox-series-x-HD-728x408.jpeg 728w, https://cdn.wccftech.com/wp-content/uploads/2026/07/asha-sharma-xbox-series-x-HD-564x316.jpeg 564w, https://cdn.wccftech.com/wp-content/uploads/2026/07/asha-sharma-xbox-series-x-HD-1456x815.jpeg 1456w, https://cdn.wccftech.com/wp-content/uploads/2026/07/asha-sharma-xbox-series-x-HD-1920x1075.jpeg 1920w" sizes="(max-width: 728px) 100vw, 728px" /></a></p><p>Amid all the problems that besiege Microsoft's Xbox division, the studio divestitures, the layoffs, the declining business, and even the loss of a few million Game Pass subscribers, lies one lingering question: what actually is Xbox? A platform or the biggest third-party publisher? Microsoft certainly tried its damnedest to confuse consumers with its constantly shifting strategy regarding first-party content, as well as the delirious "This Is an Xbox" campaign. Xbox CEO Asha Sharma quickly tossed it in the trash after taking over from&nbsp;Phil Spencer, seeking a return to the brand's core values. But even she admitted that there's a fundamental [&hellip;]</p><p>Read full article at <a href="https://wccftech.com/xbox-cant-be-both-platform-and-worlds-biggest-publisher/">https://wccftech.com/xbox-cant-be-both-platform-and-worlds-biggest-publisher/</a></p>]]></content:encoded>
+					
+		
+		
+		<category><![CDATA[Gaming]]></category>
+<media:content medium="image" url="https://cdn.wccftech.com/wp-content/uploads/2026/07/asha-sharma-xbox-series-x-HD-1456x815.jpeg" width="1456" height="815" />	</item>
+		<item>
+		<title><![CDATA[Intel Foundry Snags AMD, NVIDIA, and OpenAI as Design Wins on 18A & 14A Nodes While EMIB Achieves 98% Yields]]></title>
+		<link>https://wccftech.com/intel-foundry-snags-amd-nvidia-openai-as-design-wins-on-18a-14a-nodes/</link>
+		
+		<dc:creator><![CDATA[Hassan Mujtaba]]></dc:creator>
+		<pubDate>Tue, 14 Jul 2026 17:55:07 +0000</pubDate>
+				<category><![CDATA[Featured]]></category>
+		<category><![CDATA[News]]></category>
+		<category><![CDATA[Sticky]]></category>
+		<category><![CDATA[14A]]></category>
+		<category><![CDATA[18A]]></category>
+		<category><![CDATA[AMD]]></category>
+		<category><![CDATA[CoWoS]]></category>
+		<category><![CDATA[EMIB]]></category>
+		<category><![CDATA[Intel]]></category>
+		<category><![CDATA[Micron]]></category>
+		<category><![CDATA[Nvidia]]></category>
+		<category><![CDATA[OpenAI]]></category>
+		<category><![CDATA[tsmc]]></category>
+		<guid isPermaLink="false">https://wccftech.com/?p=1733938</guid>
+
+					<description><![CDATA[Intel has reportedly secured some big wins with its 18A, 14A, and EMIB process / advanced packaging technologies, signaling massive interest in its Foundry business. Tech Heavyweights Are Lining Up To See What Intel Foundry Has To Offer As 18A, 14A &#38; EMIB Technologies See Heightened Interest TSMC has so far been the only semiconductor manufacturer to offer bleeding-edge processes and packaging technology, but Intel has quickly emerged as a fierce competitor. Intel has only launched its 18A node, which is already achieving volume ramp, and is working towards its more advanced 18A-P (In Risk Production) and 14A nodes (Risk [&#8230;]]]></description>
+										<content:encoded><![CDATA[<p><a href="https://wccftech.com/intel-foundry-snags-amd-nvidia-openai-as-design-wins-on-18a-14a-nodes/"><img width="728" height="410" src="https://cdn.wccftech.com/wp-content/uploads/2026/07/Intel-Foundry-728x410.jpg" class="attachment-large size-large wp-post-image" alt="Two people in cleanroom suits holding a semiconductor wafer in a fabrication facility." decoding="async" srcset="https://cdn.wccftech.com/wp-content/uploads/2026/07/Intel-Foundry-728x410.jpg 728w, https://cdn.wccftech.com/wp-content/uploads/2026/07/Intel-Foundry-564x317.jpg 564w, https://cdn.wccftech.com/wp-content/uploads/2026/07/Intel-Foundry-1456x819.jpg 1456w, https://cdn.wccftech.com/wp-content/uploads/2026/07/Intel-Foundry-1920x1080.jpg 1920w" sizes="(max-width: 728px) 100vw, 728px" /></a></p><p>Intel has reportedly secured some big wins with its 18A, 14A, and EMIB process / advanced packaging technologies, signaling massive interest in its Foundry business. Tech Heavyweights Are Lining Up To See What Intel Foundry Has To Offer As 18A, 14A &amp; EMIB Technologies See Heightened Interest TSMC has so far been the only semiconductor manufacturer to offer bleeding-edge processes and packaging technology, but Intel has quickly emerged as a fierce competitor. Intel has only launched its 18A node, which is already achieving volume ramp, and is working towards its more advanced 18A-P (In Risk Production) and 14A nodes (Risk [&hellip;]</p><p>Read full article at <a href="https://wccftech.com/intel-foundry-snags-amd-nvidia-openai-as-design-wins-on-18a-14a-nodes/">https://wccftech.com/intel-foundry-snags-amd-nvidia-openai-as-design-wins-on-18a-14a-nodes/</a></p>]]></content:encoded>
+					
+		
+		
+		<category><![CDATA[Hardware]]></category>
+<category><![CDATA[Industry]]></category>
+<category><![CDATA[Rumor]]></category>
+<media:content medium="image" url="https://cdn.wccftech.com/wp-content/uploads/2026/07/Intel-Foundry-1456x819.jpg" width="1456" height="819" />	</item>
+		<item>
+		<title><![CDATA[U.S. Officials Reportedly Confirm First NVIDIA H200 AI GPU Shipments To China Two Months After Trump-Xi Meeting]]></title>
+		<link>https://wccftech.com/u-s-officials-confirm-first-nvidia-h200-ai-gpu-shipments-to-china/</link>
+		
+		<dc:creator><![CDATA[Hassan Mujtaba]]></dc:creator>
+		<pubDate>Tue, 14 Jul 2026 16:50:01 +0000</pubDate>
+				<category><![CDATA[Featured]]></category>
+		<category><![CDATA[News]]></category>
+		<category><![CDATA[Sticky]]></category>
+		<category><![CDATA[Alibaba]]></category>
+		<category><![CDATA[Blackwell]]></category>
+		<category><![CDATA[Bytedance]]></category>
+		<category><![CDATA[DeepSeek]]></category>
+		<category><![CDATA[h20]]></category>
+		<category><![CDATA[H200]]></category>
+		<category><![CDATA[Hopper]]></category>
+		<category><![CDATA[JD]]></category>
+		<category><![CDATA[Nvidia]]></category>
+		<category><![CDATA[Tencent]]></category>
+		<guid isPermaLink="false">https://wccftech.com/?p=1733932</guid>
+
+					<description><![CDATA[NVIDIA's H200 AI GPUs are finally shipping to China, as reported by U.S. officials, marking the return of the banned chip. China Softens Its Position on NVIDIA GPUs As First H200 Shipments Now Headed To Chinese AI Firms The NVIDIA Hopper story in China has been a roller coaster ride so far. When Hopper was launched, US export restrictions for the Chinese market were in full swing. These pushed NVIDIA to release an export-compliant variant called the H20 for China, which ended up being severely cut down, but still a viable option against what China's domestic chipmakers had to offer. [&#8230;]]]></description>
+										<content:encoded><![CDATA[<p><a href="https://wccftech.com/u-s-officials-confirm-first-nvidia-h200-ai-gpu-shipments-to-china/"><img width="728" height="410" src="https://cdn.wccftech.com/wp-content/uploads/2024/07/NVIDIA-H200-GPU-Grace-Hopper-Superchips-_3-1456x819-1-728x410.png" class="attachment-large size-large wp-post-image" alt="U.S. Officials Reportedly Confirm First NVIDIA H200 AI GPU Shipments To China Two Months After Trump-Xi Meeting" decoding="async" loading="lazy" srcset="https://cdn.wccftech.com/wp-content/uploads/2024/07/NVIDIA-H200-GPU-Grace-Hopper-Superchips-_3-1456x819-1-728x410.png 728w, https://cdn.wccftech.com/wp-content/uploads/2024/07/NVIDIA-H200-GPU-Grace-Hopper-Superchips-_3-1456x819-1-564x317.png 564w, https://cdn.wccftech.com/wp-content/uploads/2024/07/NVIDIA-H200-GPU-Grace-Hopper-Superchips-_3-1456x819-1.png 1456w" sizes="auto, (max-width: 728px) 100vw, 728px" /></a></p><p>NVIDIA's H200 AI GPUs are finally shipping to China, as reported by U.S. officials, marking the return of the banned chip. China Softens Its Position on NVIDIA GPUs As First H200 Shipments Now Headed To Chinese AI Firms The NVIDIA Hopper story in China has been a roller coaster ride so far. When Hopper was launched, US export restrictions for the Chinese market were in full swing. These pushed NVIDIA to release an export-compliant variant called the H20 for China, which ended up being severely cut down, but still a viable option against what China's domestic chipmakers had to offer. [&hellip;]</p><p>Read full article at <a href="https://wccftech.com/u-s-officials-confirm-first-nvidia-h200-ai-gpu-shipments-to-china/">https://wccftech.com/u-s-officials-confirm-first-nvidia-h200-ai-gpu-shipments-to-china/</a></p>]]></content:encoded>
+					
+		
+		
+		<category><![CDATA[GPUs]]></category>
+<category><![CDATA[Hardware]]></category>
+<category><![CDATA[Industry]]></category>
+<category><![CDATA[Report]]></category>
+<media:content medium="image" url="https://cdn.wccftech.com/wp-content/uploads/2024/07/NVIDIA-H200-GPU-Grace-Hopper-Superchips-_3-1456x819-1.png" width="1456" height="819" />	</item>
+		<item>
+		<title><![CDATA[Samsung Reportedly Lands Anthropic as Foundry Customer, Looking to Reverse its Chip Deficit With 2nm AI Orders]]></title>
+		<link>https://wccftech.com/samsung-reportedly-lands-anthropic-as-foundry-customer-looking-to-reverse-its-chip-deficit-with-2nm-ai-orders/</link>
+		
+		<dc:creator><![CDATA[Ramish Zafar]]></dc:creator>
+		<pubDate>Tue, 14 Jul 2026 15:24:25 +0000</pubDate>
+				<category><![CDATA[Featured]]></category>
+		<category><![CDATA[News]]></category>
+		<category><![CDATA[Samsung]]></category>
+		<guid isPermaLink="false">https://wccftech.com/?p=1733848</guid>
+
+					<description><![CDATA[With the AI race in full swing, Samsung Foundry has reportedly secured a contract to manufacture Anthropic's AI chips. Anthropic has slowly shaped up to be one of the most important players in the AI industry courtesy of its advanced AI models. As the AI semiconductor sector remains highly concentrated, with the bulk of chips designed and sold by NVIDIA, major players such as Google, OpenAI and Amazon are designing custom chips. Samsung's deal with Anthropic is expected to allow the foundry business to return to growth, say the sources, and allow it to reverse a deficit. Anthropic to Purportedly [&#8230;]]]></description>
+										<content:encoded><![CDATA[<p><a href="https://wccftech.com/samsung-reportedly-lands-anthropic-as-foundry-customer-looking-to-reverse-its-chip-deficit-with-2nm-ai-orders/"><img width="728" height="410" src="https://cdn.wccftech.com/wp-content/uploads/2026/07/Anthropic-728x410.jpg" class="attachment-large size-large wp-post-image" alt="" decoding="async" loading="lazy" srcset="https://cdn.wccftech.com/wp-content/uploads/2026/07/Anthropic-728x410.jpg 728w, https://cdn.wccftech.com/wp-content/uploads/2026/07/Anthropic-564x317.jpg 564w, https://cdn.wccftech.com/wp-content/uploads/2026/07/Anthropic-1456x819.jpg 1456w, https://cdn.wccftech.com/wp-content/uploads/2026/07/Anthropic.jpg 1920w" sizes="auto, (max-width: 728px) 100vw, 728px" /></a></p><p>With the AI race in full swing, Samsung Foundry has reportedly secured a contract to manufacture Anthropic's AI chips. Anthropic has slowly shaped up to be one of the most important players in the AI industry courtesy of its advanced AI models. As the AI semiconductor sector remains highly concentrated, with the bulk of chips designed and sold by NVIDIA, major players such as Google, OpenAI and Amazon are designing custom chips. Samsung's deal with Anthropic is expected to allow the foundry business to return to growth, say the sources, and allow it to reverse a deficit. Anthropic to Purportedly [&hellip;]</p><p>Read full article at <a href="https://wccftech.com/samsung-reportedly-lands-anthropic-as-foundry-customer-looking-to-reverse-its-chip-deficit-with-2nm-ai-orders/">https://wccftech.com/samsung-reportedly-lands-anthropic-as-foundry-customer-looking-to-reverse-its-chip-deficit-with-2nm-ai-orders/</a></p>]]></content:encoded>
+					
+		
+		
+		<category><![CDATA[AI]]></category>
+<category><![CDATA[Hardware]]></category>
+<category><![CDATA[Industry]]></category>
+<media:content medium="image" url="https://cdn.wccftech.com/wp-content/uploads/2026/07/Anthropic-1456x819.jpg" width="1456" height="819" />	</item>
+		<item>
+		<title><![CDATA[NVIDIA RTX 50 Series Hotspot Temperature Readings Are Back Through HWMonitor Utility]]></title>
+		<link>https://wccftech.com/nvidia-rtx-50-series-hotspot-temperature-readings-are-back-through-hwmonitor-utility/</link>
+		
+		<dc:creator><![CDATA[Sarfraz Khan]]></dc:creator>
+		<pubDate>Tue, 14 Jul 2026 15:03:33 +0000</pubDate>
+				<category><![CDATA[Featured]]></category>
+		<category><![CDATA[News]]></category>
+		<category><![CDATA[Blackwell]]></category>
+		<category><![CDATA[cpuid]]></category>
+		<category><![CDATA[GeForce RTX 50]]></category>
+		<category><![CDATA[hotspot]]></category>
+		<category><![CDATA[HWMonitor]]></category>
+		<category><![CDATA[HWMonitor Version 1.65]]></category>
+		<category><![CDATA[Nvidia]]></category>
+		<category><![CDATA[VRM]]></category>
+		<guid isPermaLink="false">https://wccftech.com/?p=1733915</guid>
+
+					<description><![CDATA[Despite NVIDIA's removal of the Hotspot temperature measurements, CPUID developers have deployed the feature to their popular hardware monitoring utility. NVIDIA Killed RTX 50 Hotspot Readings, but HWMonitor 1.65 Just Brought Them Back With Two Sensors While NVIDIA may have dropped the Hotspot temperature measurements from the Blackwell GeForce RTX 50 series graphics cards, the sensors reportedly do exist. We saw how modders brought back the hotspot monitoring through modding, which revealed how some GPUs were thermal throttling despite showing normal average GPU temperatures. The GPUs, therefore, were affected by high hotspot temperatures, resulting in inferior gaming performance. The experiment [&#8230;]]]></description>
+										<content:encoded><![CDATA[<p><a href="https://wccftech.com/nvidia-rtx-50-series-hotspot-temperature-readings-are-back-through-hwmonitor-utility/"><img width="728" height="410" src="https://cdn.wccftech.com/wp-content/uploads/2026/07/NVIDIA-RTX-50-GPU-Hotspot-Temperatures-_F-728x410.jpg" class="attachment-large size-large wp-post-image" alt="A close-up of an NVIDIA GeForce RTX graphics card with visible thermal paste on the GPU and the &#039;NVIDIA GPU Hotspot&#039; graphic in the background." decoding="async" loading="lazy" srcset="https://cdn.wccftech.com/wp-content/uploads/2026/07/NVIDIA-RTX-50-GPU-Hotspot-Temperatures-_F-728x410.jpg 728w, https://cdn.wccftech.com/wp-content/uploads/2026/07/NVIDIA-RTX-50-GPU-Hotspot-Temperatures-_F-564x317.jpg 564w, https://cdn.wccftech.com/wp-content/uploads/2026/07/NVIDIA-RTX-50-GPU-Hotspot-Temperatures-_F-1456x819.jpg 1456w, https://cdn.wccftech.com/wp-content/uploads/2026/07/NVIDIA-RTX-50-GPU-Hotspot-Temperatures-_F.jpg 1672w" sizes="auto, (max-width: 728px) 100vw, 728px" /></a></p><p>Despite NVIDIA's removal of the Hotspot temperature measurements, CPUID developers have deployed the feature to their popular hardware monitoring utility. NVIDIA Killed RTX 50 Hotspot Readings, but HWMonitor 1.65 Just Brought Them Back With Two Sensors While NVIDIA may have dropped the Hotspot temperature measurements from the Blackwell GeForce RTX 50 series graphics cards, the sensors reportedly do exist. We saw how modders brought back the hotspot monitoring through modding, which revealed how some GPUs were thermal throttling despite showing normal average GPU temperatures. The GPUs, therefore, were affected by high hotspot temperatures, resulting in inferior gaming performance. The experiment [&hellip;]</p><p>Read full article at <a href="https://wccftech.com/nvidia-rtx-50-series-hotspot-temperature-readings-are-back-through-hwmonitor-utility/">https://wccftech.com/nvidia-rtx-50-series-hotspot-temperature-readings-are-back-through-hwmonitor-utility/</a></p>]]></content:encoded>
+					
+		
+		
+		<category><![CDATA[Hardware]]></category>
+<category><![CDATA[Software]]></category>
+<media:content medium="image" url="https://cdn.wccftech.com/wp-content/uploads/2026/07/NVIDIA-RTX-50-GPU-Hotspot-Temperatures-_F-1456x819.jpg" width="1456" height="819" />	</item>
+		<item>
+		<title><![CDATA[Apple Just Hit A 20% Global Smartphone Share, Yet A New Report Warns Slowing iPhone Builds Amid Price Increases And Weak US Upgrades Threaten 2027]]></title>
+		<link>https://wccftech.com/apple-just-hit-a-20-global-smartphone-share-yet-a-new-report-warns-slowing-iphone-builds-amid-price-increases-and-weak-us-upgrades-threaten-2027/</link>
+		
+		<dc:creator><![CDATA[Rohail Saleem]]></dc:creator>
+		<pubDate>Tue, 14 Jul 2026 14:59:09 +0000</pubDate>
+				<category><![CDATA[Featured]]></category>
+		<category><![CDATA[News]]></category>
+		<category><![CDATA[Apple]]></category>
+		<category><![CDATA[iPhone Sales]]></category>
+		<category><![CDATA[KeyBanc]]></category>
+		<category><![CDATA[Q2 2026]]></category>
+		<guid isPermaLink="false">https://wccftech.com/?p=1733890</guid>
+
+					<description><![CDATA[Apple's sales cadence benefitted enormously from its relatively attractive pricing regime that it chose to maintain until the tail-end of Q2, when the Cupertino-based tech giant finally gave in to the oncoming margin-related pressures by hiking prices of its Mac and iPad offerings. Now, however, with the hype around the iPhone 17 series fizzling out, and the upcoming iPhone 18 Pro series expected to debut with material price hikes, a new research report has just found worrying evidence of Apple's slowing sales momentum. A KeyBanc analyst now believes the consensus estimate for Apple's iPhone growth of 8 percent in 2027 [&#8230;]]]></description>
+										<content:encoded><![CDATA[<p><a href="https://wccftech.com/apple-just-hit-a-20-global-smartphone-share-yet-a-new-report-warns-slowing-iphone-builds-amid-price-increases-and-weak-us-upgrades-threaten-2027/"><img width="728" height="485" src="https://cdn.wccftech.com/wp-content/uploads/2023/03/Apple-CEO-Tim-Cook-728x485.jpg" class="attachment-large size-large wp-post-image" alt="Apple" decoding="async" loading="lazy" srcset="https://cdn.wccftech.com/wp-content/uploads/2023/03/Apple-CEO-Tim-Cook-728x485.jpg 728w, https://cdn.wccftech.com/wp-content/uploads/2023/03/Apple-CEO-Tim-Cook-768x512.jpg 768w, https://cdn.wccftech.com/wp-content/uploads/2023/03/Apple-CEO-Tim-Cook.jpg 1200w" sizes="auto, (max-width: 728px) 100vw, 728px" /></a></p><p>Apple's sales cadence benefitted enormously from its relatively attractive pricing regime that it chose to maintain until the tail-end of Q2, when the Cupertino-based tech giant finally gave in to the oncoming margin-related pressures by hiking prices of its Mac and iPad offerings. Now, however, with the hype around the iPhone 17 series fizzling out, and the upcoming iPhone 18 Pro series expected to debut with material price hikes, a new research report has just found worrying evidence of Apple's slowing sales momentum. A KeyBanc analyst now believes the consensus estimate for Apple's iPhone growth of 8 percent in 2027 [&hellip;]</p><p>Read full article at <a href="https://wccftech.com/apple-just-hit-a-20-global-smartphone-share-yet-a-new-report-warns-slowing-iphone-builds-amid-price-increases-and-weak-us-upgrades-threaten-2027/">https://wccftech.com/apple-just-hit-a-20-global-smartphone-share-yet-a-new-report-warns-slowing-iphone-builds-amid-price-increases-and-weak-us-upgrades-threaten-2027/</a></p>]]></content:encoded>
+					
+		
+		
+		<category><![CDATA[Mobile]]></category>
+<media:content medium="image" url="https://cdn.wccftech.com/wp-content/uploads/2023/03/Apple-CEO-Tim-Cook.jpg" width="1200" height="800" />	</item>
+		<item>
+		<title><![CDATA[AMD’s 10th Anniversary Ryzen 7 5800X3D Effectively Drops Below $300 As Newegg Bundles A Free Cooler]]></title>
+		<link>https://wccftech.com/amds-10th-anniversary-ryzen-7-5800x3d-effectively-drops-below-300-as-newegg-bundles-a-free-cooler/</link>
+		
+		<dc:creator><![CDATA[Sarfraz Khan]]></dc:creator>
+		<pubDate>Tue, 14 Jul 2026 14:46:22 +0000</pubDate>
+				<category><![CDATA[Featured]]></category>
+		<category><![CDATA[News]]></category>
+		<category><![CDATA[10th anniversary]]></category>
+		<category><![CDATA[AM5]]></category>
+		<category><![CDATA[AMD]]></category>
+		<category><![CDATA[MAG Core Liquid 240mm AIO]]></category>
+		<category><![CDATA[MSI]]></category>
+		<category><![CDATA[Newegg]]></category>
+		<category><![CDATA[Ryzen 7 5800X3D]]></category>
+		<category><![CDATA[Ryzen 7 7800X3D]]></category>
+		<guid isPermaLink="false">https://wccftech.com/?p=1733902</guid>
+
+					<description><![CDATA[If you were waiting to buy AMD Ryzen's 10th Anniversary edition Ryzen 7 5800X3D, now is the best time. AMD Ryzen 7 5800X3D is Now Available for $349 on Newegg, Coupled With a Free MSI 240mm AIO Valued at $70 Right after the launch of AMD's Ryzen 10th Anniversary Ryzen 7 5800X3D edition, they started appearing on eBay for over $500. Even though the processor was officially launched for $349, scalpers tried to take advantage of this situation and started earning hundreds of dollars on the launch by relisting the CPU on eBay. Since the launch, the availability of the [&#8230;]]]></description>
+										<content:encoded><![CDATA[<p><a href="https://wccftech.com/amds-10th-anniversary-ryzen-7-5800x3d-effectively-drops-below-300-as-newegg-bundles-a-free-cooler/"><img width="728" height="410" src="https://cdn.wccftech.com/wp-content/uploads/2026/07/Ryzen-7-5800X3D-MSI-240mm-AIO-728x410.jpg" class="attachment-large size-large wp-post-image" alt="The image shows an AMD Ryzen 7 5000 series processor box with text &#039;Processor includes AMD 3D V-Cache technology,&#039; an MSI cooler with RGB fans, and the phrase &#039;RYZEN 7 PERFECT PAIR!&#039; in the background." decoding="async" loading="lazy" srcset="https://cdn.wccftech.com/wp-content/uploads/2026/07/Ryzen-7-5800X3D-MSI-240mm-AIO-728x410.jpg 728w, https://cdn.wccftech.com/wp-content/uploads/2026/07/Ryzen-7-5800X3D-MSI-240mm-AIO-564x317.jpg 564w, https://cdn.wccftech.com/wp-content/uploads/2026/07/Ryzen-7-5800X3D-MSI-240mm-AIO-1456x819.jpg 1456w, https://cdn.wccftech.com/wp-content/uploads/2026/07/Ryzen-7-5800X3D-MSI-240mm-AIO.jpg 1672w" sizes="auto, (max-width: 728px) 100vw, 728px" /></a></p><p>If you were waiting to buy AMD Ryzen's 10th Anniversary edition Ryzen 7 5800X3D, now is the best time. AMD Ryzen 7 5800X3D is Now Available for $349 on Newegg, Coupled With a Free MSI 240mm AIO Valued at $70 Right after the launch of AMD's Ryzen 10th Anniversary Ryzen 7 5800X3D edition, they started appearing on eBay for over $500. Even though the processor was officially launched for $349, scalpers tried to take advantage of this situation and started earning hundreds of dollars on the launch by relisting the CPU on eBay. Since the launch, the availability of the [&hellip;]</p><p>Read full article at <a href="https://wccftech.com/amds-10th-anniversary-ryzen-7-5800x3d-effectively-drops-below-300-as-newegg-bundles-a-free-cooler/">https://wccftech.com/amds-10th-anniversary-ryzen-7-5800x3d-effectively-drops-below-300-as-newegg-bundles-a-free-cooler/</a></p>]]></content:encoded>
+					
+		
+		
+		<category><![CDATA[Deals]]></category>
+<category><![CDATA[Hardware]]></category>
+<media:content medium="image" url="https://cdn.wccftech.com/wp-content/uploads/2026/07/Ryzen-7-5800X3D-MSI-240mm-AIO-1456x819.jpg" width="1456" height="819" />	</item>
+		<item>
+		<title><![CDATA[Nintendo Switch 2 Handles Dragon’s Dogma 2 Better Than Anyone Predicted, But The Real Winners Are PS5 And Xbox Owners]]></title>
+		<link>https://wccftech.com/nintendo-switch-2-handles-dragons-dogma-2-better-winners-ps5-xbox/</link>
+					<comments>https://wccftech.com/nintendo-switch-2-handles-dragons-dogma-2-better-winners-ps5-xbox/#respond</comments>
+		
+		<dc:creator><![CDATA[Francesco De Meo]]></dc:creator>
+		<pubDate>Tue, 14 Jul 2026 14:42:52 +0000</pubDate>
+				<category><![CDATA[Featured]]></category>
+		<category><![CDATA[News]]></category>
+		<category><![CDATA[Capcom]]></category>
+		<category><![CDATA[Dragon's Dogma]]></category>
+		<category><![CDATA[Dragon's Dogma 2: Dark Arisen]]></category>
+		<category><![CDATA[Nintendo Switch 2]]></category>
+		<category><![CDATA[PC]]></category>
+		<category><![CDATA[PlayStation 5]]></category>
+		<category><![CDATA[Xbox Series S]]></category>
+		<category><![CDATA[Xbox Series X]]></category>
+		<guid isPermaLink="false">https://wccftech.com/?p=1733896</guid>
+
+					<description><![CDATA[CAPCOM is among the third-party publishers that is supporting the Nintendo Switch 2 the best, delivering incredible ports of games such as Street Fighter 6, Resident Evil Requiem, PRAGMATA and Devil May Cry 5. Although the base game is remembered alongside Monster Hunter Wilds as one of the games powered by the RE Engine with the worst performance, Dragon's Dogma 2 Dark Arisen is already exceeding expectations on the system, running at 30 FPS and higher in its current state, which bodes incredibly well for the game ahead of its release on October 9. "We've been working not only to [&#8230;]]]></description>
+										<content:encoded><![CDATA[<p><a href="https://wccftech.com/nintendo-switch-2-handles-dragons-dogma-2-better-winners-ps5-xbox/"><img width="728" height="410" src="https://cdn.wccftech.com/wp-content/uploads/2026/07/Dragons-Dogma-2-Dark-Arisen-Nintendo-Switch-2-Exceeding-Expectations-728x410.jpg" class="attachment-large size-large wp-post-image" alt="A character in &#039;Dragon&#039;s Dogma II&#039; confronts a large winged dragon surrounded by skeletal enemies in a dark, cavernous environment." decoding="async" loading="lazy" srcset="https://cdn.wccftech.com/wp-content/uploads/2026/07/Dragons-Dogma-2-Dark-Arisen-Nintendo-Switch-2-Exceeding-Expectations-728x410.jpg 728w, https://cdn.wccftech.com/wp-content/uploads/2026/07/Dragons-Dogma-2-Dark-Arisen-Nintendo-Switch-2-Exceeding-Expectations-564x317.jpg 564w, https://cdn.wccftech.com/wp-content/uploads/2026/07/Dragons-Dogma-2-Dark-Arisen-Nintendo-Switch-2-Exceeding-Expectations-1456x819.jpg 1456w, https://cdn.wccftech.com/wp-content/uploads/2026/07/Dragons-Dogma-2-Dark-Arisen-Nintendo-Switch-2-Exceeding-Expectations.jpg 1920w" sizes="auto, (max-width: 728px) 100vw, 728px" /></a></p><p>CAPCOM is among the third-party publishers that is supporting the Nintendo Switch 2 the best, delivering incredible ports of games such as Street Fighter 6, Resident Evil Requiem, PRAGMATA and Devil May Cry 5. Although the base game is remembered alongside Monster Hunter Wilds as one of the games powered by the RE Engine with the worst performance, Dragon's Dogma 2 Dark Arisen is already exceeding expectations on the system, running at 30 FPS and higher in its current state, which bodes incredibly well for the game ahead of its release on October 9. "We've been working not only to [&hellip;]</p><p>Read full article at <a href="https://wccftech.com/nintendo-switch-2-handles-dragons-dogma-2-better-winners-ps5-xbox/">https://wccftech.com/nintendo-switch-2-handles-dragons-dogma-2-better-winners-ps5-xbox/</a></p>]]></content:encoded>
+					
+					<wfw:commentRss>https://wccftech.com/nintendo-switch-2-handles-dragons-dogma-2-better-winners-ps5-xbox/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+		<category><![CDATA[Gaming]]></category>
+<media:content medium="image" url="https://cdn.wccftech.com/wp-content/uploads/2026/07/Dragons-Dogma-2-Dark-Arisen-Nintendo-Switch-2-Exceeding-Expectations-1456x819.jpg" width="1456" height="819" />	</item>
+		<item>
+		<title><![CDATA[Microsoft Officially Removes Promotional Content From Windows Search]]></title>
+		<link>https://wccftech.com/microsoft-officially-removes-promotional-content-from-windows-search/</link>
+		
+		<dc:creator><![CDATA[Sarfraz Khan]]></dc:creator>
+		<pubDate>Tue, 14 Jul 2026 14:30:54 +0000</pubDate>
+				<category><![CDATA[Featured]]></category>
+		<category><![CDATA[News]]></category>
+		<category><![CDATA[Microsoft]]></category>
+		<category><![CDATA[Microsoft Store]]></category>
+		<category><![CDATA[Windows]]></category>
+		<category><![CDATA[windows search]]></category>
+		<guid isPermaLink="false">https://wccftech.com/?p=1733895</guid>
+
+					<description><![CDATA[Finally, a good change. This should now make the search content more relevant and less like a promotional window. Microsoft is Finally Cleaning up Windows Search, Removing Promotional Content Nobody loves the annoying promotional content in the Windows Search tab, which exists to solve users' queries. Thankfully, Microsoft is now removing it, addressing one of the biggest complaints about Windows Search. This will make users find the apps, files, and settings easier as this redesigns the experience to focus on what users actually want. The updated Search experience will now prioritize local results, allowing users to easily find the apps, [&#8230;]]]></description>
+										<content:encoded><![CDATA[<p><a href="https://wccftech.com/microsoft-officially-removes-promotional-content-from-windows-search/"><img width="728" height="410" src="https://cdn.wccftech.com/wp-content/uploads/2026/07/Windows-11-Search-Fixed-728x410.jpg" class="attachment-large size-large wp-post-image" alt="The image shows a Windows 11 search interface with the highlighted text &#039;SEARCH IS FINALLY FIXED!&#039; and a checkmark next to the search results, which include Calculator, File Explorer, and Settings." decoding="async" loading="lazy" srcset="https://cdn.wccftech.com/wp-content/uploads/2026/07/Windows-11-Search-Fixed-728x410.jpg 728w, https://cdn.wccftech.com/wp-content/uploads/2026/07/Windows-11-Search-Fixed-564x317.jpg 564w, https://cdn.wccftech.com/wp-content/uploads/2026/07/Windows-11-Search-Fixed-1456x819.jpg 1456w, https://cdn.wccftech.com/wp-content/uploads/2026/07/Windows-11-Search-Fixed.jpg 1672w" sizes="auto, (max-width: 728px) 100vw, 728px" /></a></p><p>Finally, a good change. This should now make the search content more relevant and less like a promotional window. Microsoft is Finally Cleaning up Windows Search, Removing Promotional Content Nobody loves the annoying promotional content in the Windows Search tab, which exists to solve users' queries. Thankfully, Microsoft is now removing it, addressing one of the biggest complaints about Windows Search. This will make users find the apps, files, and settings easier as this redesigns the experience to focus on what users actually want. The updated Search experience will now prioritize local results, allowing users to easily find the apps, [&hellip;]</p><p>Read full article at <a href="https://wccftech.com/microsoft-officially-removes-promotional-content-from-windows-search/">https://wccftech.com/microsoft-officially-removes-promotional-content-from-windows-search/</a></p>]]></content:encoded>
+					
+		
+		
+		<category><![CDATA[Hardware]]></category>
+<category><![CDATA[Windows Update]]></category>
+<media:content medium="image" url="https://cdn.wccftech.com/wp-content/uploads/2026/07/Windows-11-Search-Fixed-1456x819.jpg" width="1456" height="819" />	</item>
+		<item>
+		<title><![CDATA[Gears of War: E-Day Will Launch with NVIDIA DLSS 4.5 Dynamic Multi Frame Generation and Ray Tracing on PC]]></title>
+		<link>https://wccftech.com/gears-of-war-e-day-dlss-4-5-ray-tracing-pc/</link>
+		
+		<dc:creator><![CDATA[Alessio Palumbo]]></dc:creator>
+		<pubDate>Tue, 14 Jul 2026 13:00:00 +0000</pubDate>
+				<category><![CDATA[Featured]]></category>
+		<category><![CDATA[News]]></category>
+		<category><![CDATA[DLSS 4.5]]></category>
+		<category><![CDATA[Dynamic Multi-Frame Generation]]></category>
+		<category><![CDATA[Gears of War: E-Day]]></category>
+		<category><![CDATA[Gears of War: E-Day NVIDIA DLSS]]></category>
+		<category><![CDATA[Gears of War: E-Day PC]]></category>
+		<category><![CDATA[Gears of War: E-Day ray tracing]]></category>
+		<guid isPermaLink="false">https://wccftech.com/?p=1733828</guid>
+
+					<description><![CDATA[Today, NVIDIA announced a technical partnership with Gears of War: E-Day developer The Coalition to bring its RTX technologies to the upcoming third-person shooter game. DLSS Super Resolution, Dynamic Multi Frame Generation, NVIDIA Reflex, and Ray Tracing (for shadows, Lumen global illumination, and ambient occlusion) will all be supported for GeForce RTX Series owners. NVIDIA hasn't provided frame rate estimates yet, but early access to the multiplayer Open Beta begins on Thursday, August 6, so it's not too far off from being available to the public. It's likely that most, if not all, of these technologies will already be there. [&#8230;]]]></description>
+										<content:encoded><![CDATA[<p><a href="https://wccftech.com/gears-of-war-e-day-dlss-4-5-ray-tracing-pc/"><img width="728" height="410" src="https://cdn.wccftech.com/wp-content/uploads/2026/07/gears-of-war-e-day_kv-HD-728x410.jpeg" class="attachment-large size-large wp-post-image" alt="The image shows a promotional banner for Gears of War: E-Day featuring soldiers with weapons amid a fiery backdrop, accompanied by the text &#039;RTX. It&#039;s On.&#039; and &#039;Launching with ray tracing and DLSS 4.5.&#039; on the left with an NVIDIA GeForce RTX logo." decoding="async" loading="lazy" srcset="https://cdn.wccftech.com/wp-content/uploads/2026/07/gears-of-war-e-day_kv-HD-728x410.jpeg 728w, https://cdn.wccftech.com/wp-content/uploads/2026/07/gears-of-war-e-day_kv-HD-564x317.jpeg 564w, https://cdn.wccftech.com/wp-content/uploads/2026/07/gears-of-war-e-day_kv-HD-1456x819.jpeg 1456w, https://cdn.wccftech.com/wp-content/uploads/2026/07/gears-of-war-e-day_kv-HD-1920x1080.jpeg 1920w" sizes="auto, (max-width: 728px) 100vw, 728px" /></a></p><p>Today, NVIDIA announced a technical partnership with Gears of War: E-Day developer The Coalition to bring its RTX technologies to the upcoming third-person shooter game. DLSS Super Resolution, Dynamic Multi Frame Generation, NVIDIA Reflex, and Ray Tracing (for shadows, Lumen global illumination, and ambient occlusion) will all be supported for GeForce RTX Series owners. NVIDIA hasn't provided frame rate estimates yet, but early access to the multiplayer Open Beta begins on Thursday, August 6, so it's not too far off from being available to the public. It's likely that most, if not all, of these technologies will already be there. [&hellip;]</p><p>Read full article at <a href="https://wccftech.com/gears-of-war-e-day-dlss-4-5-ray-tracing-pc/">https://wccftech.com/gears-of-war-e-day-dlss-4-5-ray-tracing-pc/</a></p>]]></content:encoded>
+					
+		
+		
+		<category><![CDATA[Gaming]]></category>
+<media:content medium="image" url="https://cdn.wccftech.com/wp-content/uploads/2026/07/gears-of-war-e-day_kv-HD-1456x819.jpeg" width="1456" height="819" />	</item>
+		<item>
+		<title><![CDATA[Compulsion Games, Freed from Xbox, Scrambles for New Partners Just Days After Its Divestment and Return to Independence]]></title>
+		<link>https://wccftech.com/compulsion-games-seeks-partners-after-xbox-divestment/</link>
+		
+		<dc:creator><![CDATA[Alessio Palumbo]]></dc:creator>
+		<pubDate>Tue, 14 Jul 2026 12:00:00 +0000</pubDate>
+				<category><![CDATA[News]]></category>
+		<category><![CDATA[Compulsion Games]]></category>
+		<category><![CDATA[south of midnight]]></category>
+		<category><![CDATA[Xbox]]></category>
+		<category><![CDATA[Xbox layoffs]]></category>
+		<guid isPermaLink="false">https://wccftech.com/?p=1733873</guid>
+
+					<description><![CDATA[Montréal-based developer Compulsion Games is among the studios that were officially divested from Microsoft's Xbox last week. Indeed, Compulsion Games (like Double Fine Productions) was sold back to its own management and has therefore returned to full independence, but that does not mean they won't need partners. In fact, they haven't wasted any time at all in opening the search. A few hours ago, the official LinkedIn account of the studio posted the following call-out message to fellow industry members: With Compulsion Games returning to its roots as an independent developer, we are expanding opportunities to collaborate with studios across [&#8230;]]]></description>
+										<content:encoded><![CDATA[<p><a href="https://wccftech.com/compulsion-games-seeks-partners-after-xbox-divestment/"><img width="728" height="408" src="https://cdn.wccftech.com/wp-content/uploads/2026/07/compulsion-games-xbox-HD-728x408.jpeg" class="attachment-large size-large wp-post-image" alt="A female character from South of Midnight is shown next to the &#039;Compulsion Games&#039; logo with a green background." decoding="async" loading="lazy" srcset="https://cdn.wccftech.com/wp-content/uploads/2026/07/compulsion-games-xbox-HD-728x408.jpeg 728w, https://cdn.wccftech.com/wp-content/uploads/2026/07/compulsion-games-xbox-HD-564x316.jpeg 564w, https://cdn.wccftech.com/wp-content/uploads/2026/07/compulsion-games-xbox-HD-1456x815.jpeg 1456w, https://cdn.wccftech.com/wp-content/uploads/2026/07/compulsion-games-xbox-HD-1920x1075.jpeg 1920w" sizes="auto, (max-width: 728px) 100vw, 728px" /></a></p><p>Montréal-based developer Compulsion Games is among the studios that were officially divested from Microsoft's Xbox last week. Indeed, Compulsion Games (like Double Fine Productions) was sold back to its own management and has therefore returned to full independence, but that does not mean they won't need partners. In fact, they haven't wasted any time at all in opening the search. A few hours ago, the official LinkedIn account of the studio posted the following call-out message to fellow industry members: With Compulsion Games returning to its roots as an independent developer, we are expanding opportunities to collaborate with studios across [&hellip;]</p><p>Read full article at <a href="https://wccftech.com/compulsion-games-seeks-partners-after-xbox-divestment/">https://wccftech.com/compulsion-games-seeks-partners-after-xbox-divestment/</a></p>]]></content:encoded>
+					
+		
+		
+		<category><![CDATA[Gaming]]></category>
+<media:content medium="image" url="https://cdn.wccftech.com/wp-content/uploads/2026/07/compulsion-games-xbox-HD-1456x815.jpeg" width="1456" height="815" />	</item>
+		<item>
+		<title><![CDATA[GIGABYTE Silently Releases B850M AORUS Stealth With Connectors On The Back]]></title>
+		<link>https://wccftech.com/gigabyte-silently-releases-b850m-aorus-stealth-with-connectors-on-the-back/</link>
+		
+		<dc:creator><![CDATA[Sarfraz Khan]]></dc:creator>
+		<pubDate>Tue, 14 Jul 2026 11:41:30 +0000</pubDate>
+				<category><![CDATA[Featured]]></category>
+		<category><![CDATA[News]]></category>
+		<category><![CDATA[12 Power Phase VRM]]></category>
+		<category><![CDATA[600 series]]></category>
+		<category><![CDATA[800 series]]></category>
+		<category><![CDATA[B850M AORUS Stealth]]></category>
+		<category><![CDATA[Gigabyte]]></category>
+		<category><![CDATA[M.2 EZ-Flex]]></category>
+		<category><![CDATA[Micro-ATX]]></category>
+		<category><![CDATA[Project Stealth]]></category>
+		<category><![CDATA[Rear EZ]]></category>
+		<category><![CDATA[Stealth lineup]]></category>
+		<guid isPermaLink="false">https://wccftech.com/?p=1733880</guid>
+
+					<description><![CDATA[The company just dropped another connector-less motherboard, but with the micro-ATX form-factor for compact builds. GIGABYTE Releases B850M AORUS Stealth Motherboard, Featuring 12 Power Phase VRM, 4x DIMMs, Dual PCIe x16 Slots, While Keeping the Rest of the Connectors at the Back Popular hardware maker GIGABYTE is silently expanding its Stealth lineup with more motherboard models. GIGABYTE's Project Stealth was introduced back in 2022, and since then, it has added several motherboard models in the series, including 600 and 800 series motherboards with different chipsets. The company has now introduced a new Stealth motherboard called B850M AORUS Stealth, which introduces [&#8230;]]]></description>
+										<content:encoded><![CDATA[<p><a href="https://wccftech.com/gigabyte-silently-releases-b850m-aorus-stealth-with-connectors-on-the-back/"><img width="728" height="388" src="https://cdn.wccftech.com/wp-content/uploads/2026/07/GIGABYTE-B850M-AORUS-Stealth-728x388.jpg" class="attachment-large size-large wp-post-image" alt="The image shows a Gigabyte B850M AORUS STEALTH motherboard featuring &#039;X3D Turbo Mode,&#039; &#039;Driver BIOS,&#039; &#039;5 GbE LAN,&#039; &#039;WiFi 7,&#039; and other specifications, displayed prominently alongside AMD Ryzen and Stealth branding elements." decoding="async" loading="lazy" srcset="https://cdn.wccftech.com/wp-content/uploads/2026/07/GIGABYTE-B850M-AORUS-Stealth-728x388.jpg 728w, https://cdn.wccftech.com/wp-content/uploads/2026/07/GIGABYTE-B850M-AORUS-Stealth-564x301.jpg 564w, https://cdn.wccftech.com/wp-content/uploads/2026/07/GIGABYTE-B850M-AORUS-Stealth-1456x776.jpg 1456w, https://cdn.wccftech.com/wp-content/uploads/2026/07/GIGABYTE-B850M-AORUS-Stealth-1920x1024.jpg 1920w" sizes="auto, (max-width: 728px) 100vw, 728px" /></a></p><p>The company just dropped another connector-less motherboard, but with the micro-ATX form-factor for compact builds. GIGABYTE Releases B850M AORUS Stealth Motherboard, Featuring 12 Power Phase VRM, 4x DIMMs, Dual PCIe x16 Slots, While Keeping the Rest of the Connectors at the Back Popular hardware maker GIGABYTE is silently expanding its Stealth lineup with more motherboard models. GIGABYTE's Project Stealth was introduced back in 2022, and since then, it has added several motherboard models in the series, including 600 and 800 series motherboards with different chipsets. The company has now introduced a new Stealth motherboard called B850M AORUS Stealth, which introduces [&hellip;]</p><p>Read full article at <a href="https://wccftech.com/gigabyte-silently-releases-b850m-aorus-stealth-with-connectors-on-the-back/">https://wccftech.com/gigabyte-silently-releases-b850m-aorus-stealth-with-connectors-on-the-back/</a></p>]]></content:encoded>
+					
+		
+		
+		<category><![CDATA[Hardware]]></category>
+<category><![CDATA[Launch]]></category>
+<media:content medium="image" url="https://cdn.wccftech.com/wp-content/uploads/2026/07/GIGABYTE-B850M-AORUS-Stealth-1456x776.jpg" width="1456" height="776" />	</item>
+		<item>
+		<title><![CDATA[ASUS ROG Swift OLED Edition 20 Hits Shelves At $1,400, One Of Its Priciest Displays Ever]]></title>
+		<link>https://wccftech.com/asus-rog-swift-oled-edition-20-hits-shelves-at-1400-one-of-its-priciest-displays-ever/</link>
+		
+		<dc:creator><![CDATA[Sarfraz Khan]]></dc:creator>
+		<pubDate>Tue, 14 Jul 2026 11:20:17 +0000</pubDate>
+				<category><![CDATA[Featured]]></category>
+		<category><![CDATA[News]]></category>
+		<category><![CDATA[ASUS]]></category>
+		<category><![CDATA[JD]]></category>
+		<category><![CDATA[PG27AQWP-GR]]></category>
+		<category><![CDATA[ROG Astral RTX 5090 Edition 20]]></category>
+		<category><![CDATA[ROG Edition 20]]></category>
+		<category><![CDATA[ROG Strix G15 27 PRO OLED]]></category>
+		<category><![CDATA[ROG SWIFT OLED]]></category>
+		<category><![CDATA[Tandem OLED]]></category>
+		<category><![CDATA[TrueBlack Glossy]]></category>
+		<guid isPermaLink="false">https://wccftech.com/?p=1733869</guid>
+
+					<description><![CDATA[The latest special edition ROG Swift OLED gaming monitor is now available in both standard and stand versions in China. Popular Chinese Platform JD Lists ROG Swift OLED PG27AQWP-GR Edition 20 Gaming Monitor for Sale, Starting at $1327 Some of the ASUS ROG Special Edition 20 products are now getting listed for sale. We recently saw ASUS listing its ROG Astral RTX 5090 Edition 20 graphics card for a whopping $5,499 on the official store, making it one of the most expensive, if not the most expensive, RTX 5090 from the company. While all the hardware in the lineup is [&#8230;]]]></description>
+										<content:encoded><![CDATA[<p><a href="https://wccftech.com/asus-rog-swift-oled-edition-20-hits-shelves-at-1400-one-of-its-priciest-displays-ever/"><img width="728" height="394" src="https://cdn.wccftech.com/wp-content/uploads/2026/07/ROG-Swift-OLED-PG27AQWP-GR-728x394.jpg" class="attachment-large size-large wp-post-image" alt="An ASUS ROG monitor with a sleek design is mounted on an ROG desk arm in a futuristic setting, displaying the text &#039;Dare to Innovate.&#039;" decoding="async" loading="lazy" srcset="https://cdn.wccftech.com/wp-content/uploads/2026/07/ROG-Swift-OLED-PG27AQWP-GR-728x394.jpg 728w, https://cdn.wccftech.com/wp-content/uploads/2026/07/ROG-Swift-OLED-PG27AQWP-GR-564x305.jpg 564w, https://cdn.wccftech.com/wp-content/uploads/2026/07/ROG-Swift-OLED-PG27AQWP-GR-1456x787.jpg 1456w, https://cdn.wccftech.com/wp-content/uploads/2026/07/ROG-Swift-OLED-PG27AQWP-GR-1920x1038.jpg 1920w" sizes="auto, (max-width: 728px) 100vw, 728px" /></a></p><p>The latest special edition ROG Swift OLED gaming monitor is now available in both standard and stand versions in China. Popular Chinese Platform JD Lists ROG Swift OLED PG27AQWP-GR Edition 20 Gaming Monitor for Sale, Starting at $1327 Some of the ASUS ROG Special Edition 20 products are now getting listed for sale. We recently saw ASUS listing its ROG Astral RTX 5090 Edition 20 graphics card for a whopping $5,499 on the official store, making it one of the most expensive, if not the most expensive, RTX 5090 from the company. While all the hardware in the lineup is [&hellip;]</p><p>Read full article at <a href="https://wccftech.com/asus-rog-swift-oled-edition-20-hits-shelves-at-1400-one-of-its-priciest-displays-ever/">https://wccftech.com/asus-rog-swift-oled-edition-20-hits-shelves-at-1400-one-of-its-priciest-displays-ever/</a></p>]]></content:encoded>
+					
+		
+		
+		<category><![CDATA[Hardware]]></category>
+<category><![CDATA[Launch]]></category>
+<media:content medium="image" url="https://cdn.wccftech.com/wp-content/uploads/2026/07/ROG-Swift-OLED-PG27AQWP-GR-1456x787.jpg" width="1456" height="787" />	</item>
+		<item>
+		<title><![CDATA[Ubisoft Barcelona Built Assassin’s Creed Black Flag Resynced’s Acclaimed Underwater Levels, Then Got 51 Layoffs After 2 Million Sales]]></title>
+		<link>https://wccftech.com/ubisoft-barcelona-built-assassins-creed-black-flag-resynced-underwater-layoffs/</link>
+					<comments>https://wccftech.com/ubisoft-barcelona-built-assassins-creed-black-flag-resynced-underwater-layoffs/#respond</comments>
+		
+		<dc:creator><![CDATA[Francesco De Meo]]></dc:creator>
+		<pubDate>Tue, 14 Jul 2026 10:30:27 +0000</pubDate>
+				<category><![CDATA[News]]></category>
+		<category><![CDATA[Assassin's Creed Black Flag Resynced]]></category>
+		<category><![CDATA[PC]]></category>
+		<category><![CDATA[PlayStation 5]]></category>
+		<category><![CDATA[Ubisoft]]></category>
+		<category><![CDATA[Ubisoft Barcelona]]></category>
+		<category><![CDATA[Xbox Series S]]></category>
+		<category><![CDATA[Xbox Series X]]></category>
+		<guid isPermaLink="false">https://wccftech.com/?p=1733858</guid>
+
+					<description><![CDATA[Assassin's Creed Black Flag Resynced does a lot of things right, enhancing the visuals of the fourth entry in the series to new heights while introducing choice combat and parkour changes for a more engaging experience, and new content allowing players to delve deeper into Edward Kenway's story, which remains as engaging as it has always been. For some, myself included, one of the highlights of the experience is underwater exploration, which I feel is one of the best ever seen in video games to date. However, having created what's one of the best features of the game wasn't enough [&#8230;]]]></description>
+										<content:encoded><![CDATA[<p><a href="https://wccftech.com/ubisoft-barcelona-built-assassins-creed-black-flag-resynced-underwater-layoffs/"><img width="728" height="410" src="https://cdn.wccftech.com/wp-content/uploads/2026/07/Assassins-Creed-Black-Flag-Resynced-Ubisoft-Barcelona-728x410.jpg" class="attachment-large size-large wp-post-image" alt="A character from Assassin&#039;s Creed IV: Black Flag stands on a beach with a sword, facing other characters." decoding="async" loading="lazy" srcset="https://cdn.wccftech.com/wp-content/uploads/2026/07/Assassins-Creed-Black-Flag-Resynced-Ubisoft-Barcelona-728x410.jpg 728w, https://cdn.wccftech.com/wp-content/uploads/2026/07/Assassins-Creed-Black-Flag-Resynced-Ubisoft-Barcelona-564x317.jpg 564w, https://cdn.wccftech.com/wp-content/uploads/2026/07/Assassins-Creed-Black-Flag-Resynced-Ubisoft-Barcelona-1456x819.jpg 1456w, https://cdn.wccftech.com/wp-content/uploads/2026/07/Assassins-Creed-Black-Flag-Resynced-Ubisoft-Barcelona-1920x1080.jpg 1920w" sizes="auto, (max-width: 728px) 100vw, 728px" /></a></p><p>Assassin's Creed Black Flag Resynced does a lot of things right, enhancing the visuals of the fourth entry in the series to new heights while introducing choice combat and parkour changes for a more engaging experience, and new content allowing players to delve deeper into Edward Kenway's story, which remains as engaging as it has always been. For some, myself included, one of the highlights of the experience is underwater exploration, which I feel is one of the best ever seen in video games to date. However, having created what's one of the best features of the game wasn't enough [&hellip;]</p><p>Read full article at <a href="https://wccftech.com/ubisoft-barcelona-built-assassins-creed-black-flag-resynced-underwater-layoffs/">https://wccftech.com/ubisoft-barcelona-built-assassins-creed-black-flag-resynced-underwater-layoffs/</a></p>]]></content:encoded>
+					
+					<wfw:commentRss>https://wccftech.com/ubisoft-barcelona-built-assassins-creed-black-flag-resynced-underwater-layoffs/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+		<category><![CDATA[Gaming]]></category>
+<media:content medium="image" url="https://cdn.wccftech.com/wp-content/uploads/2026/07/Assassins-Creed-Black-Flag-Resynced-Ubisoft-Barcelona-1456x819.jpg" width="1456" height="819" />	</item>
+		<item>
+		<title><![CDATA[MSI Brings CXMT DDR5 Memory Support To Intel Desktop Platforms, Offering Over 8000 MT/s “Optimized” Speeds]]></title>
+		<link>https://wccftech.com/msi-brings-cxmt-ddr5-memory-support-to-intel-desktop-platforms-over-8000-mtps/</link>
+		
+		<dc:creator><![CDATA[Hassan Mujtaba]]></dc:creator>
+		<pubDate>Tue, 14 Jul 2026 10:25:46 +0000</pubDate>
+				<category><![CDATA[Featured]]></category>
+		<category><![CDATA[News]]></category>
+		<category><![CDATA[Sticky]]></category>
+		<category><![CDATA[8000 MT/s]]></category>
+		<category><![CDATA[AGESA]]></category>
+		<category><![CDATA[AM5]]></category>
+		<category><![CDATA[CXMT]]></category>
+		<category><![CDATA[DDR5]]></category>
+		<category><![CDATA[Gloway International]]></category>
+		<category><![CDATA[Intel LGA 1851]]></category>
+		<category><![CDATA[MEG Z890 Unify-X]]></category>
+		<category><![CDATA[MSI]]></category>
+		<category><![CDATA[PRO Z890-S WIFI]]></category>
+		<guid isPermaLink="false">https://wccftech.com/?p=1733846</guid>
+
+					<description><![CDATA[MSI has become one of the first motherboard makers to offer optimized CXMT DDR5 memory support on its Intel Desktop platforms. After AMD AM5, MSI Brings CXMT DDR5 Memory Support To Intel LGA 1851 Platforms, With Speeds Topping Past 8000 MT/s China is rapidly adopting its domestically produced memory to reduce reliance on offshore brands that are charging heavy prices for their DRAM solutions. As such, CXMT (ChangXin Memory Technologies) has become the go-to choice as it is the country's premier DRAM manufacturer. While there have been reports that CXMT has started supplying DRAM to global markets, those aren't true [&#8230;]]]></description>
+										<content:encoded><![CDATA[<p><a href="https://wccftech.com/msi-brings-cxmt-ddr5-memory-support-to-intel-desktop-platforms-over-8000-mtps/"><img width="728" height="485" src="https://cdn.wccftech.com/wp-content/uploads/2026/07/MSI-CXMT-DDR5-Memory-Support-Intel-728x485.jpg" class="attachment-large size-large wp-post-image" alt="Close-up of an MSI motherboard featuring &#039;CXMT DDR5 Support&#039; and &#039;8000 MT/s+&#039; text, with the MSI dragon logo prominently displayed." decoding="async" loading="lazy" srcset="https://cdn.wccftech.com/wp-content/uploads/2026/07/MSI-CXMT-DDR5-Memory-Support-Intel-728x485.jpg 728w, https://cdn.wccftech.com/wp-content/uploads/2026/07/MSI-CXMT-DDR5-Memory-Support-Intel-540x360.jpg 540w, https://cdn.wccftech.com/wp-content/uploads/2026/07/MSI-CXMT-DDR5-Memory-Support-Intel-1456x971.jpg 1456w, https://cdn.wccftech.com/wp-content/uploads/2026/07/MSI-CXMT-DDR5-Memory-Support-Intel.jpg 1536w" sizes="auto, (max-width: 728px) 100vw, 728px" /></a></p><p>MSI has become one of the first motherboard makers to offer optimized CXMT DDR5 memory support on its Intel Desktop platforms. After AMD AM5, MSI Brings CXMT DDR5 Memory Support To Intel LGA 1851 Platforms, With Speeds Topping Past 8000 MT/s China is rapidly adopting its domestically produced memory to reduce reliance on offshore brands that are charging heavy prices for their DRAM solutions. As such, CXMT (ChangXin Memory Technologies) has become the go-to choice as it is the country's premier DRAM manufacturer. While there have been reports that CXMT has started supplying DRAM to global markets, those aren't true [&hellip;]</p><p>Read full article at <a href="https://wccftech.com/msi-brings-cxmt-ddr5-memory-support-to-intel-desktop-platforms-over-8000-mtps/">https://wccftech.com/msi-brings-cxmt-ddr5-memory-support-to-intel-desktop-platforms-over-8000-mtps/</a></p>]]></content:encoded>
+					
+		
+		
+		<category><![CDATA[Hardware]]></category>
+<category><![CDATA[Memory]]></category>
+<category><![CDATA[PC]]></category>
+<media:content medium="image" url="https://cdn.wccftech.com/wp-content/uploads/2026/07/MSI-CXMT-DDR5-Memory-Support-Intel-1456x971.jpg" width="1456" height="971" />	</item>
+		<item>
+		<title><![CDATA[PlayStation Left Demon’s Souls Trapped on PS3, But a Single Modder is Remastering it for PC]]></title>
+		<link>https://wccftech.com/playstation-demons-souls-remaster-pc/</link>
+					<comments>https://wccftech.com/playstation-demons-souls-remaster-pc/#respond</comments>
+		
+		<dc:creator><![CDATA[Francesco De Meo]]></dc:creator>
+		<pubDate>Tue, 14 Jul 2026 09:59:26 +0000</pubDate>
+				<category><![CDATA[Featured]]></category>
+		<category><![CDATA[News]]></category>
+		<category><![CDATA[demons souls]]></category>
+		<category><![CDATA[fromsoftware]]></category>
+		<category><![CDATA[Mods]]></category>
+		<category><![CDATA[PC]]></category>
+		<category><![CDATA[playstation]]></category>
+		<guid isPermaLink="false">https://wccftech.com/?p=1733841</guid>
+
+					<description><![CDATA[Despite being an iconic game which gave rise to the Soulslike phenomenon, the original Demon's Souls was never released from its PlayStation 3 prison, much like the remake developed by Bluepoint Games likely won't from its PlayStation 5 prison. However, thanks to the RPCS3 emulator, the game is fully playable on PC, and soon enough, fans will be able to enjoy the now-classic action RPG developed by FromSoftware with significant visual improvements from the PC Remaster mod. Developed by fromsoftserve, the developer behind the stunning Bloodborne Remaster Project, this visual overhaul "modifies the game's models to now react to light sources [&#8230;]]]></description>
+										<content:encoded><![CDATA[<p><a href="https://wccftech.com/playstation-demons-souls-remaster-pc/"><img width="728" height="409" src="https://cdn.wccftech.com/wp-content/uploads/2026/07/Demons-Souls-PC-Remaster-728x409.jpg" class="attachment-large size-large wp-post-image" alt="A character in armor exploring a medieval, overgrown stone corridor in the game Demon&#039;s Souls." decoding="async" loading="lazy" srcset="https://cdn.wccftech.com/wp-content/uploads/2026/07/Demons-Souls-PC-Remaster-728x409.jpg 728w, https://cdn.wccftech.com/wp-content/uploads/2026/07/Demons-Souls-PC-Remaster-564x317.jpg 564w, https://cdn.wccftech.com/wp-content/uploads/2026/07/Demons-Souls-PC-Remaster-1456x819.jpg 1456w, https://cdn.wccftech.com/wp-content/uploads/2026/07/Demons-Souls-PC-Remaster-1920x1080.jpg 1920w" sizes="auto, (max-width: 728px) 100vw, 728px" /></a></p><p>Despite being an iconic game which gave rise to the Soulslike phenomenon, the original Demon's Souls was never released from its PlayStation 3 prison, much like the remake developed by Bluepoint Games likely won't from its PlayStation 5 prison. However, thanks to the RPCS3 emulator, the game is fully playable on PC, and soon enough, fans will be able to enjoy the now-classic action RPG developed by FromSoftware with significant visual improvements from the PC Remaster mod. Developed by fromsoftserve, the developer behind the stunning Bloodborne Remaster Project, this visual overhaul "modifies the game's models to now react to light sources [&hellip;]</p><p>Read full article at <a href="https://wccftech.com/playstation-demons-souls-remaster-pc/">https://wccftech.com/playstation-demons-souls-remaster-pc/</a></p>]]></content:encoded>
+					
+					<wfw:commentRss>https://wccftech.com/playstation-demons-souls-remaster-pc/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+		<category><![CDATA[Gaming]]></category>
+<media:content medium="image" url="https://cdn.wccftech.com/wp-content/uploads/2026/07/Demons-Souls-PC-Remaster-1456x819.jpg" width="1456" height="819" />	</item>
+		<item>
+		<title><![CDATA[NVIDIA Teams With US Government to Slam Shut the Backdoor Feeding Banned AI Chips Into China]]></title>
+		<link>https://wccftech.com/nvidia-teams-with-us-government-to-slam-shut-the-backdoor-feeding-banned-ai-chips-into-china/</link>
+		
+		<dc:creator><![CDATA[Ramish Zafar]]></dc:creator>
+		<pubDate>Tue, 14 Jul 2026 09:48:20 +0000</pubDate>
+				<category><![CDATA[Featured]]></category>
+		<category><![CDATA[News]]></category>
+		<category><![CDATA[China]]></category>
+		<category><![CDATA[Nvidia]]></category>
+		<guid isPermaLink="false">https://wccftech.com/?p=1733820</guid>
+
+					<description><![CDATA[NVIDIA Corporation is taking strict action to ensure that its AI GPUs only land in the hands of the right customers, reports the Financial Times. The action is to ensure that its chips do not reach China, and it follows increasing scrutiny by Taiwanese authorities on firms allegedly involved in shipping the chips to the Asian country. Previous reports have suggested that the Chinese government is interested in granting exemptions to some local firms to buy NVIDIA chips, even as firms such as Huawei claim to be able to achieve parity with Western technology in the future. NVIDIA Is Working [&#8230;]]]></description>
+										<content:encoded><![CDATA[<p><a href="https://wccftech.com/nvidia-teams-with-us-government-to-slam-shut-the-backdoor-feeding-banned-ai-chips-into-china/"><img width="728" height="408" src="https://cdn.wccftech.com/wp-content/uploads/2026/05/NVIDIA-Hopper-H200-China-728x408.jpg" class="attachment-large size-large wp-post-image" alt="" decoding="async" loading="lazy" srcset="https://cdn.wccftech.com/wp-content/uploads/2026/05/NVIDIA-Hopper-H200-China-728x408.jpg 728w, https://cdn.wccftech.com/wp-content/uploads/2026/05/NVIDIA-Hopper-H200-China-564x316.jpg 564w, https://cdn.wccftech.com/wp-content/uploads/2026/05/NVIDIA-Hopper-H200-China-1456x817.jpg 1456w, https://cdn.wccftech.com/wp-content/uploads/2026/05/NVIDIA-Hopper-H200-China-1920x1077.jpg 1920w" sizes="auto, (max-width: 728px) 100vw, 728px" /></a></p><p>NVIDIA Corporation is taking strict action to ensure that its AI GPUs only land in the hands of the right customers, reports the Financial Times. The action is to ensure that its chips do not reach China, and it follows increasing scrutiny by Taiwanese authorities on firms allegedly involved in shipping the chips to the Asian country. Previous reports have suggested that the Chinese government is interested in granting exemptions to some local firms to buy NVIDIA chips, even as firms such as Huawei claim to be able to achieve parity with Western technology in the future. NVIDIA Is Working [&hellip;]</p><p>Read full article at <a href="https://wccftech.com/nvidia-teams-with-us-government-to-slam-shut-the-backdoor-feeding-banned-ai-chips-into-china/">https://wccftech.com/nvidia-teams-with-us-government-to-slam-shut-the-backdoor-feeding-banned-ai-chips-into-china/</a></p>]]></content:encoded>
+					
+		
+		
+		<category><![CDATA[AI]]></category>
+<category><![CDATA[Hardware]]></category>
+<category><![CDATA[Industry]]></category>
+<media:content medium="image" url="https://cdn.wccftech.com/wp-content/uploads/2026/05/NVIDIA-Hopper-H200-China-1456x817.jpg" width="1456" height="817" />	</item>
+		<item>
+		<title><![CDATA[CAPCOM Reportedly Plans to Create Bigger Expansions Starting With Resident Evil Requiem, As It Prepares Veronica Q1 2027 Release]]></title>
+		<link>https://wccftech.com/capcom-plans-bigger-expansions-resident-evil-requiem-veronica-q1-2027-release/</link>
+					<comments>https://wccftech.com/capcom-plans-bigger-expansions-resident-evil-requiem-veronica-q1-2027-release/#respond</comments>
+		
+		<dc:creator><![CDATA[Francesco De Meo]]></dc:creator>
+		<pubDate>Tue, 14 Jul 2026 09:17:37 +0000</pubDate>
+				<category><![CDATA[News]]></category>
+		<category><![CDATA[Capcom]]></category>
+		<category><![CDATA[Nintendo Switch 2]]></category>
+		<category><![CDATA[PC]]></category>
+		<category><![CDATA[PlayStation 5]]></category>
+		<category><![CDATA[Resident Evil Requiem]]></category>
+		<category><![CDATA[Resident Evil Veronica]]></category>
+		<category><![CDATA[Xbox Series S]]></category>
+		<category><![CDATA[Xbox Series X]]></category>
+		<guid isPermaLink="false">https://wccftech.com/?p=1733830</guid>
+
+					<description><![CDATA[Following the release of Resident Evil VII Biohazard, the survival-horror series by CAPCOM has entered a new golden age which has culminated this year with Resident Evil Requiem on PC, PlayStation 5, Xbox Series X&#124;S and Nintendo Switch 2. A few months back, CAPCOM confirmed a story expansion is in the works, and it is reportedly going to be as substantial as Resident Evil 4 remake’s Separate Ways expansion, signaling the beginning of a new strategy for the Japanese publisher. Bigger Story Expansions To Fill The Gaps Between Major Titles "I want to share something I heard which I think [&#8230;]]]></description>
+										<content:encoded><![CDATA[<p><a href="https://wccftech.com/capcom-plans-bigger-expansions-resident-evil-requiem-veronica-q1-2027-release/"><img width="728" height="410" src="https://cdn.wccftech.com/wp-content/uploads/2026/07/Resident-Evil-Requiem-Expansion-Veronica-Early-2027-728x410.jpg" class="attachment-large size-large wp-post-image" alt="A split image showing a male character in a black leather jacket on the left and a close-up of a female character with intense expression and red lighting on the right, from Resident Evil" decoding="async" loading="lazy" srcset="https://cdn.wccftech.com/wp-content/uploads/2026/07/Resident-Evil-Requiem-Expansion-Veronica-Early-2027-728x410.jpg 728w, https://cdn.wccftech.com/wp-content/uploads/2026/07/Resident-Evil-Requiem-Expansion-Veronica-Early-2027-564x317.jpg 564w, https://cdn.wccftech.com/wp-content/uploads/2026/07/Resident-Evil-Requiem-Expansion-Veronica-Early-2027-1456x820.jpg 1456w, https://cdn.wccftech.com/wp-content/uploads/2026/07/Resident-Evil-Requiem-Expansion-Veronica-Early-2027-1920x1081.jpg 1920w" sizes="auto, (max-width: 728px) 100vw, 728px" /></a></p><p>Following the release of Resident Evil VII Biohazard, the survival-horror series by CAPCOM has entered a new golden age which has culminated this year with Resident Evil Requiem on PC, PlayStation 5, Xbox Series X|S and Nintendo Switch 2. A few months back, CAPCOM confirmed a story expansion is in the works, and it is reportedly going to be as substantial as Resident Evil 4 remake’s Separate Ways expansion, signaling the beginning of a new strategy for the Japanese publisher. Bigger Story Expansions To Fill The Gaps Between Major Titles "I want to share something I heard which I think [&hellip;]</p><p>Read full article at <a href="https://wccftech.com/capcom-plans-bigger-expansions-resident-evil-requiem-veronica-q1-2027-release/">https://wccftech.com/capcom-plans-bigger-expansions-resident-evil-requiem-veronica-q1-2027-release/</a></p>]]></content:encoded>
+					
+					<wfw:commentRss>https://wccftech.com/capcom-plans-bigger-expansions-resident-evil-requiem-veronica-q1-2027-release/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+		<category><![CDATA[Gaming]]></category>
+<category><![CDATA[Rumor]]></category>
+<media:content medium="image" url="https://cdn.wccftech.com/wp-content/uploads/2026/07/Resident-Evil-Requiem-Expansion-Veronica-Early-2027-1456x820.jpg" width="1456" height="820" />	</item>
+		<item>
+		<title><![CDATA[Samsung Pushes Nintendo Toward a Switch 2 OLED, yet the $499 Price Crisis Threatens to Stall the Deal]]></title>
+		<link>https://wccftech.com/samsung-nintendo-switch-2-oled-price-crisis/</link>
+		
+		<dc:creator><![CDATA[Alessio Palumbo]]></dc:creator>
+		<pubDate>Tue, 14 Jul 2026 08:30:09 +0000</pubDate>
+				<category><![CDATA[Featured]]></category>
+		<category><![CDATA[News]]></category>
+		<category><![CDATA[Nintendo Switch 2]]></category>
+		<category><![CDATA[Nintendo Switch 2 OLED]]></category>
+		<category><![CDATA[nintendo switch oled]]></category>
+		<category><![CDATA[Samsung OLED]]></category>
+		<guid isPermaLink="false">https://wccftech.com/?p=1733824</guid>
+
+					<description><![CDATA[Rumors about a Nintendo Switch 2 OLED version have swirled even before Nintendo's latest console launched in June 2025. In April 2024, a Samsung leaker suggested that the unit was actually already in production for a launch slated at a later time. That turned out to be incorrect, but the rumor that Samsung is pushing for an OLED version persisted into May 2025. That wouldn't be surprising, as Samsung supplied Nintendo with the OLED panel for the first Switch. Now, the Korean edition of the business technology website ZDNET has learned that Nintendo is actively evaluating the possibility. They cited [&#8230;]]]></description>
+										<content:encoded><![CDATA[<p><a href="https://wccftech.com/samsung-nintendo-switch-2-oled-price-crisis/"><img width="728" height="410" src="https://cdn.wccftech.com/wp-content/uploads/2026/07/nintendo-switch-2-official-HD-728x410.jpeg" class="attachment-large size-large wp-post-image" alt="A hand places a Nintendo Switch 2 OLED console into a charging dock labeled with &#039;Nintendo Switch 2&#039; against a red background." decoding="async" loading="lazy" srcset="https://cdn.wccftech.com/wp-content/uploads/2026/07/nintendo-switch-2-official-HD-728x410.jpeg 728w, https://cdn.wccftech.com/wp-content/uploads/2026/07/nintendo-switch-2-official-HD-564x317.jpeg 564w, https://cdn.wccftech.com/wp-content/uploads/2026/07/nintendo-switch-2-official-HD-1456x819.jpeg 1456w, https://cdn.wccftech.com/wp-content/uploads/2026/07/nintendo-switch-2-official-HD-1920x1080.jpeg 1920w" sizes="auto, (max-width: 728px) 100vw, 728px" /></a></p><p>Rumors about a Nintendo Switch 2 OLED version have swirled even before Nintendo's latest console launched in June 2025. In April 2024, a Samsung leaker suggested that the unit was actually already in production for a launch slated at a later time. That turned out to be incorrect, but the rumor that Samsung is pushing for an OLED version persisted into May 2025. That wouldn't be surprising, as Samsung supplied Nintendo with the OLED panel for the first Switch. Now, the Korean edition of the business technology website ZDNET has learned that Nintendo is actively evaluating the possibility. They cited [&hellip;]</p><p>Read full article at <a href="https://wccftech.com/samsung-nintendo-switch-2-oled-price-crisis/">https://wccftech.com/samsung-nintendo-switch-2-oled-price-crisis/</a></p>]]></content:encoded>
+					
+		
+		
+		<category><![CDATA[Gaming]]></category>
+<category><![CDATA[Rumor]]></category>
+<media:content medium="image" url="https://cdn.wccftech.com/wp-content/uploads/2026/07/nintendo-switch-2-official-HD-1456x819.jpeg" width="1456" height="819" />	</item>
+	</channel>
+</rss>

@@ -21,6 +21,9 @@ const SEO_DESCRIPTION_TARGET_CHARS = 150;
 const SEO_DESCRIPTION_MIN_CHARS = 120;
 const SEO_DESCRIPTION_MAX_CHARS = 160;
 const TOPIC_SIMILARITY_THRESHOLD = 0.6;
+const MAX_STORY_BODY_CHARS = 8000;
+const MAX_PROMPT_SUMMARY_CHARS = 4000;
+const ENRICH_FETCH_TIMEOUT_MS = 12000;
 const REDDIT_FETCH_DELAY_MS = Number.parseInt(process.env.REDDIT_FETCH_DELAY_MS || '3000', 10);
 const REDDIT_RATE_LIMIT_BACKOFF_MS = Number.parseInt(process.env.REDDIT_RATE_LIMIT_BACKOFF_MS || '3000', 10);
 const PERSISTENT_BLOCK_FAILURE_STREAK = 2;
@@ -53,6 +56,23 @@ const CONTENT_SOURCES = [
     /^share of the week/i,
     /^players'? choice/i,
     /playstation store:.*top downloads/i
+  ] },
+  { name: 'Aftermath', url: 'https://aftermath.site/rss/', weight: 1.25, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
+  { name: 'GamesIndustry', url: 'https://www.gamesindustry.biz/feed', weight: 1.2, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
+  { name: 'The Gamer', url: 'https://www.thegamer.com/feed/', weight: 1.05, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
+  { name: 'Insider Gaming', url: 'https://insider-gaming.com/feed/', weight: 1.0, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
+  { name: 'Wccftech', url: 'https://www.wccftech.com/feed/', weight: 0.95, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
+  { name: 'Siliconera', url: 'https://www.siliconera.com/feed/', weight: 0.95, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
+  { name: 'Engadget', url: 'https://www.engadget.com/rss.xml', weight: 0.9, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
+  { name: 'Fallout Wiki — New Pages', url: 'https://fallout.fandom.com/wiki/Special:NewPages?feed=rss', weight: 1.2, category: 'community', tier: 'community', kind: 'rss', excludeTitlePatterns: [
+    /^talk:/i,
+    /^user:/i,
+    /^user blog:/i,
+    /^category:/i,
+    /^template:/i,
+    /^file:/i,
+    /^help:/i,
+    /^draft:/i
   ] }
 ];
 
@@ -63,7 +83,8 @@ const REDDIT_SOURCES = [
   { name: 'r/FalloutMods', subreddit: 'FalloutMods', weight: 1.45, category: 'mods', tier: 'community', kind: 'reddit', minScore: 80, minComments: 18 },
   { name: 'r/fo4', subreddit: 'fo4', weight: 1.3, category: 'mods', tier: 'community', kind: 'reddit', minScore: 60, minComments: 15 },
   { name: 'r/FalloutTV', subreddit: 'FalloutTV', weight: 1.2, category: 'community', tier: 'community', kind: 'reddit', minScore: 120, minComments: 30 },
-  { name: 'r/fnv', subreddit: 'fnv', weight: 1.1, category: 'community', tier: 'community', kind: 'reddit', minScore: 80, minComments: 18 }
+  { name: 'r/fnv', subreddit: 'fnv', weight: 1.1, category: 'community', tier: 'community', kind: 'reddit', minScore: 80, minComments: 18 },
+  { name: 'r/classicfallout', subreddit: 'classicfallout', weight: 1.05, category: 'community', tier: 'community', kind: 'reddit', minScore: 55, minComments: 12 }
 ];
 
 function decodeHtmlEntities(value) {
@@ -210,15 +231,47 @@ export function ensureSeoDescription(article = {}) {
   return buildSeoDescriptionFallback(article);
 }
 
+const OUTLET_TITLE_PREFIX = /^(?:bloomberg|ign|gamespot|eurogamer|polygon|the verge|vgc|gamesradar|kotaku|aftermath|gamesindustry|insider gaming|the gamer|wccftech|siliconera|engadget|pc gamer|rock paper shotgun)\s*:\s*/i;
+
+const SPECIFIC_TOPIC_ANCHORS = new Set([
+  'obsidian', 'bethesda', 'zenimax', 'fo76', 'fnv', 'wasteland', 'vault',
+  'appalachia', 'brotherhood', 'prime', 'amazon', 'nexus', 'layoff', 'layoffs',
+  'avowed', 'elder', 'scrolls', 'starfield', 'xbox', 'microsoft', 'studio'
+]);
+
+const TOPIC_ANCHOR_TOKENS = new Set(['fallout', ...SPECIFIC_TOPIC_ANCHORS]);
+
+export function normalizeTopicTitle(title = '') {
+  return String(title).replace(OUTLET_TITLE_PREFIX, '').trim();
+}
+
 export function getTopicTokens(title = '') {
   return new Set(
-    normalizeStoryText(title)
+    normalizeStoryText(normalizeTopicTitle(title))
       .split(' ')
       .filter((token) => token.length > 2)
   );
 }
 
-export function areTopicsSimilar(titleA = '', titleB = '') {
+function getTopicAnchorTokens(title = '') {
+  return new Set(
+    normalizeStoryText(normalizeTopicTitle(title))
+      .split(' ')
+      .filter((token) => TOPIC_ANCHOR_TOKENS.has(token))
+  );
+}
+
+export function shareStrongTopicAnchors(titleA = '', titleB = '') {
+  const anchorsA = getTopicAnchorTokens(titleA);
+  const anchorsB = getTopicAnchorTokens(titleB);
+  const shared = [...anchorsA].filter((token) => anchorsB.has(token));
+  const sharedSpecific = shared.filter((token) => SPECIFIC_TOPIC_ANCHORS.has(token));
+  return shared.includes('fallout') && sharedSpecific.length >= 1;
+}
+
+export function areTopicsSimilar(titleA = '', titleB = '', { allowAnchorMatch = true } = {}) {
+  if (allowAnchorMatch && shareStrongTopicAnchors(titleA, titleB)) return true;
+
   const tokensA = getTopicTokens(titleA);
   const tokensB = getTopicTokens(titleB);
   if (tokensA.size === 0 || tokensB.size === 0) return false;
@@ -318,8 +371,8 @@ export function isDuplicateArticleTitle(title = '', historyEntries = [], { withi
 
   return historyEntries.some((entry) => {
     if (entry.coveredAt < cutoff) return false;
-    if (entry.articleTitle && areTopicsSimilar(entry.articleTitle, title)) return true;
-    if (entry.title && areTopicsSimilar(entry.title, title)) return true;
+    if (entry.articleTitle && areTopicsSimilar(entry.articleTitle, title, { allowAnchorMatch: false })) return true;
+    if (entry.title && areTopicsSimilar(entry.title, title, { allowAnchorMatch: false })) return true;
     return false;
   });
 }
@@ -511,12 +564,51 @@ export function engagementBonus(item = {}) {
   return bonus;
 }
 
-export function compareCandidatePriority(a, b) {
+const SOURCE_ROTATION_WINDOW_DAYS = 7;
+const MAX_SOURCE_RECENCY_PENALTY = 5;
+
+export function getRecentSourceUsage(historyEntries = [], { withinDays = SOURCE_ROTATION_WINDOW_DAYS } = {}) {
+  const cutoff = Date.now() - withinDays * 24 * 60 * 60 * 1000;
+  const counts = new Map();
+
+  for (const entry of historyEntries) {
+    if (!entry?.source || entry.coveredAt < cutoff) continue;
+    counts.set(entry.source, (counts.get(entry.source) || 0) + 1);
+  }
+
+  return counts;
+}
+
+export function getSourceDiversityAdjustment(item = {}, historyEntries = []) {
+  if (!historyEntries.length) return 0;
+
+  const usage = getRecentSourceUsage(historyEntries);
+  const sourceUses = usage.get(item.source) || 0;
+  let adjustment = 0;
+
+  adjustment -= Math.min(sourceUses * 1.75, MAX_SOURCE_RECENCY_PENALTY);
+
+  if (item.contentType === 'community' || item.contentType === 'mods') adjustment += 1.5;
+  if (item.sourceTier === 'official') adjustment += 1;
+  if (item.sourceTier === 'community') adjustment += 1.2;
+  if (sourceUses === 0 && item.sourceTier === 'press') adjustment += 0.6;
+
+  return adjustment;
+}
+
+export function getAdjustedCandidateScore(item = {}, historyEntries = []) {
+  return (item.score ?? 0) + getSourceDiversityAdjustment(item, historyEntries);
+}
+
+export function compareCandidatePriority(a, b, historyEntries = []) {
   const metricsA = a.sourceKind === 'reddit' && hasRedditEngagementMetrics(a) ? 1 : 0;
   const metricsB = b.sourceKind === 'reddit' && hasRedditEngagementMetrics(b) ? 1 : 0;
   if (metricsB !== metricsA) return metricsB - metricsA;
 
-  if (b.score !== a.score) return b.score - a.score;
+  const scoreA = getAdjustedCandidateScore(a, historyEntries);
+  const scoreB = getAdjustedCandidateScore(b, historyEntries);
+  if (scoreB !== scoreA) return scoreB - scoreA;
+
   const engagementA = (a.redditScore ?? 0) + (a.redditComments ?? 0) * 2;
   const engagementB = (b.redditScore ?? 0) + (b.redditComments ?? 0) * 2;
   return engagementB - engagementA;
@@ -543,7 +635,7 @@ export function pickFeaturedStory(candidates = [], historyEntries = []) {
   for (const contentType of preferredOrder) {
     const matches = eligible
       .filter((item) => item.contentType === contentType)
-      .sort(compareCandidatePriority);
+      .sort((a, b) => compareCandidatePriority(a, b, historyEntries));
 
     if (matches.length === 0) continue;
 
@@ -551,11 +643,11 @@ export function pickFeaturedStory(candidates = [], historyEntries = []) {
     break;
   }
 
-  mainStory = mainStory || eligible.sort(compareCandidatePriority)[0];
+  mainStory = mainStory || eligible.sort((a, b) => compareCandidatePriority(a, b, historyEntries))[0];
   const mainTopic = getStoryTopicKey(mainStory);
   const supporting = eligible
     .filter((item) => getStoryTopicKey(item) !== mainTopic)
-    .sort(compareCandidatePriority)
+    .sort((a, b) => compareCandidatePriority(a, b, historyEntries))
     .slice(0, 4);
 
   return [mainStory, ...supporting];
@@ -577,7 +669,7 @@ export function selectStoriesForGeneration(candidates = [], historyEntries = [],
 
       return true;
     })
-    .sort((a, b) => b.score - a.score);
+    .sort((a, b) => getAdjustedCandidateScore(b, historyEntries) - getAdjustedCandidateScore(a, historyEntries));
 
   if (eligible.length === 0) return [];
 
@@ -605,12 +697,15 @@ function extractRssItems(xmlText) {
     const titleMatch = block.match(/<title><!\[CDATA\[([\s\S]*?)\]\]><\/title>|<title>([\s\S]*?)<\/title>/i);
     const linkMatch = block.match(/<link><!\[CDATA\[([\s\S]*?)\]\]><\/link>|<link>([\s\S]*?)<\/link>/i);
     const descriptionMatch = block.match(/<description><!\[CDATA\[([\s\S]*?)\]\]><\/description>|<description>([\s\S]*?)<\/description>/i);
+    const contentEncodedMatch = block.match(/<content:encoded><!\[CDATA\[([\s\S]*?)\]\]><\/content:encoded>|<content:encoded>([\s\S]*?)<\/content:encoded>/i);
     const pubDateMatch = block.match(/<pubDate>([\s\S]*?)<\/pubDate>/i);
     const sourceMatch = block.match(/<source\b[^>]*>([\s\S]*?)<\/source>/i);
 
     const title = cleanText(titleMatch?.[1] || titleMatch?.[2] || '');
     const link = cleanText(linkMatch?.[1] || linkMatch?.[2] || '');
-    const description = cleanText(descriptionMatch?.[1] || descriptionMatch?.[2] || '');
+    const summary = cleanText(descriptionMatch?.[1] || descriptionMatch?.[2] || '');
+    const fullContent = cleanText(contentEncodedMatch?.[1] || contentEncodedMatch?.[2] || '');
+    const description = fullContent.length > summary.length ? fullContent : summary;
     const publishedAt = parseRssDate(pubDateMatch?.[1]);
     const feedSource = cleanText(sourceMatch?.[1] || '');
 
@@ -719,7 +814,8 @@ const CONFIRMED_PRESS_SIGNALS = [
 const REPORTING_OUTLETS = [
   'Bloomberg', 'IGN', 'Kotaku', 'Eurogamer', 'VGC', 'GamesRadar', 'GameSpot', 'Polygon',
   'The Verge', 'PC Gamer', 'PCGamesN', 'Rock Paper Shotgun', 'Shacknews', 'DualShockers',
-  'Video Games Chronicle'
+  'Video Games Chronicle', 'Aftermath', 'GamesIndustry', 'The Gamer', 'Insider Gaming',
+  'Wccftech', 'Siliconera', 'Engadget'
 ];
 
 function scoreItem(item, source) {
@@ -990,7 +1086,7 @@ function buildPromptContext(newsItems = []) {
         ? `${Math.max(1, Math.round((Date.now() - item.publishedAt) / (1000 * 60 * 60)))}h ago`
         : 'recent';
       const itemTrust = item.trustLevel || detectTrustLevel(item, { tier: item.sourceTier, category: item.contentType });
-      const summary = item.description ? item.description.slice(0, 900) : 'No summary available.';
+      const summary = buildStorySummaryForPrompt(item);
       return `${index + 1}. ${item.title}
    Source: ${item.source}
    Type: ${getContentTypeLabel(item.contentType || 'news', itemTrust)}
@@ -1281,23 +1377,134 @@ function parseModelList(value) {
     .filter(Boolean);
 }
 
-export function extractArticleBodyText(html = '') {
+export function buildStorySummaryForPrompt(item = {}, { maxChars = MAX_PROMPT_SUMMARY_CHARS } = {}) {
+  const text = String(item.description || '').trim();
+  if (!text) return 'No summary available.';
+  if (text.length <= maxChars) return text;
+  return `${text.slice(0, maxChars - 1)}…`;
+}
+
+function pickLongerDescription(current = '', candidate = '') {
+  const left = String(current || '').trim();
+  const right = String(candidate || '').trim();
+  return right.length > left.length ? right : left;
+}
+
+function mergeEnrichedDescription(item = {}, candidateText = '', extra = {}) {
+  const merged = pickLongerDescription(item.description, candidateText);
+  if (merged.length <= (item.description || '').length) return item;
+
+  return {
+    ...item,
+    ...extra,
+    description: merged.slice(0, MAX_STORY_BODY_CHARS),
+    enriched: true
+  };
+}
+
+export function isRedditPostLink(link = '') {
+  return Boolean(getRedditPostJsonUrl(link));
+}
+
+export function getRedditPostJsonUrl(link = '', { oauth = false } = {}) {
+  try {
+    const url = new URL(link);
+    if (!/reddit\.com$/i.test(url.hostname.replace(/^www\./, '')) && !url.hostname.includes('reddit.com')) {
+      return null;
+    }
+
+    const pathname = url.pathname.replace(/\/$/, '');
+    if (!/\/comments\/[a-z0-9]+/i.test(pathname)) return null;
+
+    const host = oauth ? 'oauth.reddit.com' : 'www.reddit.com';
+    return `https://${host}${pathname}.json?raw_json=1`;
+  } catch {
+    return null;
+  }
+}
+
+export function parseRedditPostDetailPayload(payload = []) {
+  const post = payload?.[0]?.data?.children?.[0]?.data;
+  if (!post) return null;
+
+  const selftext = cleanText(post.selftext || '');
+  const title = cleanText(post.title || '');
+  const isSelf = Boolean(post.is_self);
+  const externalUrl = !isSelf && post.url && !/reddit\.com/i.test(post.url) ? post.url : '';
+  let description = selftext;
+
+  if (!description && externalUrl) {
+    description = `Link post pointing to ${externalUrl}.`;
+  }
+
+  return {
+    title,
+    description: description.slice(0, MAX_STORY_BODY_CHARS),
+    redditScore: post.score ?? null,
+    redditComments: post.num_comments ?? null,
+    isSelf,
+    externalUrl
+  };
+}
+
+async function fetchRedditPostDetail(link = '') {
+  const useOAuth = hasRedditOAuthCredentials();
+  const jsonUrl = getRedditPostJsonUrl(link, { oauth: useOAuth });
+  if (!jsonUrl) return null;
+
+  const request = async (accessToken = null) => fetch(jsonUrl, {
+    headers: getRedditJsonRequestHeaders(accessToken)
+  });
+
+  try {
+    let accessToken = useOAuth ? await getRedditOAuthAccessToken() : null;
+    let response = await request(accessToken);
+
+    if (useOAuth && response.status === 401) {
+      accessToken = await getRedditOAuthAccessToken({ forceRefresh: true });
+      response = await request(accessToken);
+    }
+
+    if (!response.ok) return null;
+    return parseRedditPostDetailPayload(await response.json());
+  } catch {
+    return null;
+  }
+}
+
+export function extractArticleBodyText(html = '', { maxChars = MAX_STORY_BODY_CHARS } = {}) {
+  const jsonLdBlocks = html.match(/<script[^>]+type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>/gi) || [];
+
+  for (const block of jsonLdBlocks) {
+    try {
+      const raw = block.replace(/<script[^>]*>|<\/script>/gi, '').trim();
+      const parsed = JSON.parse(raw);
+      const nodes = Array.isArray(parsed) ? parsed : [parsed, ...(Array.isArray(parsed?.['@graph']) ? parsed['@graph'] : [])];
+      for (const node of nodes) {
+        const articleBody = cleanText(node?.articleBody || '');
+        if (articleBody.length > 200) return articleBody.slice(0, maxChars);
+      }
+    } catch {
+      // Try the next JSON-LD block.
+    }
+  }
+
   const articleMatch = html.match(/<article[^>]*>([\s\S]*?)<\/article>/i);
-  const contentMatch = html.match(/<div[^>]+class=["'][^"']*(?:entry-content|article-body|post-content)[^"']*["'][^>]*>([\s\S]*?)<\/div>/i);
+  const contentMatch = html.match(/<div[^>]+class=["'][^"']*(?:entry-content|article-body|post-content|article__content)[^"']*["'][^>]*>([\s\S]*?)<\/div>/i);
   const block = articleMatch?.[1] || contentMatch?.[1] || html;
   const paragraphs = [...block.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/gi)]
     .map((match) => cleanText(match[1]))
-    .filter((paragraph) => paragraph.length > 80);
+    .filter((paragraph) => paragraph.length > 40);
 
-  return paragraphs.slice(0, 3).join(' ').slice(0, 2000);
+  return paragraphs.join(' ').slice(0, maxChars);
 }
 
-async function enrichStoryDetail(item) {
+async function fetchArticlePageDetail(item = {}) {
   if (!item.link) return item;
 
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 8000);
+    const timeout = setTimeout(() => controller.abort(), ENRICH_FETCH_TIMEOUT_MS);
     const response = await fetch(item.link, {
       signal: controller.signal,
       headers: {
@@ -1317,22 +1524,52 @@ async function enrichStoryDetail(item) {
     const excerpt = cleanText(ogDescription?.[1] || metaDescription?.[1] || '');
     const bodyText = extractArticleBodyText(html);
     const combined = [excerpt, bodyText].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
-    const currentLength = (item.description || '').length;
 
-    if (combined.length > currentLength) {
-      return { ...item, description: combined.slice(0, 2000), enriched: true };
-    }
+    return mergeEnrichedDescription(item, combined);
   } catch {
-    // Ignore enrichment failures and keep RSS summary.
+    return item;
   }
-
-  return item;
 }
 
-export async function enrichStories(stories) {
-  const topStories = stories.slice(0, 3);
-  const enrichedTop = await Promise.all(topStories.map((story) => enrichStoryDetail(story)));
-  return [...enrichedTop, ...stories.slice(3)];
+export async function enrichStoryDetail(item) {
+  if (!item.link) return item;
+
+  let enrichedItem = item;
+
+  if (item.sourceKind === 'reddit' || isRedditPostLink(item.link)) {
+    const redditDetail = await fetchRedditPostDetail(item.link);
+    if (redditDetail) {
+      enrichedItem = mergeEnrichedDescription(enrichedItem, redditDetail.description, {
+        redditScore: redditDetail.redditScore ?? enrichedItem.redditScore,
+        redditComments: redditDetail.redditComments ?? enrichedItem.redditComments
+      });
+
+      if (!redditDetail.isSelf && redditDetail.externalUrl) {
+        enrichedItem = await fetchArticlePageDetail({
+          ...enrichedItem,
+          link: redditDetail.externalUrl
+        });
+      }
+    }
+
+    return enrichedItem;
+  }
+
+  return fetchArticlePageDetail(item);
+}
+
+export async function enrichStories(stories, { limit = stories.length } = {}) {
+  const targetStories = stories.slice(0, limit);
+  const enriched = [];
+
+  for (const story of targetStories) {
+    enriched.push(await enrichStoryDetail(story));
+    if (story.sourceKind === 'reddit' || isRedditPostLink(story.link)) {
+      await sleep(400);
+    }
+  }
+
+  return [...enriched, ...stories.slice(targetStories.length)];
 }
 
 async function loadStoryHistory() {
@@ -1762,7 +1999,7 @@ export function parseRedditListing(payload = {}, source = {}) {
       const post = child.data;
       const permalink = post.permalink ? `https://www.reddit.com${post.permalink}` : '';
       const link = post.url && /^https?:\/\//i.test(post.url) ? post.url : permalink;
-      const description = cleanText(post.selftext || post.title || '').slice(0, 1200);
+      const description = cleanText(post.selftext || post.title || '').slice(0, MAX_STORY_BODY_CHARS);
 
       return {
         title: cleanText(post.title || ''),
@@ -1860,7 +2097,7 @@ export function parseRedditRssFeed(xmlText = '', source = {}) {
     .map((item, index) => {
       const title = cleanText(item.title || '');
       const link = item.link || '';
-      const description = cleanText(item.description || item.title || '').slice(0, 1200);
+      const description = cleanText(item.description || item.title || '').slice(0, MAX_STORY_BODY_CHARS);
       const isModeratorPost = REDDIT_MOD_POST_PATTERNS.some((pattern) => pattern.test(title));
 
       return {
@@ -1997,20 +2234,18 @@ async function enrichRssItemsWithRedditJson(items = [], source, { skipIfJsonAtte
     const jsonItems = hasRedditOAuthCredentials()
       ? await fetchRedditOAuthJsonItems(source)
       : await fetchRedditJsonItems(source, { maxAttempts: 2 });
-    const metricsByTitle = new Map(
-      jsonItems.map((item) => [normalizeRedditTitleKey(item.title), {
-        redditScore: item.redditScore,
-        redditComments: item.redditComments
-      }])
+    const detailsByTitle = new Map(
+      jsonItems.map((item) => [normalizeRedditTitleKey(item.title), item])
     );
 
     return items.map((item) => {
-      const metrics = metricsByTitle.get(normalizeRedditTitleKey(item.title));
-      if (!metrics) return item;
+      const detail = detailsByTitle.get(normalizeRedditTitleKey(item.title));
+      if (!detail) return item;
       return {
         ...item,
-        redditScore: metrics.redditScore,
-        redditComments: metrics.redditComments
+        redditScore: detail.redditScore ?? item.redditScore,
+        redditComments: detail.redditComments ?? item.redditComments,
+        description: pickLongerDescription(item.description, detail.description)
       };
     });
   } catch {

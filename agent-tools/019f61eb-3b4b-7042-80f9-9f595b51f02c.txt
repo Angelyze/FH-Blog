@@ -1,0 +1,715 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+      xmlns:content="http://purl.org/rss/1.0/modules/content/"
+      xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+      xmlns:dc="http://purl.org/dc/elements/1.1/"
+      xmlns:atom="http://www.w3.org/2005/Atom"
+      xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+      xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+      xmlns:media="http://search.yahoo.com/mrss/"
+      >
+<channel>
+    <title>Dexerto Latest Posts</title>
+    <atom:link href="https://www.dexerto.com/feed/" rel="self" type="application/rss+xml" />
+    <link>https://www.dexerto.com</link>
+    <description>Esports, Gaming &amp; Influencer News</description>
+    <lastBuildDate>Tue, 14 Jul 2026 18:26:01 GMT</lastBuildDate>
+    <language>en-US</language>
+    <sy:updatePeriod>hourly</sy:updatePeriod>
+    <sy:updateFrequency>1</sy:updateFrequency>
+    <image>
+      <url>https://www.dexerto.com/cdn-image/wp-content/uploads/2020/10/dexerto-logo-1.png?width=1080&amp;quality=75&amp;format=auto</url>
+      <title>Dexerto Latest Posts</title>
+      <link>https://www.dexerto.com</link>
+      <width>144</width>
+      <height>14</height>
+    </image>
+    
+    <item>
+        <title>Pro cyclist devestated after China race disqualifies him over AI glasses while Tour de France allows vlogging</title>
+        <link>https://www.dexerto.com/entertainment/pro-cyclist-devestated-after-china-race-disqualifies-him-over-ai-glasses-while-tour-de-france-allows-vlogging-3387387/</link>
+        <dc:creator><![CDATA[Michael Gwilliam]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 18:26:01 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/entertainment/pro-cyclist-devestated-after-china-race-disqualifies-him-over-ai-glasses-while-tour-de-france-allows-vlogging-3387387/</guid>
+        <description><![CDATA[Professional cyclist Willie Smit has been disqualified from a major race after using AI-enabled glasses to record footage while riding.]]></description>
+        <content:encoded><![CDATA[Professional cyclist Willie Smit has been disqualified from a major race after using AI-enabled glasses to record footage while riding.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/pro-cyclist-dq-china-meta-ai-glasses.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="745510" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/pro-cyclist-dq-china-meta-ai-glasses.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Kick streamer and Fishtank Live star SuzieSmalls found dead in apartment</title>
+        <link>https://www.dexerto.com/kick/kick-streamer-and-fishtank-live-star-suziesmalls-found-dead-in-apartment-3387388/</link>
+        <dc:creator><![CDATA[Zackerie Fairfax]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 18:25:31 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <category><![CDATA[Kick]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/kick/kick-streamer-and-fishtank-live-star-suziesmalls-found-dead-in-apartment-3387388/</guid>
+        <description><![CDATA[Kick IRL streamer SuzieSmalls, who appeared as Suzette on Fishtank Live Season 5, has died after being found in her apartment.]]></description>
+        <content:encoded><![CDATA[Kick IRL streamer SuzieSmalls, who appeared as Suzette on Fishtank Live Season 5, has died after being found in her apartment.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/suziesmalls-kick-streamer.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="85110" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/suziesmalls-kick-streamer.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Infamous elephant blamed for 25 deaths stalks and kills four members of same family over 14 years</title>
+        <link>https://www.dexerto.com/entertainment/infamous-elephant-blamed-for-25-deaths-stalks-and-kills-four-members-of-same-family-over-14-years-3387379/</link>
+        <dc:creator><![CDATA[Michael Gwilliam]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 17:44:20 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/entertainment/infamous-elephant-blamed-for-25-deaths-stalks-and-kills-four-members-of-same-family-over-14-years-3387379/</guid>
+        <description><![CDATA[A notorious elephant blamed for killing 25 people has taken the lives of four members of the same Nepalese family over 14 years.]]></description>
+        <content:encoded><![CDATA[A notorious elephant blamed for killing 25 people has taken the lives of four members of the same Nepalese family over 14 years.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/elephant-wild-kill-25-family.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="1151280" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/elephant-wild-kill-25-family.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Olive Garden brings back $100 Never Ending Pasta Pass with 13 weeks of unlimited pasta</title>
+        <link>https://www.dexerto.com/food/olive-garden-brings-back-100-never-ending-pasta-pass-with-13-weeks-of-unlimited-pasta-3387378/</link>
+        <dc:creator><![CDATA[Dylan Horetski]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 17:37:40 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <category><![CDATA[Food]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/food/olive-garden-brings-back-100-never-ending-pasta-pass-with-13-weeks-of-unlimited-pasta-3387378/</guid>
+        <description><![CDATA[Olive Garden is bringing back its Never Ending Pasta Pass for the first time in six years, giving fans another chance to secure 13 weeks of unlimited pasta for $100.]]></description>
+        <content:encoded><![CDATA[Olive Garden is bringing back its Never Ending Pasta Pass for the first time in six years, giving fans another chance to secure 13 weeks of unlimited pasta for $100.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/neverendingpastapass.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="356624" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/neverendingpastapass.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>IShowSpeed to perform viral World Cup song at FIFA World Cup Final</title>
+        <link>https://www.dexerto.com/youtube/ishowspeed-to-perform-viral-world-cup-song-at-fifa-world-cup-final-3387369/</link>
+        <dc:creator><![CDATA[Zackerie Fairfax]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 16:41:43 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <category><![CDATA[Twitch]]></category>
+        <category><![CDATA[YouTube]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/youtube/ishowspeed-to-perform-viral-world-cup-song-at-fifa-world-cup-final-3387369/</guid>
+        <description><![CDATA[IShowSpeed has confirmed he will perform “World Cup (Champions)” before the 2026 FIFA World Cup Final alongside several major stars.]]></description>
+        <content:encoded><![CDATA[IShowSpeed has confirmed he will perform “World Cup (Champions)” before the 2026 FIFA World Cup Final alongside several major stars.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/ishowspeed-fifa-final-performance.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="231220" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/ishowspeed-fifa-final-performance.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Taco Bell investigated over possible link to ‘explosive diarrhea’ parasite outbreak</title>
+        <link>https://www.dexerto.com/food/taco-bell-investigated-over-possible-link-to-explosive-diarrhea-parasite-outbreak-3387352/</link>
+        <dc:creator><![CDATA[Dylan Horetski]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 16:03:39 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <category><![CDATA[Food]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/food/taco-bell-investigated-over-possible-link-to-explosive-diarrhea-parasite-outbreak-3387352/</guid>
+        <description><![CDATA[Health officials are investigating whether Taco Bell restaurants played a role in one of the largest US outbreaks of cyclosporiasis.]]></description>
+        <content:encoded><![CDATA[Health officials are investigating whether Taco Bell restaurants played a role in one of the largest US outbreaks of cyclosporiasis.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2025/08/28/taco-bell-drive-thru-advanced.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="1004291" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2025/08/28/taco-bell-drive-thru-advanced.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Fallout: New Vegas lead is “embarrassed” by the Amazon show’s writing</title>
+        <link>https://www.dexerto.com/fallout/fallout-new-vegas-lead-is-embarrassed-by-the-amazon-shows-writing-3387322/</link>
+        <dc:creator><![CDATA[Nathan Warby]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 15:30:31 GMT</pubDate>
+        <category><![CDATA[Fallout]]></category>
+        <category><![CDATA[Gaming]]></category>
+        <category><![CDATA[TV & Movies]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/fallout/fallout-new-vegas-lead-is-embarrassed-by-the-amazon-shows-writing-3387322/</guid>
+        <description><![CDATA[Fallout: New Vegas lead designer Chris Avellone has admitted he feels “embarrassed” by some of the dialogue in the Amazon Prime show.]]></description>
+        <content:encoded><![CDATA[Fallout: New Vegas lead designer Chris Avellone has admitted he feels “embarrassed” by some of the dialogue in the Amazon Prime show.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/Fallout-New-Vegas-lead-is-embarrassed-by-some-of-the-TV-shows-dialogue.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="604784" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/Fallout-New-Vegas-lead-is-embarrassed-by-some-of-the-TV-shows-dialogue.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>How to watch EWC 2026 League of Legends: Stream, schedule, results, teams</title>
+        <link>https://www.dexerto.com/league-of-legends/how-to-watch-ewc-2026-league-of-legends-stream-schedule-results-teams-3387307/</link>
+        <dc:creator><![CDATA[Connor Bennett]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 15:15:37 GMT</pubDate>
+        <category><![CDATA[Esports]]></category>
+        <category><![CDATA[League of Legends]]></category>
+        <category><![CDATA[League Of Legends Esports]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/league-of-legends/how-to-watch-ewc-2026-league-of-legends-stream-schedule-results-teams-3387307/</guid>
+        <description><![CDATA[The 2026 Esports World Cup is making history with the kickoff of its League of Legends tournament. Here’s everything you need to know about who might take home the $600,000 top prize.]]></description>
+        <content:encoded><![CDATA[The 2026 Esports World Cup is making history with the kickoff of its League of Legends tournament. Here’s everything you need to know about who might take home the $600,000 top prize.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/How-to-watch-EWC-2026-League-of-Legends.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="214818" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/How-to-watch-EWC-2026-League-of-Legends.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>McDonald’s upgrades McCrispy Strips with ‘even crispier’ recipe and new Caesar Sauce</title>
+        <link>https://www.dexerto.com/food/mcdonalds-upgrades-mccrispy-strips-with-even-crispier-recipe-and-new-caesar-sauce-3387314/</link>
+        <dc:creator><![CDATA[Dylan Horetski]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 14:56:48 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <category><![CDATA[Food]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/food/mcdonalds-upgrades-mccrispy-strips-with-even-crispier-recipe-and-new-caesar-sauce-3387314/</guid>
+        <description><![CDATA[McDonald’s is expanding its chicken lineup with the launch of a new Caesar Sauce and an updated version of its McCrispy Strips, which are now ‘even crispier.’]]></description>
+        <content:encoded><![CDATA[McDonald’s is expanding its chicken lineup with the launch of a new Caesar Sauce and an updated version of its McCrispy Strips, which are now ‘even crispier.’]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/CaesarSauceMcDonalds.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="321853" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/CaesarSauceMcDonalds.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Skibidi Rizz wins back-to-back Ohio races as brainrot horse keeps rolling</title>
+        <link>https://www.dexerto.com/entertainment/skibidi-rizz-wins-back-to-back-ohio-races-as-brainrot-horse-keeps-rolling-3387300/</link>
+        <dc:creator><![CDATA[Zackerie Fairfax]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 14:49:46 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/entertainment/skibidi-rizz-wins-back-to-back-ohio-races-as-brainrot-horse-keeps-rolling-3387300/</guid>
+        <description><![CDATA[Skibidi Rizz, a real thoroughbred named after internet slang, has won two straight races at Thistledown in Ohio.]]></description>
+        <content:encoded><![CDATA[Skibidi Rizz, a real thoroughbred named after internet slang, has won two straight races at Thistledown in Ohio.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/skibidi-rizz-win-number-3.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="81852" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/skibidi-rizz-win-number-3.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Referee dies aged 38 weeks after being dropped from World Cup following arrest</title>
+        <link>https://www.dexerto.com/entertainment/referee-dies-aged-38-weeks-after-being-dropped-from-world-cup-following-arrest-3387302/</link>
+        <dc:creator><![CDATA[Calum Patterson]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 14:47:20 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <category><![CDATA[Sports]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/entertainment/referee-dies-aged-38-weeks-after-being-dropped-from-world-cup-following-arrest-3387302/</guid>
+        <description><![CDATA[Dutch soccer referee Rob Dieperink has died at the age of 38, just weeks after he was removed from the list of officials selected for the 2026 World Cup.]]></description>
+        <content:encoded><![CDATA[Dutch soccer referee Rob Dieperink has died at the age of 38, just weeks after he was removed from the list of officials selected for the 2026 World Cup.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/knvb-ref.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="716518" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/knvb-ref.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Be a Fish Bait codes (July 2026)</title>
+        <link>https://www.dexerto.com/roblox/be-a-fish-bait-codes-3387170/</link>
+        <dc:creator><![CDATA[Kuldeep Thapa]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 14:31:29 GMT</pubDate>
+        <category><![CDATA[Codes]]></category>
+        <category><![CDATA[Roblox]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/roblox/be-a-fish-bait-codes-3387170/</guid>
+        <description><![CDATA[Get the latest Be a Fish Bait codes for July 2026 and claim free rerolls, spins, and other rewards.]]></description>
+        <content:encoded><![CDATA[Get the latest Be a Fish Bait codes for July 2026 and claim free rerolls, spins, and other rewards.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/Roblox-Be-a-fish-bait-codes.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="387520" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/Roblox-Be-a-fish-bait-codes.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Netflix unveils real-life Monopoly show with $2 million prize and you can apply now</title>
+        <link>https://www.dexerto.com/tv-movies/netflix-unveils-real-life-monopoly-show-with-2-million-prize-and-you-can-apply-now-3387240/</link>
+        <dc:creator><![CDATA[Liam Mackay]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 14:24:05 GMT</pubDate>
+        <category><![CDATA[Reality TV]]></category>
+        <category><![CDATA[TV & Movies]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/tv-movies/netflix-unveils-real-life-monopoly-show-with-2-million-prize-and-you-can-apply-now-3387240/</guid>
+        <description><![CDATA[Netflix are making a Monopoly reality competition show with a $2 million prize, and you can apply to take part right now.]]></description>
+        <content:encoded><![CDATA[Netflix are making a Monopoly reality competition show with a $2 million prize, and you can apply to take part right now.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/netflix-mr-monopoly.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="109624" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/netflix-mr-monopoly.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Natural Light is giving one fan a giant solar-powered beer cooler and $15,000 in beer money</title>
+        <link>https://www.dexerto.com/food/natural-light-is-giving-one-fan-a-giant-solar-powered-beer-cooler-and-15000-in-beer-money-3387267/</link>
+        <dc:creator><![CDATA[Dylan Horetski]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 14:21:21 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <category><![CDATA[Food]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/food/natural-light-is-giving-one-fan-a-giant-solar-powered-beer-cooler-and-15000-in-beer-money-3387267/</guid>
+        <description><![CDATA[Natural Light has unveiled a new backyard creation that uses solar power to keep beer cold during the hottest days of summer.]]></description>
+        <content:encoded><![CDATA[Natural Light has unveiled a new backyard creation that uses solar power to keep beer cold during the hottest days of summer.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/naturallightcooler.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="777566" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/naturallightcooler.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Stock YouTuber allegedly stabbed by viewer who lost money taking his investment advice</title>
+        <link>https://www.dexerto.com/youtube/stock-youtuber-allegedly-stabbed-by-viewer-who-lost-money-taking-his-investment-advice-3387283/</link>
+        <dc:creator><![CDATA[Michael Gwilliam]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 14:18:23 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <category><![CDATA[YouTube]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/youtube/stock-youtuber-allegedly-stabbed-by-viewer-who-lost-money-taking-his-investment-advice-3387283/</guid>
+        <description><![CDATA[A South Korean stock YouTuber was allegedly stabbed by a viewer who lost money after following his investment advice.]]></description>
+        <content:encoded><![CDATA[A South Korean stock YouTuber was allegedly stabbed by a viewer who lost money after following his investment advice.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/stock-youtuber-stabbed-investments.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="526553" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/stock-youtuber-stabbed-investments.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Chipotle finally opens restaurant in Mexico 33 years after launch</title>
+        <link>https://www.dexerto.com/food/chipotle-finally-opens-restaurant-in-mexico-33-years-after-launch-3387241/</link>
+        <dc:creator><![CDATA[Joe Pring]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 13:43:42 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <category><![CDATA[Food]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/food/chipotle-finally-opens-restaurant-in-mexico-33-years-after-launch-3387241/</guid>
+        <description><![CDATA[The restaurant opens on July 16 in San Pedro Garza García, Nuevo León, marking the start of Chipotle’s expansion into the country.]]></description>
+        <content:encoded><![CDATA[The restaurant opens on July 16 in San Pedro Garza García, Nuevo León, marking the start of Chipotle’s expansion into the country.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/chipotle-mexico.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="261173" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/chipotle-mexico.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>South Korea files first criminal lawsuit over exam cheating with AI smart glasses</title>
+        <link>https://www.dexerto.com/entertainment/south-korea-files-first-criminal-lawsuit-over-exam-cheating-with-ai-smart-glasses-3387219/</link>
+        <dc:creator><![CDATA[James Busby]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 13:33:02 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/entertainment/south-korea-files-first-criminal-lawsuit-over-exam-cheating-with-ai-smart-glasses-3387219/</guid>
+        <description><![CDATA[South Korea has filed its first criminal case over the use of AI-powered smart glasses to cheat during a national licensing exam.]]></description>
+        <content:encoded><![CDATA[South Korea has filed its first criminal case over the use of AI-powered smart glasses to cheat during a national licensing exam.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/Man-charged-with-using-AI-smart-glasses-in-South-Korea-exam.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="314143" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/Man-charged-with-using-AI-smart-glasses-in-South-Korea-exam.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Streamer claims Microsoft “deleted” his account because it was hacked</title>
+        <link>https://www.dexerto.com/entertainment/streamer-claims-microsoft-deleted-his-account-because-it-was-hacked-3387207/</link>
+        <dc:creator><![CDATA[Jessica Filby]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 13:25:08 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/entertainment/streamer-claims-microsoft-deleted-his-account-because-it-was-hacked-3387207/</guid>
+        <description><![CDATA[Microsoft is facing fresh criticism over its handling of user accounts after another customer claimed the company permanently deleted their account.]]></description>
+        <content:encoded><![CDATA[Microsoft is facing fresh criticism over its handling of user accounts after another customer claimed the company permanently deleted their account.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2023/09/19/Microsoft-leaks.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="244172" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2023/09/19/Microsoft-leaks.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Valorant 13.01 patch notes bring Outlaw change and more rank manipulation penalties</title>
+        <link>https://www.dexerto.com/valorant/valorant-13-01-patch-notes-bring-outlaw-change-and-more-rank-manipulation-penalties-3387220/</link>
+        <dc:creator><![CDATA[Connor Bennett]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 13:06:43 GMT</pubDate>
+        <category><![CDATA[Gaming]]></category>
+        <category><![CDATA[Valorant]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/valorant/valorant-13-01-patch-notes-bring-outlaw-change-and-more-rank-manipulation-penalties-3387220/</guid>
+        <description><![CDATA[Valorant’s 13.01 patch notes are here, with some big changes to the Outlaw, as well as rank manipulation penalties. Here’s what you need to know.]]></description>
+        <content:encoded><![CDATA[Valorant’s 13.01 patch notes are here, with some big changes to the Outlaw, as well as rank manipulation penalties. Here’s what you need to know.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/valorant-13.01-patch-notes-update.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="109394" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/valorant-13.01-patch-notes-update.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Brazilian football club releases player and instantly mocks him with fail compilation</title>
+        <link>https://www.dexerto.com/entertainment/brazilian-football-club-releases-player-and-instantly-mocks-him-with-fail-compilation-3387184/</link>
+        <dc:creator><![CDATA[Jakob Barnes]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 12:29:48 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <category><![CDATA[Sports]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/entertainment/brazilian-football-club-releases-player-and-instantly-mocks-him-with-fail-compilation-3387184/</guid>
+        <description><![CDATA[Amazonas FC released defender Leo Coelho, and rubbed salt in the wound by posting a compilation of his worst mistakes on Instagram.]]></description>
+        <content:encoded><![CDATA[Amazonas FC released defender Leo Coelho, and rubbed salt in the wound by posting a compilation of his worst mistakes on Instagram.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/amazonas.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="280334" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/amazonas.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Technolarp channel removed from YouTube as he returns with new name</title>
+        <link>https://www.dexerto.com/youtube/technolarp-channel-removed-by-youtube-after-technoblades-father-asks-him-to-stop-3387208/</link>
+        <dc:creator><![CDATA[Connor Bennett]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 12:15:48 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <category><![CDATA[YouTube]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/youtube/technolarp-channel-removed-by-youtube-after-technoblades-father-asks-him-to-stop-3387208/</guid>
+        <description><![CDATA[Technolarp’s YouTube channel was temporarily removed for violating community guidelines, but he’s now back under a new name.]]></description>
+        <content:encoded><![CDATA[Technolarp’s YouTube channel was temporarily removed for violating community guidelines, but he’s now back under a new name.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2024/05/31/fans-honor-technoblade-25-birthday-twitter-hashtag-viral.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="387737" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2024/05/31/fans-honor-technoblade-25-birthday-twitter-hashtag-viral.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>82-year-old woman survives nine days trapped in bathtub by using foot to drink water</title>
+        <link>https://www.dexerto.com/entertainment/82-year-old-woman-survives-nine-days-trapped-in-bathtub-by-using-foot-to-drink-water-3387140/</link>
+        <dc:creator><![CDATA[Nathan Warby]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 12:02:06 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/entertainment/82-year-old-woman-survives-nine-days-trapped-in-bathtub-by-using-foot-to-drink-water-3387140/</guid>
+        <description><![CDATA[An 82-year-old woman who became trapped in her bathtub for nine days says she survived by using her foot to catch enough water to stay alive.]]></description>
+        <content:encoded><![CDATA[An 82-year-old woman who became trapped in her bathtub for nine days says she survived by using her foot to catch enough water to stay alive.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/82-year-old-woman-survives-nine-days-trapped-in-bathtub-by-using-foot-to-drink-water.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="695644" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/82-year-old-woman-survives-nine-days-trapped-in-bathtub-by-using-foot-to-drink-water.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Avengers: Doomsday runtime revealed and it’s Marvel’s second longest movie ever</title>
+        <link>https://www.dexerto.com/tv-movies/avengers-doomsday-runtime-revealed-and-its-marvels-second-longest-movie-ever-3387142/</link>
+        <dc:creator><![CDATA[Jessica Filby]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 12:01:46 GMT</pubDate>
+        <category><![CDATA[TV & Movies]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/tv-movies/avengers-doomsday-runtime-revealed-and-its-marvels-second-longest-movie-ever-3387142/</guid>
+        <description><![CDATA[Avengers: Doomsday is getting ever closer, and despite it coming out in five months, the tickets are about to go on sale very soon.]]></description>
+        <content:encoded><![CDATA[Avengers: Doomsday is getting ever closer, and despite it coming out in five months, the tickets are about to go on sale very soon.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/Avengers-Doomsday-concept-art.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="305090" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/Avengers-Doomsday-concept-art.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>30 Beluga whales trapped at closed theme park for 2 years finally approved for rescue</title>
+        <link>https://www.dexerto.com/entertainment/30-beluga-whales-trapped-at-closed-theme-park-for-2-years-finally-approved-for-rescue-3387137/</link>
+        <dc:creator><![CDATA[Joe Pring]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 11:49:34 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/entertainment/30-beluga-whales-trapped-at-closed-theme-park-for-2-years-finally-approved-for-rescue-3387137/</guid>
+        <description><![CDATA[A group of 30 beluga whales stranded at a closed Canadian theme park are finally set to be relocated after US authorities approved a rescue operation.]]></description>
+        <content:encoded><![CDATA[A group of 30 beluga whales stranded at a closed Canadian theme park are finally set to be relocated after US authorities approved a rescue operation.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/beluga-whale.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="194684" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/beluga-whale.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Scientists discover new massive dinosaur hidden under Thailand for millions of years</title>
+        <link>https://www.dexerto.com/entertainment/scientists-discover-new-massive-dinosaur-hidden-under-thailand-for-millions-of-years-3387150/</link>
+        <dc:creator><![CDATA[James Busby]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 11:49:08 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/entertainment/scientists-discover-new-massive-dinosaur-hidden-under-thailand-for-millions-of-years-3387150/</guid>
+        <description><![CDATA[A brand-new dinosaur species has been discovered in Thailand, and its name is just as impressive as its long neck.]]></description>
+        <content:encoded><![CDATA[A brand-new dinosaur species has been discovered in Thailand, and its name is just as impressive as its long neck.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/Scientists-discover-new-massive-dinosaur-hidden-under-Thailand-for-millions-of-years.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="493613" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/Scientists-discover-new-massive-dinosaur-hidden-under-Thailand-for-millions-of-years.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>New women’s athletics guidelines crack down on ‘sexualizing’ camera angles</title>
+        <link>https://www.dexerto.com/entertainment/new-womens-athletics-guidelines-crack-down-on-sexualizing-camera-angles-3387146/</link>
+        <dc:creator><![CDATA[Calum Patterson]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 11:46:34 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <category><![CDATA[Sports]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/entertainment/new-womens-athletics-guidelines-crack-down-on-sexualizing-camera-angles-3387146/</guid>
+        <description><![CDATA[New broadcasting guidelines have been introduced in Europe to prevent women athletes from being sexualized through camera angles and slow-motion replays.]]></description>
+        <content:encoded><![CDATA[New broadcasting guidelines have been introduced in Europe to prevent women athletes from being sexualized through camera angles and slow-motion replays.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/athleticcs.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="1003992" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/athleticcs.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Costco customers “perplexed” by sauce for new food court item</title>
+        <link>https://www.dexerto.com/food/costco-customers-perplexed-by-sauce-for-new-food-court-item-3387173/</link>
+        <dc:creator><![CDATA[Connor Bennett]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 11:38:01 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <category><![CDATA[Food]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/food/costco-customers-perplexed-by-sauce-for-new-food-court-item-3387173/</guid>
+        <description><![CDATA[A number of Costco customers say they’ve been left “perplexed” by the sauce that comes with the new chicken tenders in the food court. ]]></description>
+        <content:encoded><![CDATA[A number of Costco customers say they’ve been left “perplexed” by the sauce that comes with the new chicken tenders in the food court. ]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2023/10/01/Costco-super-fans-discover-rotisserie-chicken-secret-after-visiting-200-stores.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="379061" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2023/10/01/Costco-super-fans-discover-rotisserie-chicken-secret-after-visiting-200-stores.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Airline responds as man stealing from snack cart prompts call to police</title>
+        <link>https://www.dexerto.com/food/airline-responds-as-man-stealing-from-snack-cart-prompts-call-to-police-3387143/</link>
+        <dc:creator><![CDATA[Connor Bennett]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 11:18:22 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <category><![CDATA[Food]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/food/airline-responds-as-man-stealing-from-snack-cart-prompts-call-to-police-3387143/</guid>
+        <description><![CDATA[Breeze Airways has responded after staff called police on a passenger who tried to steal items from the snack cart while in the air.]]></description>
+        <content:encoded><![CDATA[Breeze Airways has responded after staff called police on a passenger who tried to steal items from the snack cart while in the air.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/breeze-airways-plane-in-sky.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="73182" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/breeze-airways-plane-in-sky.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Florida restaurant is giving away free “python pizza” if you catch the snake</title>
+        <link>https://www.dexerto.com/food/florida-restaurant-is-giving-away-free-python-pizza-if-you-catch-the-snake-3387124/</link>
+        <dc:creator><![CDATA[Connor Bennett]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 10:58:37 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <category><![CDATA[Food]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/food/florida-restaurant-is-giving-away-free-python-pizza-if-you-catch-the-snake-3387124/</guid>
+        <description><![CDATA[There is a restaurant in Florida that will accept snakes as currency and give you a free pizza if you bring one in during the Florida Python Challenge.]]></description>
+        <content:encoded><![CDATA[There is a restaurant in Florida that will accept snakes as currency and give you a free pizza if you bring one in during the Florida Python Challenge.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/11/python.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="1214224" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/11/python.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>GTA 4’s Cousin Roman actor joins calls for Rockstar to remaster game</title>
+        <link>https://www.dexerto.com/gta/gta-4s-cousin-roman-actor-joins-calls-for-rockstar-to-remaster-game-3387073/</link>
+        <dc:creator><![CDATA[Nathan Warby]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 10:51:50 GMT</pubDate>
+        <category><![CDATA[Gaming]]></category>
+        <category><![CDATA[GTA]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/gta/gta-4s-cousin-roman-actor-joins-calls-for-rockstar-to-remaster-game-3387073/</guid>
+        <description><![CDATA[Jason Zumwalt, the voice actor for Roman Bellic in Grand Theft Auto 4, wants Rockstar to remaster the game for modern consoles]]></description>
+        <content:encoded><![CDATA[Jason Zumwalt, the voice actor for Roman Bellic in Grand Theft Auto 4, wants Rockstar to remaster the game for modern consoles]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/GTA-4s-cousin-Roman-calls-for-Rockstar-to-remaster-the-game.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="526696" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/GTA-4s-cousin-Roman-calls-for-Rockstar-to-remaster-the-game.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>JiDion says all charges have been dismissed after livestream arrest</title>
+        <link>https://www.dexerto.com/youtube/jidion-says-all-charges-have-been-dismissed-after-livestream-arrest-3387071/</link>
+        <dc:creator><![CDATA[Joe Pring]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 10:45:37 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <category><![CDATA[Kick]]></category>
+        <category><![CDATA[YouTube]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/youtube/jidion-says-all-charges-have-been-dismissed-after-livestream-arrest-3387071/</guid>
+        <description><![CDATA[The YouTuber, real name Jidon Armani Adams, shared the update in a video posted on July 13, saying the charges had been dropped.]]></description>
+        <content:encoded><![CDATA[The YouTuber, real name Jidon Armani Adams, shared the update in a video posted on July 13, saying the charges had been dropped.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/jidion-video-update.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="161556" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/jidion-video-update.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Marvel leakers are turning Doomsday trailer scenes into anime to avoid copyright</title>
+        <link>https://www.dexerto.com/tv-movies/marvel-leakers-are-turning-doomsday-trailer-scenes-into-anime-to-avoid-copyright-3387063/</link>
+        <dc:creator><![CDATA[Jessica Filby]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 10:26:57 GMT</pubDate>
+        <category><![CDATA[TV & Movies]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/tv-movies/marvel-leakers-are-turning-doomsday-trailer-scenes-into-anime-to-avoid-copyright-3387063/</guid>
+        <description><![CDATA[Avengers: Doomsday is releasing at the end of the year, but that doesn’t stop leaks, though the leakers are going to odd lengths to avoid being caught.]]></description>
+        <content:encoded><![CDATA[Avengers: Doomsday is releasing at the end of the year, but that doesn’t stop leaks, though the leakers are going to odd lengths to avoid being caught.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/Confused-Captain-America.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="133784" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/Confused-Captain-America.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Estate agent quits and moves to Mexico to live out dream as a lucha libre wrestler</title>
+        <link>https://www.dexerto.com/entertainment/estate-agent-quits-and-moves-to-mexico-to-live-out-dream-as-a-lucha-libre-wrestler-3387025/</link>
+        <dc:creator><![CDATA[James Busby]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 10:23:56 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <category><![CDATA[Wrestling]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/entertainment/estate-agent-quits-and-moves-to-mexico-to-live-out-dream-as-a-lucha-libre-wrestler-3387025/</guid>
+        <description><![CDATA[A former estate agent has quit the property business and moved to Mexico to pursue his dream of becoming a lucha libre wrestler.]]></description>
+        <content:encoded><![CDATA[A former estate agent has quit the property business and moved to Mexico to pursue his dream of becoming a lucha libre wrestler.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/Estate-agent-quits-job-to-become-a-lucha-libre-wrestler-in-Mexico.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="282005" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/Estate-agent-quits-job-to-become-a-lucha-libre-wrestler-in-Mexico.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Black Ops devs respond as PS5 ports are already full of cheaters</title>
+        <link>https://www.dexerto.com/call-of-duty/black-ops-devs-respond-as-ps5-ports-are-already-full-of-cheaters-3387032/</link>
+        <dc:creator><![CDATA[Nathan Warby]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 09:23:40 GMT</pubDate>
+        <category><![CDATA[Call of Duty]]></category>
+        <category><![CDATA[Gaming]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/call-of-duty/black-ops-devs-respond-as-ps5-ports-are-already-full-of-cheaters-3387032/</guid>
+        <description><![CDATA[Treyarch has been forced to take action as the PS5 port of Black Ops 1 is already full of cheaters, just days after launch.]]></description>
+        <content:encoded><![CDATA[Treyarch has been forced to take action as the PS5 port of Black Ops 1 is already full of cheaters, just days after launch.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/Black-Ops-devs-respond-as-PS5-ports-are-already-full-of-cheaters.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="721943" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/Black-Ops-devs-respond-as-PS5-ports-are-already-full-of-cheaters.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Grandfather responds after viral Yellowstone bison attack leaves him in hospital</title>
+        <link>https://www.dexerto.com/entertainment/grandfather-responds-after-viral-yellowstone-bison-attack-leaves-him-in-hospital-3387049/</link>
+        <dc:creator><![CDATA[Connor Bennett]]></dc:creator>
+        <pubDate>Tue, 14 Jul 2026 09:03:54 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/entertainment/grandfather-responds-after-viral-yellowstone-bison-attack-leaves-him-in-hospital-3387049/</guid>
+        <description><![CDATA[A 65-year-old man who was attacked by a bison in Yellowstone National Park has responded after videos of the dramatic incident spread like wildfire online.]]></description>
+        <content:encoded><![CDATA[A 65-year-old man who was attacked by a bison in Yellowstone National Park has responded after videos of the dramatic incident spread like wildfire online.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/Man-responds-after-being-tossed-into-the-air-in-viral-Bison-attack.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="112716" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/14/Man-responds-after-being-tossed-into-the-air-in-viral-Bison-attack.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>YouTuber sentenced to 8 months in prison for skinning and eating stray dog</title>
+        <link>https://www.dexerto.com/youtube/youtuber-sentenced-to-8-months-in-prison-for-skinning-and-eating-stray-dog-3386994/</link>
+        <dc:creator><![CDATA[Michael Gwilliam]]></dc:creator>
+        <pubDate>Mon, 13 Jul 2026 20:47:56 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <category><![CDATA[YouTube]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/youtube/youtuber-sentenced-to-8-months-in-prison-for-skinning-and-eating-stray-dog-3386994/</guid>
+        <description><![CDATA[A Moroccan YouTuber has been sentenced to eight months in prison after filming himself skinning, cooking, and eating a stray dog.]]></description>
+        <content:encoded><![CDATA[A Moroccan YouTuber has been sentenced to eight months in prison after filming himself skinning, cooking, and eating a stray dog.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/13/youtuber-arrest-eat-dog.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="907380" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/13/youtuber-arrest-eat-dog.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Nissin unveils first ever Cup Noodles that ‘cook’ with cold water</title>
+        <link>https://www.dexerto.com/food/nissin-unveils-first-ever-cup-noodles-that-cook-with-cold-water-3386978/</link>
+        <dc:creator><![CDATA[Dylan Horetski]]></dc:creator>
+        <pubDate>Mon, 13 Jul 2026 19:58:43 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <category><![CDATA[Food]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/food/nissin-unveils-first-ever-cup-noodles-that-cook-with-cold-water-3386978/</guid>
+        <description><![CDATA[Nissin has announced the first cold water-only Cup Noodles in the brand’s 55-year history, introducing a new way to prepare one of Japan’s most recognizable instant meals without using boiling water.]]></description>
+        <content:encoded><![CDATA[Nissin has announced the first cold water-only Cup Noodles in the brand’s 55-year history, introducing a new way to prepare one of Japan’s most recognizable instant meals without using boiling water.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/13/coldcupnoodle.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="207199" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/13/coldcupnoodle.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Asmongold reveals his house is finally roach-free after major home renovations</title>
+        <link>https://www.dexerto.com/twitch/asmongold-reveals-his-house-is-finally-roach-free-after-major-home-renovations-3386953/</link>
+        <dc:creator><![CDATA[Michael Gwilliam]]></dc:creator>
+        <pubDate>Mon, 13 Jul 2026 18:42:16 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <category><![CDATA[Twitch]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/twitch/asmongold-reveals-his-house-is-finally-roach-free-after-major-home-renovations-3386953/</guid>
+        <description><![CDATA[Twitch star Asmongold may still be living in filth, but he hasn’t seen a roach in his house for nearly a year thanks to some major changes to his home.]]></description>
+        <content:encoded><![CDATA[Twitch star Asmongold may still be living in filth, but he hasn’t seen a roach in his house for nearly a year thanks to some major changes to his home.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2025/06/04/AsmongoldOldAccount.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="144899" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2025/06/04/AsmongoldOldAccount.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Viral World Cup fan Freddy returns to finish US journey after quitting over ‘toxicity’</title>
+        <link>https://www.dexerto.com/entertainment/viral-world-cup-fan-freddy-returns-to-finish-us-journey-after-quitting-over-toxicity-3386956/</link>
+        <dc:creator><![CDATA[Dylan Horetski]]></dc:creator>
+        <pubDate>Mon, 13 Jul 2026 18:42:13 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/entertainment/viral-world-cup-fan-freddy-returns-to-finish-us-journey-after-quitting-over-toxicity-3386956/</guid>
+        <description><![CDATA[Viral World Cup fan Freddy has returned to social media to continue documenting his trip across the US after deactivating his account weeks earlier.]]></description>
+        <content:encoded><![CDATA[Viral World Cup fan Freddy has returned to social media to continue documenting his trip across the US after deactivating his account weeks earlier.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/13/worldcupfanfreddy.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="412179" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/13/worldcupfanfreddy.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>KFC brings back Popcorn Chicken after years of fan demand</title>
+        <link>https://www.dexerto.com/food/kfc-brings-back-popcorn-chicken-after-years-of-fan-demand-3386943/</link>
+        <dc:creator><![CDATA[Dylan Horetski]]></dc:creator>
+        <pubDate>Mon, 13 Jul 2026 18:12:14 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <category><![CDATA[Food]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/food/kfc-brings-back-popcorn-chicken-after-years-of-fan-demand-3386943/</guid>
+        <description><![CDATA[KFC is bringing back one of its most requested menu items, with Popcorn Chicken officially returning to restaurants across the US.]]></description>
+        <content:encoded><![CDATA[KFC is bringing back one of its most requested menu items, with Popcorn Chicken officially returning to restaurants across the US.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/13/popcornchicken.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="394899" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/13/popcornchicken.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Technoblade’s dad condemns threats against Technolarp after YouTuber is doxxed</title>
+        <link>https://www.dexerto.com/youtube/technoblades-dad-condemns-threats-against-technolarp-after-youtuber-is-doxxed-3386932/</link>
+        <dc:creator><![CDATA[Michael Gwilliam]]></dc:creator>
+        <pubDate>Mon, 13 Jul 2026 17:29:14 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <category><![CDATA[YouTube]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/youtube/technoblades-dad-condemns-threats-against-technolarp-after-youtuber-is-doxxed-3386932/</guid>
+        <description><![CDATA[Technoblade’s father has defended controversial YouTuber Technolarp after the creator said he was doxxed amid growing backlash over his content.]]></description>
+        <content:encoded><![CDATA[Technoblade’s father has defended controversial YouTuber Technolarp after the creator said he was doxxed amid growing backlash over his content.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/10/technoblade-technolarp-minecraft.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="89499" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/10/technoblade-technolarp-minecraft.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Larian responds after Gerard Way reveals he’s never played Baldur’s Gate 3</title>
+        <link>https://www.dexerto.com/gaming/larian-responds-after-gerard-way-reveals-hes-never-played-baldurs-gate-3-3386898/</link>
+        <dc:creator><![CDATA[Dylan Horetski]]></dc:creator>
+        <pubDate>Mon, 13 Jul 2026 17:03:22 GMT</pubDate>
+        <category><![CDATA[Gaming]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/gaming/larian-responds-after-gerard-way-reveals-hes-never-played-baldurs-gate-3-3386898/</guid>
+        <description><![CDATA[My Chemical Romance frontman Gerard Way revealed that despite being a longtime fan of the original Baldur’s Gate, he has never played Baldur’s Gate 3.]]></description>
+        <content:encoded><![CDATA[My Chemical Romance frontman Gerard Way revealed that despite being a longtime fan of the original Baldur’s Gate, he has never played Baldur’s Gate 3.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/13/gerardwaybaldursgate.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="526215" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/13/gerardwaybaldursgate.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Ubisoft responds after Assassin’s Creed Black Flag Resynced players flood internet with feet pics</title>
+        <link>https://www.dexerto.com/assassins-creed/ubisoft-responds-after-assassins-creed-black-flag-resynced-players-flood-internet-with-feet-pics-3385857/</link>
+        <dc:creator><![CDATA[Jessica Filby]]></dc:creator>
+        <pubDate>Mon, 13 Jul 2026 15:57:34 GMT</pubDate>
+        <category><![CDATA[Assassin's Creed]]></category>
+        <category><![CDATA[Gaming]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/assassins-creed/ubisoft-responds-after-assassins-creed-black-flag-resynced-players-flood-internet-with-feet-pics-3385857/</guid>
+        <description><![CDATA[Assassin’s Creed Black Flag Resynced is finally here, bringing massively updated graphics, which means people are taking photos of the characters’ feet.]]></description>
+        <content:encoded><![CDATA[Assassin’s Creed Black Flag Resynced is finally here, bringing massively updated graphics, which means people are taking photos of the characters’ feet.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/08/Edward-Kenway-Assassins-Creed-Black-Flag-Resynced.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="179761" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/08/Edward-Kenway-Assassins-Creed-Black-Flag-Resynced.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Sopranos Vito actor reveals huge weight loss for new role</title>
+        <link>https://www.dexerto.com/tv-movies/sopranos-vito-actor-reveals-huge-weight-loss-for-new-role-3385832/</link>
+        <dc:creator><![CDATA[Liam Mackay]]></dc:creator>
+        <pubDate>Mon, 13 Jul 2026 15:44:46 GMT</pubDate>
+        <category><![CDATA[TV & Movies]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/tv-movies/sopranos-vito-actor-reveals-huge-weight-loss-for-new-role-3385832/</guid>
+        <description><![CDATA[The Sopranos actor Joe Gannascoli, who played Vito in HBO’s hit mob drama, revealed how he’s losing 40 pounds for a new role based on his book.]]></description>
+        <content:encoded><![CDATA[The Sopranos actor Joe Gannascoli, who played Vito in HBO’s hit mob drama, revealed how he’s losing 40 pounds for a new role based on his book.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/13/sopranos-vito-actor-weight-loss.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="238100" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/13/sopranos-vito-actor-weight-loss.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Christopher Nolan explains why everyone in The Odyssey has American accents</title>
+        <link>https://www.dexerto.com/tv-movies/christopher-nolan-explains-why-everyone-in-the-odyssey-has-american-accents-3385791/</link>
+        <dc:creator><![CDATA[Nathan Warby]]></dc:creator>
+        <pubDate>Mon, 13 Jul 2026 15:39:17 GMT</pubDate>
+        <category><![CDATA[TV & Movies]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/tv-movies/christopher-nolan-explains-why-everyone-in-the-odyssey-has-american-accents-3385791/</guid>
+        <description><![CDATA[The Odyssey director Christopher Nolan has revealed why everyone in his new movie speaks with American accents, despite the ancient Greek setting.]]></description>
+        <content:encoded><![CDATA[The Odyssey director Christopher Nolan has revealed why everyone in his new movie speaks with American accents, despite the ancient Greek setting.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/13/Christopher-Nolan-explains-why-everyone-in-The-Odyssey-has-American-accents.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="483133" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/13/Christopher-Nolan-explains-why-everyone-in-The-Odyssey-has-American-accents.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Games Done Quick cancels SNK streams after just two hours as Saudi link sparks backlash</title>
+        <link>https://www.dexerto.com/gaming/games-done-quick-cancels-snk-streams-after-just-two-hours-as-saudi-link-sparks-backlash-3385796/</link>
+        <dc:creator><![CDATA[Michael Gwilliam]]></dc:creator>
+        <pubDate>Mon, 13 Jul 2026 15:12:10 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <category><![CDATA[Gaming]]></category>
+        <category><![CDATA[Twitch]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/gaming/games-done-quick-cancels-snk-streams-after-just-two-hours-as-saudi-link-sparks-backlash-3385796/</guid>
+        <description><![CDATA[Games Done Quick canceled a sponsored SNK showcase after less than three hours, following backlash over the company’s ties to Saudi Arabia.]]></description>
+        <content:encoded><![CDATA[Games Done Quick canceled a sponsored SNK showcase after less than three hours, following backlash over the company’s ties to Saudi Arabia.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/13/snk-gdk-cancel-sponsorship.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="1251257" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/13/snk-gdk-cancel-sponsorship.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>European Union considers sweeping social media restrictions for children</title>
+        <link>https://www.dexerto.com/entertainment/eu-considers-sweeping-social-media-restrictions-for-children-3385783/</link>
+        <dc:creator><![CDATA[Dylan Horetski]]></dc:creator>
+        <pubDate>Mon, 13 Jul 2026 14:12:04 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/entertainment/eu-considers-sweeping-social-media-restrictions-for-children-3385783/</guid>
+        <description><![CDATA[The European Union is considering sweeping new restrictions on children’s and teenagers’ access to social media.]]></description>
+        <content:encoded><![CDATA[The European Union is considering sweeping new restrictions on children’s and teenagers’ access to social media.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2025/11/11/Denmark-Social-Media-ban.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="568256" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2025/11/11/Denmark-Social-Media-ban.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Xbox player wins lawsuit against Microsoft to get his account back plus $400</title>
+        <link>https://www.dexerto.com/gaming/xbox-player-wins-lawsuit-against-microsoft-to-get-his-account-back-plus-400-3385776/</link>
+        <dc:creator><![CDATA[Cande Maldonado]]></dc:creator>
+        <pubDate>Mon, 13 Jul 2026 14:06:17 GMT</pubDate>
+        <category><![CDATA[Gaming]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/gaming/xbox-player-wins-lawsuit-against-microsoft-to-get-his-account-back-plus-400-3385776/</guid>
+        <description><![CDATA[A Brazilian court ordered Microsoft to restore an Xbox gamer’s hacked account and digital library after support told him to rebuy his games.]]></description>
+        <content:encoded><![CDATA[A Brazilian court ordered Microsoft to restore an Xbox gamer’s hacked account and digital library after support told him to rebuy his games.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/13/Xbox-controller.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="352917" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/13/Xbox-controller.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Christopher Nolan praises Obsession and Backrooms as evidence filmmaking is evolving</title>
+        <link>https://www.dexerto.com/tv-movies/christopher-nolan-praises-obsession-and-backrooms-as-evidence-filmmaking-is-evolving-3385695/</link>
+        <dc:creator><![CDATA[Liam Mackay]]></dc:creator>
+        <pubDate>Mon, 13 Jul 2026 14:05:43 GMT</pubDate>
+        <category><![CDATA[TV & Movies]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/tv-movies/christopher-nolan-praises-obsession-and-backrooms-as-evidence-filmmaking-is-evolving-3385695/</guid>
+        <description><![CDATA[The Odyssey director Christopher Nolan was full of praise for indie hits Obsession and Backrooms and their young directors.]]></description>
+        <content:encoded><![CDATA[The Odyssey director Christopher Nolan was full of praise for indie hits Obsession and Backrooms and their young directors.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/13/christopher-nolan-obsession.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="234670" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/13/christopher-nolan-obsession.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+
+    <item>
+        <title>Tour De Donut race lets cyclists down donuts so they have a better time over 34 miles</title>
+        <link>https://www.dexerto.com/food/tour-de-donut-race-lets-cyclists-down-donuts-so-they-have-a-better-time-over-34-miles-3385789/</link>
+        <dc:creator><![CDATA[Connor Bennett]]></dc:creator>
+        <pubDate>Mon, 13 Jul 2026 13:57:30 GMT</pubDate>
+        <category><![CDATA[Entertainment]]></category>
+        <category><![CDATA[Food]]></category>
+        <category><![CDATA[Sports]]></category>
+        <guid isPermaLink="true">https://www.dexerto.com/food/tour-de-donut-race-lets-cyclists-down-donuts-so-they-have-a-better-time-over-34-miles-3385789/</guid>
+        <description><![CDATA[There is an annual bike race that takes place in two parts of the United States where you can decrease your time by eating donuts. Seriously.]]></description>
+        <content:encoded><![CDATA[There is an annual bike race that takes place in two parts of the United States where you can decrease your time by eating donuts. Seriously.]]></content:encoded>
+        <enclosure url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/13/34-mile-Tour-De-Donut-race-is-as-much-about-eating-as-it-is-cycling.jpg?width=1080&amp;quality=75&amp;format=auto" type="image/jpeg" length="225414" />
+          <media:thumbnail url="https://www.dexerto.com/cdn-image/wp-content/uploads/2026/07/13/34-mile-Tour-De-Donut-race-is-as-much-about-eating-as-it-is-cycling.jpg?width=1080&amp;quality=75&amp;format=auto" />
+    </item>
+</channel></rss>

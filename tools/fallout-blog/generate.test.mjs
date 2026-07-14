@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import {
   areTopicsSimilar,
   buildArticleHtml,
+  buildStorySummaryForPrompt,
+  extractArticleBodyText,
   countChars,
   countWords,
   detectContentType,
@@ -36,6 +38,11 @@ import {
   isTitleLengthValid,
   trimTitleToMaxChars,
   compareCandidatePriority,
+  getAdjustedCandidateScore,
+  getSourceDiversityAdjustment,
+  getRedditPostJsonUrl,
+  isRedditPostLink,
+  parseRedditPostDetailPayload,
   meetsEngagementThreshold,
   meetsMinimumSourceQuality,
   passesRssRedditQualityGate,
@@ -322,6 +329,13 @@ test('areTopicsSimilar matches paraphrased headlines', () => {
     areTopicsSimilar('Fallout 76 Season 18 goes live', 'Bethesda announces new Fallout TV details'),
     false
   );
+  assert.equal(
+    areTopicsSimilar(
+      'Obsidian reportedly shifts focus back to Fallout',
+      'Bloomberg: Obsidian refocusing on a new Fallout game'
+    ),
+    true
+  );
 });
 
 test('selectStoriesForGeneration skips fuzzy topic matches in history', () => {
@@ -427,6 +441,53 @@ test('compareCandidatePriority prefers Reddit items with engagement metrics', ()
   };
 
   assert.ok(compareCandidatePriority(withMetrics, withoutMetrics) < 0);
+});
+
+test('getSourceDiversityAdjustment penalizes recently used outlets', () => {
+  const history = [
+    { source: 'GameSpot', coveredAt: Date.now() - 24 * 60 * 60 * 1000 },
+    { source: 'GameSpot', coveredAt: Date.now() - 2 * 24 * 60 * 60 * 1000 },
+    { source: 'IGN', coveredAt: Date.now() - 3 * 24 * 60 * 60 * 1000 }
+  ];
+
+  const gameSpotPenalty = getSourceDiversityAdjustment({ source: 'GameSpot', sourceTier: 'press', contentType: 'news' }, history);
+  const aftermathBonus = getSourceDiversityAdjustment({ source: 'Aftermath', sourceTier: 'press', contentType: 'news' }, history);
+
+  assert.ok(gameSpotPenalty < aftermathBonus);
+});
+
+test('pickFeaturedStory prefers a fresh outlet over an overused syndicated source', () => {
+  const history = [
+    { source: 'GameSpot', coveredAt: Date.now() - 24 * 60 * 60 * 1000, contentType: 'news' },
+    { source: 'GameSpot', coveredAt: Date.now() - 2 * 24 * 60 * 60 * 1000, contentType: 'news' },
+    { source: 'IGN', coveredAt: Date.now() - 3 * 24 * 60 * 60 * 1000, contentType: 'news' },
+    { source: 'GameSpot', coveredAt: Date.now() - 4 * 24 * 60 * 60 * 1000, contentType: 'news' }
+  ];
+
+  const candidates = [
+    {
+      source: 'GameSpot',
+      sourceTier: 'press',
+      sourceKind: 'rss',
+      contentType: 'news',
+      score: 14,
+      title: 'Bethesda confirms new Fallout 76 season roadmap details',
+      description: 'Bethesda has outlined the next Fallout 76 season with new rewards, challenges, and quality-of-life updates for Appalachian players.'
+    },
+    {
+      source: 'Aftermath',
+      sourceTier: 'press',
+      sourceKind: 'rss',
+      contentType: 'news',
+      score: 12.5,
+      title: 'Inside the Bethesda union response after Xbox layoffs hit Fallout teams',
+      description: 'Aftermath reports on how Bethesda Game Studios workers responded after Xbox layoffs, including Fallout team morale and union demonstrations.'
+    }
+  ];
+
+  const [featured] = pickFeaturedStory(candidates, history);
+  assert.equal(featured.source, 'Aftermath');
+  assert.ok(getAdjustedCandidateScore(featured, history) > getAdjustedCandidateScore(candidates[0], history));
 });
 
 test('parseRedditRssFeed maps subreddit RSS into story items', () => {
@@ -729,4 +790,91 @@ test('getStoryFingerprint differs when source or link changes', () => {
   const b = getStoryFingerprint({ source: 'Eurogamer', title: 'Fallout update', link: 'https://example.com/2' });
 
   assert.notEqual(a, b);
+});
+
+test('getRedditPostJsonUrl converts Reddit permalinks into JSON endpoints', () => {
+  const link = 'https://www.reddit.com/r/fallout/comments/abc123/my-long-post-title/';
+  assert.equal(
+    getRedditPostJsonUrl(link),
+    'https://www.reddit.com/r/fallout/comments/abc123/my-long-post-title.json?raw_json=1'
+  );
+  assert.equal(
+    getRedditPostJsonUrl(link, { oauth: true }),
+    'https://oauth.reddit.com/r/fallout/comments/abc123/my-long-post-title.json?raw_json=1'
+  );
+  assert.equal(isRedditPostLink(link), true);
+  assert.equal(getRedditPostJsonUrl('https://www.ign.com/articles/fallout'), null);
+});
+
+test('parseRedditPostDetailPayload returns the full selftext body', () => {
+  const longBody = 'This is a detailed mod breakdown.'.repeat(80);
+  const payload = [{
+    data: {
+      children: [{
+        kind: 't3',
+        data: {
+          title: 'Huge Fallout 4 overhaul released',
+          selftext: longBody,
+          is_self: true,
+          score: 512,
+          num_comments: 88
+        }
+      }]
+    }
+  }];
+
+  const detail = parseRedditPostDetailPayload(payload);
+  assert.equal(detail.title, 'Huge Fallout 4 overhaul released');
+  assert.equal(detail.description, longBody);
+  assert.equal(detail.redditScore, 512);
+  assert.equal(detail.redditComments, 88);
+  assert.equal(detail.isSelf, true);
+});
+
+test('parseRedditListing keeps long selftext instead of truncating at 1200 characters', () => {
+  const longBody = 'Vault dweller field report.'.repeat(120);
+  const payload = {
+    data: {
+      children: [{
+        kind: 't3',
+        data: {
+          title: 'My Appalachia camp build',
+          selftext: longBody,
+          permalink: '/r/fo76/comments/xyz/camp/',
+          score: 240,
+          num_comments: 42,
+          created_utc: 1_700_000_000
+        }
+      }]
+    }
+  };
+
+  const [item] = parseRedditListing(payload, { minScore: 50, minComments: 10 });
+  assert.equal(item.description.length, longBody.length);
+});
+
+test('extractFeedItems prefers full RSS content:encoded over short descriptions', () => {
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <item>
+      <title>Fallout 76 update goes live</title>
+      <link>https://example.com/fallout-76-update</link>
+      <description><![CDATA[Short teaser.]]></description>
+      <content:encoded><![CDATA[<p>${'Full article body with patch notes and seasonal details. '.repeat(20)}</p>]]></content:encoded>
+    </item>
+  </channel>
+</rss>`;
+
+  const [item] = extractFeedItems(xml);
+  assert.match(item.description, /patch notes and seasonal details/);
+  assert.ok(item.description.length > 200);
+});
+
+test('buildStorySummaryForPrompt keeps long enriched summaries for article generation', () => {
+  const longDescription = 'Season breakdown with rewards, systems, and community reaction. '.repeat(120);
+  const summary = buildStorySummaryForPrompt({ description: longDescription });
+
+  assert.ok(summary.length > 3000);
+  assert.match(summary, /community reaction/);
 });
