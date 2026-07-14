@@ -31,6 +31,12 @@ const FEED_USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/5
 const BRAND_NAME = 'Fallout Hub';
 
 const CONTENT_TYPES = ['news', 'mods', 'community'];
+const GENERATION_BATCH_LIMITS = {
+  news: 5,
+  mods: 5,
+  community: 5
+};
+const CONTENT_TYPE_ROTATION_BONUS = 1.5;
 
 const CONTENT_SOURCES = [
   { name: 'IGN', url: 'https://www.ign.com/rss/articles/feed', weight: 1.45, category: 'news', tier: 'press', kind: 'rss' },
@@ -614,43 +620,86 @@ export function compareCandidatePriority(a, b, historyEntries = []) {
   return engagementB - engagementA;
 }
 
+export function getContentTypeCounts(historyEntries = [], { withinDays = 7 } = {}) {
+  const cutoff = Date.now() - withinDays * 24 * 60 * 60 * 1000;
+  const typeCounts = { news: 0, mods: 0, community: 0 };
+
+  for (const entry of historyEntries) {
+    if (entry.coveredAt < cutoff || !entry.contentType) continue;
+    typeCounts[entry.contentType] = (typeCounts[entry.contentType] || 0) + 1;
+  }
+
+  return typeCounts;
+}
+
+export function getContentTypeRotationBonus(contentType = 'news', typeCounts = {}) {
+  const counts = CONTENT_TYPES.map((type) => typeCounts[type] || 0);
+  const minCount = counts.length > 0 ? Math.min(...counts) : 0;
+  return (typeCounts[contentType] || 0) <= minCount ? CONTENT_TYPE_ROTATION_BONUS : 0;
+}
+
+export function getEditorialCandidateScore(item = {}, historyEntries = [], typeCounts = {}) {
+  return getAdjustedCandidateScore(item, historyEntries)
+    + getContentTypeRotationBonus(item.contentType, typeCounts);
+}
+
+export function getGenerationBatchLimit(contentType = 'news') {
+  return GENERATION_BATCH_LIMITS[contentType] || 1;
+}
+
 export function pickFeaturedStory(candidates = [], historyEntries = []) {
   const eligible = selectStoriesForGeneration(candidates, historyEntries, { storyLimit: 20 });
   if (eligible.length === 0) return [];
 
-  const weekAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
-  const recentTypes = historyEntries
-    .filter((entry) => entry.coveredAt >= weekAgo)
-    .map((entry) => entry.contentType)
-    .filter(Boolean);
+  const typeCounts = getContentTypeCounts(historyEntries);
+  const mainStory = [...eligible].sort((a, b) => {
+    const scoreA = getEditorialCandidateScore(a, historyEntries, typeCounts);
+    const scoreB = getEditorialCandidateScore(b, historyEntries, typeCounts);
+    if (scoreB !== scoreA) return scoreB - scoreA;
+    return compareCandidatePriority(a, b, historyEntries);
+  })[0];
 
-  const typeCounts = { news: 0, mods: 0, community: 0 };
-  for (const contentType of recentTypes) {
-    typeCounts[contentType] = (typeCounts[contentType] || 0) + 1;
-  }
+  return [mainStory];
+}
 
-  const preferredOrder = [...CONTENT_TYPES].sort((a, b) => typeCounts[a] - typeCounts[b]);
-  let mainStory = null;
+export function assembleGenerationItems(mainStory = {}, candidates = [], historyEntries = [], { maxItems = 1 } = {}) {
+  if (!mainStory?.title) return [];
 
-  for (const contentType of preferredOrder) {
-    const matches = eligible
-      .filter((item) => item.contentType === contentType)
-      .sort((a, b) => compareCandidatePriority(a, b, historyEntries));
-
-    if (matches.length === 0) continue;
-
-    mainStory = matches[0];
-    break;
-  }
-
-  mainStory = mainStory || eligible.sort((a, b) => compareCandidatePriority(a, b, historyEntries))[0];
+  const contentType = mainStory.contentType || 'news';
+  const limit = Math.min(maxItems, getGenerationBatchLimit(contentType));
   const mainTopic = getStoryTopicKey(mainStory);
-  const supporting = eligible
-    .filter((item) => getStoryTopicKey(item) !== mainTopic)
-    .sort((a, b) => compareCandidatePriority(a, b, historyEntries))
-    .slice(0, 4);
 
-  return [mainStory, ...supporting];
+  const pool = candidates
+    .filter((item) => item.contentType === contentType)
+    .filter((item) => !isTopicCovered(item, historyEntries))
+    .filter((item) => {
+      if (item.publishedAt && item.publishedAt < Date.now() - HISTORY_RETENTION_DAYS * 24 * 60 * 60 * 1000) {
+        return false;
+      }
+
+      if (item.sourceKind === 'reddit' && !passesCommunityQualityGate(item)) {
+        return false;
+      }
+
+      return true;
+    })
+    .sort((a, b) => getAdjustedCandidateScore(b, historyEntries) - getAdjustedCandidateScore(a, historyEntries));
+
+  const selected = [mainStory];
+  const usedTopics = new Set([mainTopic]);
+
+  for (const item of pool) {
+    if (selected.length >= limit) break;
+
+    const topicKey = getStoryTopicKey(item);
+    if (usedTopics.has(topicKey)) continue;
+    if (item.link === mainStory.link && item.title === mainStory.title) continue;
+
+    selected.push(item);
+    usedTopics.add(topicKey);
+  }
+
+  return selected;
 }
 
 export function selectStoriesForGeneration(candidates = [], historyEntries = [], { storyLimit = 5 } = {}) {
@@ -1123,6 +1172,7 @@ function buildSharedArticleRequirements(contentType, trustLevel, reportingOutlet
 - contentType: "${contentType}"
 - trustLevel: "${trustLevel}"
 - sources: array of {title, url, type} using ONLY URLs from SOURCE MATERIAL below — omit tangential supporting links
+- Write ONLY about the source material provided. Do not invent stories or add topics that are not listed in the summaries below
 
 Return valid JSON only with these fields: title, seoDescription, subtitle, intro, keyFacts, sections, conclusion, takeaway, cta, contentType, trustLevel, sources`;
 }
@@ -1131,21 +1181,30 @@ function buildNewsPrompt(newsItems, context) {
   const mainStory = newsItems[0];
   const trustLevel = mainStory.trustLevel || detectTrustLevel(mainStory, { tier: mainStory.sourceTier, category: 'news' });
   const reportingOutlet = resolveReportingOutlet(mainStory);
+  const isMultiAngle = newsItems.length > 1;
+
+  const formatRules = isMultiAngle
+    ? `NEWS BRIEF RULES (${newsItems.length} sourced angles):
+- Lead with the strongest headline: ${mainStory.title}
+- Weave the other sourced items into one cohesive Fallout news brief — different outlets, official channels, or complementary angles are welcome
+- Keep every section tied to material below; this is one briefing, not a random link dump
+- Separate official facts from press reports and explain why fans should care`
+    : `NEWS WRITING RULES:
+- Lead with the most newsworthy confirmed or reported fact first
+- Name the game, platform, studio, or show when known from sources
+- Separate official facts from press reports and fan reaction
+- Use an informative newsroom tone — not hype, not rumor-chasing
+- Help readers understand timing, scope, and why the franchise conversation shifted`;
 
   return `You are the lead editor of ${BRAND_NAME}, writing a Fallout NEWS brief fans will trust and share.
 
 ${getContentTypeGuidance('news', trustLevel)}
 
-NEWS WRITING RULES:
-- Lead with the most newsworthy confirmed or reported fact first
-- Name the game, platform, studio, or show when known from sources
-- Separate official facts from press reports and fan reaction
-- Use an informative newsroom tone — not hype, not rumor-chasing
-- Help readers understand timing, scope, and why the franchise conversation shifted
+${formatRules}
 
 ${buildPromptTrustSection(trustLevel, reportingOutlet)}
 
-SHORTLISTED STORIES:
+SOURCE MATERIAL (write only from these items — official, press, and community sources listed below):
 ${context}
 
 MAIN STORY TO LEAD WITH: ${mainStory.title}
@@ -1157,24 +1216,34 @@ function buildModsPrompt(newsItems, context) {
   const mainStory = newsItems[0];
   const trustLevel = mainStory.trustLevel || detectTrustLevel(mainStory, { tier: mainStory.sourceTier, category: 'mods' });
   const reportingOutlet = resolveReportingOutlet(mainStory);
+  const isRoundup = newsItems.length > 1;
 
-  return `You are the lead editor of ${BRAND_NAME}, writing a MOD SPOTLIGHT for Fallout players deciding what to install next.
-
-${getContentTypeGuidance('mods', trustLevel)}
-
-MOD SPOTLIGHT RULES:
+  const formatRules = isRoundup
+    ? `MOD ROUNDUP RULES (${newsItems.length} mods):
+- This is ONE mod roundup article, not a news digest
+- Lead with the main mod: ${mainStory.title}
+- Give each mod clear coverage — what it changes, who it is for, and where to get it
+- Use section headings that name the mods or their purpose
+- Do not mention unrelated press news, studio drama, TV awards, or industry headlines`
+    : `SINGLE MOD SPOTLIGHT RULES:
+- Write only about this one mod — do not pad the article with unrelated news or other mods
 - Open with what the mod changes in practical gameplay or visuals
 - Credit the creator/mod page and make clear this is community-made, not official Bethesda content
 - Mention game, platform, requirements, or compatibility only if present in sources
-- Explain who should care: returning players, screenshot fans, survivalists, lore hunters, etc.
-- Avoid breaking-news tone — this is a useful recommendation, not an announcement
+- Avoid breaking-news tone — this is a useful recommendation, not an announcement`;
+
+  return `You are the lead editor of ${BRAND_NAME}, writing ${isRoundup ? 'a MOD ROUNDUP' : 'a MOD SPOTLIGHT'} for Fallout players deciding what to install next.
+
+${getContentTypeGuidance('mods', trustLevel)}
+
+${formatRules}
 
 ${buildPromptTrustSection(trustLevel, reportingOutlet)}
 
-SHORTLISTED STORIES:
+SOURCE MATERIAL (write ONLY about these mods — nothing else):
 ${context}
 
-MAIN MOD TO SPOTLIGHT: ${mainStory.title}
+MAIN MOD TO LEAD WITH: ${mainStory.title}
 
 ${buildSharedArticleRequirements('mods', trustLevel, reportingOutlet)}`;
 }
@@ -1183,21 +1252,30 @@ function buildCommunityPrompt(newsItems, context) {
   const mainStory = newsItems[0];
   const trustLevel = mainStory.trustLevel || detectTrustLevel(mainStory, { tier: mainStory.sourceTier, category: 'community' });
   const reportingOutlet = resolveReportingOutlet(mainStory);
+  const isRoundup = newsItems.length > 1;
 
-  return `You are the lead editor of ${BRAND_NAME}, spotlighting something the Fallout community created and would enjoy sharing.
-
-${getContentTypeGuidance('community', trustLevel)}
-
-COMMUNITY HIGHLIGHT RULES:
+  const formatRules = isRoundup
+    ? `COMMUNITY ROUNDUP RULES (${newsItems.length} highlights):
+- Lead with the strongest community story: ${mainStory.title}
+- Give each highlight clear credit and explain why fans would share it
+- Keep the tone celebratory and human — this is fan culture, not a press release
+- Do not mix in unrelated industry news or mod releases unless they are listed below`
+    : `COMMUNITY HIGHLIGHT RULES:
 - Celebrate the creator, build, artwork, cosplay, lore thread, or project clearly
 - Make the opening feel human and shareable, not like a press release
 - Explain why this stands out in the fandom and who will appreciate it
 - Credit the source thread or creator path from the summaries
-- Never frame fan work as official news or a Bethesda announcement
+- Never frame fan work as official news or a Bethesda announcement`;
+
+  return `You are the lead editor of ${BRAND_NAME}, spotlighting ${isRoundup ? 'the best Fallout community moments' : 'something the Fallout community created and would enjoy sharing'}.
+
+${getContentTypeGuidance('community', trustLevel)}
+
+${formatRules}
 
 ${buildPromptTrustSection(trustLevel, reportingOutlet)}
 
-SHORTLISTED STORIES:
+SOURCE MATERIAL (write only from these community items):
 ${context}
 
 MAIN COMMUNITY STORY TO LEAD WITH: ${mainStory.title}
@@ -2575,7 +2653,23 @@ async function main() {
     return;
   }
 
-  const enrichedItems = await enrichStories(featuredItems);
+  const mainStory = featuredItems[0];
+  const batchLimit = getGenerationBatchLimit(mainStory.contentType);
+  const generationBatch = assembleGenerationItems(mainStory, contentItems, localHistory, {
+    maxItems: batchLimit
+  });
+
+  if (generationBatch.length === 0) {
+    console.log('No fresh Fallout stories to post; skipping generation.');
+    return;
+  }
+
+  const editorialScore = getEditorialCandidateScore(mainStory, localHistory, getContentTypeCounts(localHistory));
+  const batchMode = generationBatch.length > 1 ? 'multi-angle roundup' : 'single spotlight';
+  console.log(`Editorial pick: ${mainStory.contentType} (score ${editorialScore.toFixed(1)}) — "${mainStory.title}"`);
+  console.log(`Generation batch: ${generationBatch.length}/${batchLimit} ${mainStory.contentType} item(s) for ${batchMode}.`);
+
+  const enrichedItems = await enrichStories(generationBatch);
   const substantiveItems = enrichedItems.filter((item) => meetsMinimumSourceQuality(item));
 
   if (substantiveItems.length === 0) {

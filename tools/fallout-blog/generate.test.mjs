@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   areTopicsSimilar,
+  assembleGenerationItems,
   buildArticleHtml,
   buildStorySummaryForPrompt,
   extractArticleBodyText,
@@ -39,6 +40,7 @@ import {
   trimTitleToMaxChars,
   compareCandidatePriority,
   getAdjustedCandidateScore,
+  getEditorialCandidateScore,
   getGeminiApiKeys,
   getGeminiModelChain,
   getSourceDiversityAdjustment,
@@ -89,7 +91,110 @@ test('selectStoriesForGeneration rejects thin RSS summaries', () => {
   assert.equal(fresh[0].title, 'Fallout 76 season launch brings new rewards');
 });
 
-test('pickFeaturedStory rotates toward underused content types', () => {
+test('assembleGenerationItems never mixes content types in one generation batch', () => {
+  const mainStory = {
+    source: 'IGN',
+    title: 'Fallout Season 2 earns nine Emmy nods',
+    link: 'https://example.com/emmys',
+    contentType: 'news',
+    description: 'The Fallout Prime Video series picked up nine Emmy nominations across craft and performance categories this week, giving the adaptation another high-profile awards-season moment.'
+  };
+
+  const candidates = [
+    mainStory,
+    {
+      source: 'Aftermath',
+      title: 'Obsidian defends its studio DNA',
+      link: 'https://example.com/obsidian',
+      contentType: 'news',
+      description: 'Aftermath reports on Obsidian leadership messaging after recent Xbox portfolio changes and what it means for RPG fans watching the studio closely.'
+    },
+    {
+      source: 'r/FalloutMods',
+      title: 'New Vegas assassin faction mod released',
+      link: 'https://example.com/mod',
+      contentType: 'mods',
+      description: 'A New Vegas mod adds a Dark Brotherhood-style assassin faction with new quests, contracts, and stealth-focused progression for returning players.'
+    }
+  ];
+
+  const batch = assembleGenerationItems(mainStory, candidates, [], { maxItems: 5 });
+  assert.equal(batch.length, 2);
+  assert.ok(batch.every((item) => item.contentType === 'news'));
+  assert.equal(batch[0].title, mainStory.title);
+});
+
+test('assembleGenerationItems builds a mod roundup from same-type candidates only', () => {
+  const mainStory = {
+    source: 'r/FalloutMods',
+    title: 'New Vegas assassin faction mod released',
+    link: 'https://example.com/mod-1',
+    contentType: 'mods',
+    description: 'A New Vegas mod adds a Dark Brotherhood-style assassin faction with new quests and contracts.'
+  };
+
+  const candidates = [
+    mainStory,
+    {
+      source: 'r/fo4',
+      title: 'Fallout 4 settlement overhaul mod',
+      link: 'https://example.com/mod-2',
+      contentType: 'mods',
+      description: 'A settlement overhaul mod for Fallout 4 adds new build pieces, lighting presets, and clutter packs.'
+    },
+    {
+      source: 'IGN',
+      title: 'Xbox portfolio reset continues',
+      link: 'https://example.com/news',
+      contentType: 'news',
+      description: 'Industry coverage of Xbox portfolio changes across first-party studios.'
+    },
+    {
+      source: 'r/FalloutMods',
+      title: 'FNV weapon pack expansion',
+      link: 'https://example.com/mod-3',
+      contentType: 'mods',
+      description: 'A weapon pack expansion for Fallout New Vegas adds lore-friendly firearms and custom animations.'
+    }
+  ];
+
+  const batch = assembleGenerationItems(mainStory, candidates, [], { maxItems: 5 });
+  assert.equal(batch.length, 3);
+  assert.equal(batch[0].title, mainStory.title);
+  assert.ok(batch.every((item) => item.contentType === 'mods'));
+});
+
+test('pickFeaturedStory prefers the strongest candidate even if that type was posted recently', () => {
+  const history = Array.from({ length: 4 }).map(() => ({
+    contentType: 'news',
+    coveredAt: Date.now() - (24 * 60 * 60 * 1000)
+  }));
+
+  const items = [
+    {
+      source: 'Steam — Fallout 76',
+      sourceTier: 'official',
+      contentType: 'news',
+      score: 22,
+      title: 'Fallout 76 season update is live with new rewards',
+      link: 'https://example.com/season',
+      description: 'Bethesda has launched a new Fallout 76 season with fresh daily challenges, seasonal rewards, quality-of-life fixes, and a revised progression track for returning players.'
+    },
+    {
+      source: 'r/FalloutMods',
+      contentType: 'mods',
+      score: 9,
+      title: 'Small texture tweak mod',
+      link: 'https://example.com/mod',
+      description: 'A minor texture tweak mod for Fallout 4 adjusts a handful of weapon skins for players who want a subtle visual refresh.'
+    }
+  ];
+
+  const [featured] = pickFeaturedStory(items, history);
+  assert.equal(featured.contentType, 'news');
+});
+
+test('pickFeaturedStory can still favor an underused type when scores are close', () => {
   const items = [
     { source: 'IGN', title: 'Fallout 76 patch notes arrive', link: 'https://example.com/news', contentType: 'news', description: 'Bethesda has published new Fallout 76 patch notes with balance updates, bug fixes, seasonal content, and quality-of-life improvements for players returning this week.' },
     { source: 'r/FalloutMods', title: 'New Appalachia overhaul mod released', link: 'https://example.com/mod', contentType: 'mods', description: 'A major visual overhaul mod for Fallout 76 has released on Nexus with updated textures, lighting, weather tweaks, and optional performance presets for PC players.' },
@@ -104,6 +209,17 @@ test('pickFeaturedStory rotates toward underused content types', () => {
   const featured = pickFeaturedStory(items, history);
 
   assert.equal(featured[0].contentType, 'mods');
+});
+
+test('getEditorialCandidateScore gives underused content types a small boost', () => {
+  const typeCounts = { news: 4, mods: 0, community: 0 };
+  const newsItem = { contentType: 'news', score: 10 };
+  const modItem = { contentType: 'mods', score: 10 };
+
+  assert.ok(
+    getEditorialCandidateScore(modItem, [], typeCounts)
+    > getEditorialCandidateScore(newsItem, [], typeCounts)
+  );
 });
 
 test('hasFalloutFocus rejects comparison pieces led by another franchise', () => {
