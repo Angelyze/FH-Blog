@@ -16,6 +16,7 @@ import {
   getStoryFingerprint,
   getStoryTopicFingerprint,
   getStoryTopicKey,
+  hasFalloutFocus,
   getTitleValidationIssue,
   formatFeedWarnings,
   getRedditFetchStrategies,
@@ -92,6 +93,36 @@ test('pickFeaturedStory rotates toward underused content types', () => {
   const featured = pickFeaturedStory(items, history);
 
   assert.equal(featured[0].contentType, 'mods');
+});
+
+test('hasFalloutFocus rejects comparison pieces led by another franchise', () => {
+  assert.equal(
+    hasFalloutFocus({
+      title: 'Diablo 4 Update Will Drown You In Mythics',
+      description: 'GameSpot compares the loot changes to Fallout 76 seasons and Xbox RPG strategy shifts.'
+    }),
+    false
+  );
+});
+
+test('hasFalloutFocus accepts stories with Fallout in the headline', () => {
+  assert.equal(
+    hasFalloutFocus({
+      title: 'Fallout 5, The Elder Scrolls 6, Blade, and More: What is going on at Bethesda?',
+      description: 'IGN reports on sweeping Xbox layoffs across Bethesda studios.'
+    }),
+    true
+  );
+});
+
+test('hasFalloutFocus accepts Fallout-led stories without a competing franchise title', () => {
+  assert.equal(
+    hasFalloutFocus({
+      title: 'New Fallout Game Is New Focus For Obsidian Entertainment - Report',
+      description: 'Bloomberg reports Obsidian is shifting priorities toward Fallout.'
+    }),
+    true
+  );
 });
 
 test('detectContentType identifies mods and community posts', () => {

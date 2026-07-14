@@ -662,12 +662,44 @@ function extractItems(xmlText) {
 
 const FALLOUT_KEYWORDS = [
   'fallout 76', 'fallout 4', 'fallout 3', 'fallout 5', 'fallout 2', 'fallout 1',
-  'new vegas', 'fo76', 'fo4', 'fnv', 'prime video', 'fallout tv', 'fallout series', 'bethesda',
+  'new vegas', 'fo76', 'fo4', 'fnv', 'prime video', 'fallout tv', 'fallout series',
   'vault dweller', 'vault-tec', 'appalachia', 'wasteland', 'atomic shop',
-  'expedition', 'season', 'brotherhood', 'ncr', 'institute', 'pip-boy',
+  'brotherhood of steel', 'ncr', 'institute', 'pip-boy',
   'nexus mod', 'mod release', 'lucy', 'the ghoul', 'vault boy', 'power armor',
-  'cosplay', 'fan art', 'mod showcase', 'camp build', 'xbox', 'playstation', 'steam'
+  'cosplay', 'fan art', 'mod showcase', 'camp build', 'obsidian entertainment'
 ];
+
+const COMPETING_FRANCHISE_PATTERNS = [
+  /\bdiablo(?:\s+\d+)?\b/i,
+  /\bthe elder scrolls\b/i,
+  /\belder scrolls(?:\s+online|\s+\d+)?\b/i,
+  /\bstarfield\b/i,
+  /\bavowed\b/i,
+  /\bcall of duty\b/i,
+  /\bworld of warcraft\b/i,
+  /\boverwatch\b/i,
+  /\bhalo(?:\s+\d+)?\b/i,
+  /\bforza(?:\s+horizon|\s+motorsport)?\b/i,
+  /\bgears of war\b/i,
+  /\bdestiny(?:\s+\d+)?\b/i,
+  /\bborderlands(?:\s+\d+)?\b/i,
+  /\bthe witcher(?:\s+\d+)?\b/i,
+  /\bassassin'?s creed\b/i
+];
+
+export function hasCompetingFranchiseInTitle(title = '') {
+  return COMPETING_FRANCHISE_PATTERNS.some((pattern) => pattern.test(title));
+}
+
+export function hasFalloutFocus(item = {}) {
+  const title = String(item.title || '');
+  const haystack = `${title} ${item.description || ''} ${item.link || ''}`.toLowerCase();
+
+  if (/\bfallout\b/i.test(title)) return true;
+  if (hasCompetingFranchiseInTitle(title)) return false;
+
+  return /\bfallout\b/i.test(haystack);
+}
 
 const NOISE_TERMS = ['rumor', 'rumour', 'leak', 'leaked', 'speculation', 'datamine', 'insider claims', 'allegedly'];
 
@@ -713,6 +745,7 @@ function scoreItem(item, source) {
   if (haystack.includes('season') && haystack.includes('fallout')) score += 1.0;
   if (isNicheCommunityPost(item)) score -= 3.5;
   if (NOISE_TERMS.some((term) => haystack.includes(term))) score -= 4;
+  if (hasCompetingFranchiseInTitle(item.title || '') && !/\bfallout\b/i.test(item.title || '')) score -= 8;
 
   return score;
 }
@@ -1702,16 +1735,19 @@ function isRelevantFalloutItem(item, source) {
   const title = normalizeSyndicatedTitle(item.title || '', item.feedSource || '');
   if (isFeedTitleExcluded(title, source)) return false;
 
+  const normalizedItem = { ...item, title };
   const haystack = `${title} ${item.description} ${item.link || ''}`.toLowerCase();
   const hasRelevantKeyword = FALLOUT_KEYWORDS.some((term) => haystack.includes(term)) || haystack.includes('fallout');
   const hasNoise = NOISE_TERMS.some((term) => haystack.includes(term));
 
-  if (source.requiresFalloutMatch) {
-    return hasRelevantKeyword && !hasNoise;
-  }
-
   if (source.kind === 'reddit' || source.category === 'community' || source.category === 'mods') {
     return !hasNoise;
+  }
+
+  if (!hasFalloutFocus(normalizedItem)) return false;
+
+  if (source.requiresFalloutMatch) {
+    return hasRelevantKeyword && !hasNoise;
   }
 
   return hasRelevantKeyword && !hasNoise;
