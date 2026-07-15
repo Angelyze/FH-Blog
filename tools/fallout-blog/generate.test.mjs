@@ -66,6 +66,7 @@ import {
   passesCustomRedditFeedQualityGate,
   passesCommunityQualityGate,
   extractHistoryEntryFromFragment,
+  sanitizeMisattributedPressText,
   salvageConflictedStoryHistory,
   parseRedditListing,
   parseRedditRssFeed,
@@ -74,6 +75,8 @@ import {
   recordFeedHealthResult,
   resolveArticleSources,
   resolveReportingOutlet,
+  resolveReportingOutletFromBatch,
+  resolveReportingOutletFromSources,
   selectStoriesForGeneration,
   trimToCharCount
 } from './generate.mjs';
@@ -458,6 +461,39 @@ test('buildArticleHtml shows press-report disclaimer and label', () => {
   assert.doesNotMatch(html, /editorial standard/);
 });
 
+test('resolveArticleSources keeps only LLM-cited outlets on multi-source briefs', () => {
+  const newsItems = [
+    {
+      source: 'IGN',
+      title: 'Fallout 5, Blade, and More: As Xbox Layoffs Hit Hard, What is Going on at Bethesda?',
+      link: 'https://www.ign.com/articles/fallout-5-blade-bethesda-layoffs',
+      sourceTier: 'press'
+    },
+    {
+      source: 'Rock Paper Shotgun',
+      title: 'Fallout 4 has been filled with protest signs and OneBGS logoed vault suits by modders',
+      link: 'https://www.rockpapershotgun.com/fallout-4-protest-mods',
+      sourceTier: 'press'
+    },
+    {
+      source: 'GamesRadar',
+      title: 'Obsidian still have the same DNA that went into New Vegas, director insists',
+      link: 'https://www.gamesradar.com/obsidian-dna-new-vegas',
+      sourceTier: 'press'
+    }
+  ];
+
+  const sources = resolveArticleSources([
+    { title: 'Protest mods', url: 'https://www.rockpapershotgun.com/fallout-4-protest-mods', type: 'press' },
+    { title: 'Obsidian DNA', url: 'https://www.gamesradar.com/obsidian-dna-new-vegas', type: 'press' }
+  ], newsItems);
+
+  assert.deepEqual(sources.map((source) => source.url), [
+    'https://www.rockpapershotgun.com/fallout-4-protest-mods',
+    'https://www.gamesradar.com/obsidian-dna-new-vegas'
+  ]);
+});
+
 test('resolveArticleSources drops tangential supporting links', () => {
   const newsItems = [
     {
@@ -661,6 +697,16 @@ test('passesCustomRedditFeedQualityGate allows deeper custom-feed slots without 
       title: 'Incredible Vault Dweller cosplay from Dragon Con',
       description: 'Handmade pip-boy and weathered armor from the Fallout TV series.',
       redditFeedRank: 30
+    }),
+    true
+  );
+
+  assert.equal(
+    passesCustomRedditFeedQualityGate({
+      sourceKind: 'reddit',
+      title: 'Incredible Vault Dweller cosplay from Dragon Con',
+      description: 'Handmade pip-boy and weathered armor from the Fallout TV series.',
+      redditFeedRank: 31
     }),
     false
   );
@@ -1151,6 +1197,119 @@ test('resolveReportingOutlet prefers outlet named in the story', () => {
     resolveReportingOutlet({ title: 'Obsidian Fallout pivot – Report', description: 'Bloomberg says Obsidian is refocusing.' }),
     'Bloomberg'
   );
+});
+
+test('resolveReportingOutlet prefers article link host over substring false positives', () => {
+  assert.equal(
+    resolveReportingOutlet({
+      source: 'IGN',
+      title: 'Fallout 4 modders ignore Bethesda warning signs',
+      description: 'Players campaign against recent layoffs inside Fallout 4.',
+      link: 'https://www.rockpapershotgun.com/fallout-4-protest-mods'
+    }),
+    'Rock Paper Shotgun'
+  );
+});
+
+test('resolveReportingOutletFromBatch attributes multi-source briefs to the actual feed sources', () => {
+  assert.equal(
+    resolveReportingOutletFromBatch([
+      {
+        source: 'IGN',
+        title: 'Fallout 5, Blade, and More: As Xbox Layoffs Hit Hard, What is Going on at Bethesda?',
+        link: 'https://www.ign.com/articles/fallout-5-blade-bethesda-layoffs'
+      },
+      {
+        source: 'Rock Paper Shotgun',
+        title: 'As unionised Microsoft workers rally against Bethesda layoffs, Fallout 4 has been filled with protest signs',
+        link: 'https://www.rockpapershotgun.com/fallout-4-protest-mods'
+      },
+      {
+        source: 'GamesRadar',
+        title: 'Obsidian still have the same DNA that went into New Vegas, director insists',
+        link: 'https://www.gamesradar.com/obsidian-dna-new-vegas'
+      }
+    ]),
+    'IGN, Rock Paper Shotgun, and GamesRadar'
+  );
+});
+
+test('resolveReportingOutletFromSources ignores an unused lead outlet', () => {
+  assert.equal(
+    resolveReportingOutletFromSources(
+      [
+        { url: 'https://www.rockpapershotgun.com/fallout-4-protest-mods', title: 'Protest mods' },
+        { url: 'https://www.rockpapershotgun.com/obsidian-dna', title: 'Obsidian DNA' },
+        { url: 'https://www.gamesradar.com/obsidian-dna-new-vegas', title: 'GamesRadar coverage' }
+      ],
+      [
+        {
+          source: 'IGN',
+          title: 'Fallout 5, Blade, and More: As Xbox Layoffs Hit Hard, What is Going on at Bethesda?',
+          link: 'https://www.ign.com/articles/fallout-5-blade-bethesda-layoffs'
+        },
+        {
+          source: 'Rock Paper Shotgun',
+          title: 'Fallout 4 has been filled with protest signs and OneBGS logoed vault suits by modders',
+          link: 'https://www.rockpapershotgun.com/fallout-4-protest-mods'
+        },
+        {
+          source: 'Rock Paper Shotgun',
+          title: 'Obsidian still have the same DNA that went into New Vegas, director insists',
+          link: 'https://www.rockpapershotgun.com/obsidian-dna'
+        },
+        {
+          source: 'GamesRadar',
+          title: 'Obsidian still have the same DNA that went into New Vegas, director insists',
+          link: 'https://www.gamesradar.com/obsidian-dna-new-vegas'
+        }
+      ]
+    ),
+    'Rock Paper Shotgun and GamesRadar'
+  );
+});
+
+test('sanitizeMisattributedPressText replaces uncited lead outlets in prose', () => {
+  const intro = 'According to coverage, Fallout 4 modders are protesting recent layoffs, reported by IGN across the Commonwealth.';
+  const sanitized = sanitizeMisattributedPressText(intro, 'Rock Paper Shotgun and GamesRadar');
+
+  assert.match(sanitized, /reported by Rock Paper Shotgun and GamesRadar/i);
+  assert.doesNotMatch(sanitized, /reported by IGN/i);
+});
+
+test('ensureTrustKeyFacts matches cited sources rather than an unused lead outlet', () => {
+  const newsItems = [
+    {
+      source: 'IGN',
+      title: 'Fallout 5, Blade, and More: As Xbox Layoffs Hit Hard, What is Going on at Bethesda?',
+      link: 'https://www.ign.com/articles/fallout-5-blade-bethesda-layoffs'
+    },
+    {
+      source: 'Rock Paper Shotgun',
+      title: 'Fallout 4 has been filled with protest signs and OneBGS logoed vault suits by modders',
+      link: 'https://www.rockpapershotgun.com/fallout-4-protest-mods'
+    },
+    {
+      source: 'GamesRadar',
+      title: 'Obsidian still have the same DNA that went into New Vegas, director insists',
+      link: 'https://www.gamesradar.com/obsidian-dna-new-vegas'
+    }
+  ];
+  const resolvedSources = [
+    { url: 'https://www.rockpapershotgun.com/fallout-4-protest-mods', title: 'Protest mods' },
+    { url: 'https://www.gamesradar.com/obsidian-dna-new-vegas', title: 'Obsidian DNA' }
+  ];
+
+  const facts = ensureTrustKeyFacts(
+    ['Fallout 4 modders added protest signs across the Commonwealth.'],
+    newsItems[0],
+    'press-report',
+    newsItems,
+    resolvedSources
+  );
+
+  assert.match(facts[0], /Reported by Rock Paper Shotgun and GamesRadar; not yet confirmed/);
+  assert.doesNotMatch(facts[0], /IGN/);
 });
 
 test('getBloggerInsertUrl requests draft creation via query parameter', () => {

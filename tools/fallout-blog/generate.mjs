@@ -921,6 +921,51 @@ const REPORTING_OUTLETS = [
   'Wccftech', 'Siliconera', 'Engadget'
 ];
 
+const UPSTREAM_REPORTING_OUTLETS = ['Bloomberg'];
+
+const LINK_HOST_TO_OUTLET = Object.fromEntries(
+  CONTENT_SOURCES
+    .filter((source) => source.url)
+    .map((source) => {
+      try {
+        return [new URL(source.url).hostname.replace(/^www\./, '').toLowerCase(), source.name];
+      } catch {
+        return null;
+      }
+    })
+    .filter(Boolean)
+);
+
+const KNOWN_REPORTING_OUTLETS = new Set([
+  ...REPORTING_OUTLETS,
+  ...CONTENT_SOURCES.map((source) => source.name)
+]);
+
+function outletMentionedInText(text = '', outlet = '') {
+  const escaped = outlet.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  if (outlet.length <= 3) {
+    return new RegExp(`\\b${escaped}\\b`, 'i').test(text);
+  }
+  return text.toLowerCase().includes(outlet.toLowerCase());
+}
+
+function resolveOutletFromLink(link = '') {
+  if (!link) return null;
+  try {
+    const host = new URL(link).hostname.replace(/^www\./, '').toLowerCase();
+    return LINK_HOST_TO_OUTLET[host] || null;
+  } catch {
+    return null;
+  }
+}
+
+function formatOutletList(outlets = []) {
+  if (outlets.length === 0) return 'the original report';
+  if (outlets.length === 1) return outlets[0];
+  if (outlets.length === 2) return `${outlets[0]} and ${outlets[1]}`;
+  return `${outlets.slice(0, -1).join(', ')}, and ${outlets.at(-1)}`;
+}
+
 function scoreItem(item, source) {
   const haystack = `${item.title} ${item.description}`.toLowerCase();
   const keywordHits = FALLOUT_KEYWORDS.filter((keyword) => haystack.includes(keyword));
@@ -950,15 +995,96 @@ function scoreItem(item, source) {
 }
 
 export function resolveReportingOutlet(item = {}) {
-  const haystack = `${item.title} ${item.description} ${item.link || ''}`;
+  const haystack = `${item.title} ${item.description}`;
+
+  for (const outlet of UPSTREAM_REPORTING_OUTLETS) {
+    if (outletMentionedInText(haystack, outlet)) return outlet;
+  }
+
+  const fromLink = resolveOutletFromLink(item.link);
+  if (fromLink) return fromLink;
+
+  if (item.source && KNOWN_REPORTING_OUTLETS.has(item.source)) {
+    return item.source;
+  }
 
   for (const outlet of REPORTING_OUTLETS) {
-    if (haystack.toLowerCase().includes(outlet.toLowerCase())) {
-      return outlet;
-    }
+    if (UPSTREAM_REPORTING_OUTLETS.includes(outlet)) continue;
+    if (outletMentionedInText(haystack, outlet)) return outlet;
   }
 
   return item.source || 'the original report';
+}
+
+export function resolveReportingOutletFromBatch(newsItems = []) {
+  if (!Array.isArray(newsItems) || newsItems.length === 0) return 'the original report';
+  if (newsItems.length === 1) return resolveReportingOutlet(newsItems[0]);
+
+  const outlets = [];
+  for (const item of newsItems) {
+    const outlet = item.source?.trim();
+    if (!outlet || outlets.includes(outlet)) continue;
+    outlets.push(outlet);
+  }
+
+  if (outlets.length === 0) return resolveReportingOutlet(newsItems[0]);
+  return formatOutletList(outlets);
+}
+
+function getCitedOutletNames(outletLabel = '') {
+  return outletLabel
+    .split(/,\s+and\s+|\s+and\s+/i)
+    .flatMap((part) => part.split(/,\s*/))
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
+export function sanitizeMisattributedPressText(text = '', citedOutletLabel = '') {
+  if (!text || !citedOutletLabel) return text;
+
+  const citedOutlets = new Set(getCitedOutletNames(citedOutletLabel));
+  let sanitized = text;
+
+  for (const outlet of REPORTING_OUTLETS) {
+    if (citedOutlets.has(outlet)) continue;
+    sanitized = sanitized.replace(
+      new RegExp(`\\breported by ${outlet.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi'),
+      `reported by ${citedOutletLabel}`
+    );
+  }
+
+  return sanitized;
+}
+
+export function resolveReportingOutletFromSources(sources = [], newsItems = []) {
+  const citedUrls = new Set(
+    (Array.isArray(sources) ? sources : [])
+      .map((source) => source?.url)
+      .filter(Boolean)
+  );
+
+  if (citedUrls.size === 0) {
+    return resolveReportingOutletFromBatch(newsItems);
+  }
+
+  const outlets = [];
+  for (const item of newsItems) {
+    if (!item?.link || !citedUrls.has(item.link)) continue;
+    const outlet = item.source?.trim();
+    if (!outlet || outlets.includes(outlet)) continue;
+    outlets.push(outlet);
+  }
+
+  if (outlets.length === 0) {
+    for (const source of sources) {
+      const outlet = resolveOutletFromLink(source?.url) || source?.title;
+      if (!outlet || outlets.includes(outlet)) continue;
+      outlets.push(outlet);
+    }
+  }
+
+  if (outlets.length === 0) return resolveReportingOutlet(newsItems[0] || {});
+  return formatOutletList(outlets);
 }
 
 export function detectTrustLevel(item = {}, source = {}) {
@@ -1015,15 +1141,23 @@ export function getTrustNote(trustLevel) {
   }
 }
 
-export function ensureTrustKeyFacts(keyFacts = [], mainStory = {}, trustLevel = 'confirmed') {
+export function ensureTrustKeyFacts(keyFacts = [], mainStory = {}, trustLevel = 'confirmed', newsItems = [], resolvedSources = []) {
   const facts = [...keyFacts];
-  const outlet = resolveReportingOutlet(mainStory);
+  const batch = newsItems.length > 0 ? newsItems : [mainStory];
+  const outlet = resolvedSources.length > 0
+    ? resolveReportingOutletFromSources(resolvedSources, batch)
+    : batch.length > 1
+      ? resolveReportingOutletFromBatch(batch)
+      : resolveReportingOutlet(batch[0]);
 
   if (trustLevel === 'press-report') {
     const disclaimer = `Reported by ${outlet}; not yet confirmed by the developer or publisher.`;
-    if (!facts.some((fact) => /not yet confirmed|not confirmed by/i.test(fact))) {
-      facts.unshift(disclaimer);
-    }
+    const withoutStaleDisclaimer = facts.filter((fact) => (
+      !/^Reported by .*; not yet confirmed/i.test(fact)
+      && !/not yet confirmed by the developer or publisher/i.test(fact)
+    ));
+    withoutStaleDisclaimer.unshift(disclaimer);
+    return withoutStaleDisclaimer.slice(0, 6);
   }
 
   if (trustLevel === 'official') {
@@ -1056,17 +1190,27 @@ function isSupportingSourceRelevant(item = {}, mainStory = {}) {
 
   const mainHaystack = `${mainStory.title} ${mainStory.description}`.toLowerCase();
   const itemHaystack = `${item.title} ${item.description}`.toLowerCase();
-  const eventSignals = ['layoff', 'zenimax', 'bethesda', 'xbox', 'studio cut', 'warn act', 'restructur', 'job cut'];
-  const mainHasEvent = eventSignals.some((signal) => mainHaystack.includes(signal));
-  if (!mainHasEvent) return true;
+  const turmoilSignals = [
+    'layoff', 'zenimax', 'bethesda', 'xbox', 'studio cut', 'warn act', 'restructur', 'job cut', 'microsoft'
+  ];
+  const responseSignals = [
+    'protest', 'union', 'workers rally', 'onebgs', 'modder', 'same dna', 'studio dna'
+  ];
+  const mainHasTurmoil = turmoilSignals.some((signal) => mainHaystack.includes(signal));
+  if (!mainHasTurmoil) return true;
 
-  return eventSignals.some((signal) => itemHaystack.includes(signal));
+  if (turmoilSignals.some((signal) => itemHaystack.includes(signal))) return true;
+  if (responseSignals.some((signal) => itemHaystack.includes(signal))) return true;
+  if (/\bobsidian\b/.test(itemHaystack) && /\b(dna|director|studio)\b/.test(itemHaystack)) return true;
+
+  return false;
 }
 
 export function resolveArticleSources(sources = [], newsItems = []) {
   const mainStory = newsItems[0] || {};
   const allowedItems = newsItems.filter((item) => item?.link);
   const allowedUrls = new Map(allowedItems.map((item) => [item.link, item]));
+  const multiSourceBrief = newsItems.length > 1;
   const seenUrls = new Set();
   const resolved = [];
 
@@ -1084,20 +1228,27 @@ export function resolveArticleSources(sources = [], newsItems = []) {
     });
   }
 
-  for (const item of allowedItems) {
-    if (resolved.length >= 4) break;
-    if (!item.link || seenUrls.has(item.link)) continue;
-    if (item.link !== mainStory.link && !isSupportingSourceRelevant(item, mainStory)) continue;
+  if (!multiSourceBrief || resolved.length === 0) {
+    for (const item of allowedItems) {
+      if (resolved.length >= 4) break;
+      if (!item.link || seenUrls.has(item.link)) continue;
+      if (item.link !== mainStory.link && !isSupportingSourceRelevant(item, mainStory)) continue;
 
-    seenUrls.add(item.link);
-    resolved.push({
-      title: item.title,
-      url: item.link,
-      type: item.sourceTier || 'press'
-    });
+      seenUrls.add(item.link);
+      resolved.push({
+        title: item.title,
+        url: item.link,
+        type: item.sourceTier || 'press'
+      });
+    }
   }
 
-  return ensurePrimarySource(resolved, mainStory).slice(0, 4);
+  const includesPrimary = resolved.some((source) => source.url === mainStory.link);
+  const finalized = !multiSourceBrief || includesPrimary
+    ? ensurePrimarySource(resolved, mainStory)
+    : resolved;
+
+  return finalized.slice(0, 4);
 }
 
 export function validateArticleTrust(article = {}, newsItems = []) {
@@ -1106,14 +1257,34 @@ export function validateArticleTrust(article = {}, newsItems = []) {
     tier: mainStory.sourceTier,
     category: mainStory.contentType
   });
+  const sources = resolveArticleSources(article.sources, newsItems);
+  const citedOutlet = resolveReportingOutletFromSources(sources, newsItems);
+  const keyFacts = ensureTrustKeyFacts(article.keyFacts, mainStory, trustLevel, newsItems, sources);
+  const intro = trustLevel === 'press-report'
+    ? sanitizeMisattributedPressText(article.intro, citedOutlet)
+    : article.intro;
+  const subtitle = trustLevel === 'press-report'
+    ? sanitizeMisattributedPressText(article.subtitle, citedOutlet)
+    : article.subtitle;
+  const sections = Array.isArray(article.sections)
+    ? article.sections.map((section) => ({
+      ...section,
+      body: trustLevel === 'press-report'
+        ? sanitizeMisattributedPressText(section.body, citedOutlet)
+        : section.body
+    }))
+    : article.sections;
 
   return {
     ...article,
     trustLevel,
     contentType: article.contentType || mainStory.contentType || 'news',
-    keyFacts: ensureTrustKeyFacts(article.keyFacts, mainStory, trustLevel),
-    sources: resolveArticleSources(article.sources, newsItems),
-    seoDescription: ensureSeoDescription({ ...article, trustLevel, contentType: article.contentType || mainStory.contentType || 'news' })
+    keyFacts,
+    intro,
+    subtitle,
+    sections,
+    sources,
+    seoDescription: ensureSeoDescription({ ...article, trustLevel, contentType: article.contentType || mainStory.contentType || 'news', intro, subtitle })
   };
 }
 
@@ -1200,24 +1371,32 @@ function buildPromptContext(newsItems = []) {
     .join('\n\n');
 }
 
-function buildPromptTrustSection(trustLevel, reportingOutlet) {
+function buildPromptTrustSection(trustLevel, reportingOutlet, { multiSource = false } = {}) {
+  const attributionRule = multiSource
+    ? `- Reporting outlets in this batch: ${reportingOutlet}. Only name an outlet in the intro, body, or keyFacts if its URL appears in your sources array`
+    : `- Primary reporting outlet to attribute: ${reportingOutlet}`;
+
   return `TRUST AND EDITORIAL STANDARDS:
 - Use ONLY the material below. Never invent facts, dates, quotes, patch notes, or creator names.
 - trustLevel for this post: ${trustLevel} (${getTrustLabel(trustLevel)})
-- Primary reporting outlet to attribute: ${reportingOutlet}
-- If trustLevel is "press-report", every section making a claim must attribute it to ${reportingOutlet} or "the report"
+${attributionRule}
+- If trustLevel is "press-report", every section making a claim must attribute it to the cited outlet(s) or "the report"
 - If trustLevel is "confirmed", write about established facts but still cite sources
 - If trustLevel is "community-highlight", make clear this is fan-created content
 - If a detail is missing from the sources, say "details are still limited" instead of guessing
 - Include a keyFacts array with 3-5 bullet points a busy reader can scan in 10 seconds`;
 }
 
-function buildSharedArticleRequirements(contentType, trustLevel, reportingOutlet) {
+function buildSharedArticleRequirements(contentType, trustLevel, reportingOutlet, { multiSource = false } = {}) {
+  const introAttribution = multiSource
+    ? 'attribute each claim to the specific cited outlet(s) in your sources array and note it is not confirmed by the developer/publisher'
+    : `clearly state this is reported by ${reportingOutlet} and not confirmed by the developer/publisher`;
+
   return `ARTICLE REQUIREMENTS:
 - seoDescription: a standalone meta description of 120-160 characters (target exactly 150). One or two tight sentences for Blogger/Google search snippets.
 - title: specific, ${MIN_TITLE_CHARS}-${MAX_TITLE_CHARS} characters, click-worthy without clickbait — name the game, mod, event, or creator when possible
 - subtitle: one sentence explaining the value proposition; for press-report, mention it is based on reporting
-- intro: 3-4 sentences with a strong hook; if press-report, clearly state this is reported by ${reportingOutlet} and not confirmed by the developer/publisher
+- intro: 3-4 sentences with a strong hook; if press-report, ${introAttribution}
 - keyFacts: 3-5 short scannable bullet points (only facts supported by sources)
 - sections: exactly 5 or 6 sections, each with "heading" and "body" (4-6 sentences, roughly 80-130 words each)
 - takeaway: one standout insight sentence fans might quote when sharing
@@ -1234,7 +1413,7 @@ Return valid JSON only with these fields: title, seoDescription, subtitle, intro
 function buildNewsPrompt(newsItems, context) {
   const mainStory = newsItems[0];
   const trustLevel = mainStory.trustLevel || detectTrustLevel(mainStory, { tier: mainStory.sourceTier, category: 'news' });
-  const reportingOutlet = resolveReportingOutlet(mainStory);
+  const reportingOutlet = resolveReportingOutletFromBatch(newsItems);
   const isMultiAngle = newsItems.length > 1;
 
   const formatRules = isMultiAngle
@@ -1256,20 +1435,20 @@ ${getContentTypeGuidance('news', trustLevel)}
 
 ${formatRules}
 
-${buildPromptTrustSection(trustLevel, reportingOutlet)}
+${buildPromptTrustSection(trustLevel, reportingOutlet, { multiSource: isMultiAngle })}
 
 SOURCE MATERIAL (write only from these items — official, press, and community sources listed below):
 ${context}
 
 MAIN STORY TO LEAD WITH: ${mainStory.title}
 
-${buildSharedArticleRequirements('news', trustLevel, reportingOutlet)}`;
+${buildSharedArticleRequirements('news', trustLevel, reportingOutlet, { multiSource: isMultiAngle })}`;
 }
 
 function buildModsPrompt(newsItems, context) {
   const mainStory = newsItems[0];
   const trustLevel = mainStory.trustLevel || detectTrustLevel(mainStory, { tier: mainStory.sourceTier, category: 'mods' });
-  const reportingOutlet = resolveReportingOutlet(mainStory);
+  const reportingOutlet = resolveReportingOutletFromBatch(newsItems);
   const isRoundup = newsItems.length > 1;
 
   const formatRules = isRoundup
@@ -1305,7 +1484,7 @@ ${buildSharedArticleRequirements('mods', trustLevel, reportingOutlet)}`;
 function buildCommunityPrompt(newsItems, context) {
   const mainStory = newsItems[0];
   const trustLevel = mainStory.trustLevel || detectTrustLevel(mainStory, { tier: mainStory.sourceTier, category: 'community' });
-  const reportingOutlet = resolveReportingOutlet(mainStory);
+  const reportingOutlet = resolveReportingOutletFromBatch(newsItems);
   const isRoundup = newsItems.length > 1;
 
   const formatRules = isRoundup
@@ -1369,20 +1548,21 @@ function buildFallbackArticle(newsItems) {
   const mainStory = newsItems[0];
   const supportingStories = newsItems.slice(1, 3);
   const supportText = supportingStories.map((item) => item.title).join(' and ');
+  const reportingOutlet = resolveReportingOutletFromBatch(newsItems);
 
   return {
     title: ensureArticleTitle(`${mainStory.title}: what it means for the Wasteland right now`, mainStory),
-    subtitle: `A ${getContentTypeLabel(mainStory.contentType || 'news').toLowerCase()} from ${mainStory.source}, explained for Fallout fans.`,
+    subtitle: `A ${getContentTypeLabel(mainStory.contentType || 'news').toLowerCase()} from ${reportingOutlet}, explained for Fallout fans.`,
     intro: `Fallout fans have no shortage of headlines to track, but some stories cut through the noise more than others. ${mainStory.title} is one of those — worth reading closely whether you mainline Fallout 76, replay New Vegas, or follow the Prime Video series.`,
     keyFacts: [
-      `Source: ${mainStory.source}`,
+      `Source: ${reportingOutlet}`,
       `Topic: ${getContentTypeLabel(mainStory.contentType || 'news')}`,
       mainStory.description ? mainStory.description.slice(0, 120) : 'A notable Fallout development worth following.'
     ],
     sections: [
       {
         heading: 'What happened',
-        body: `The headline driving today's conversation is ${mainStory.title}, reported by ${mainStory.source}. ${mainStory.description ? mainStory.description.slice(0, 200) + (mainStory.description.length > 200 ? '…' : '') : 'It is one of the stronger Fallout-related developments in recent coverage.'}`
+        body: `The headline driving today's conversation is ${mainStory.title}, reported by ${reportingOutlet}. ${mainStory.description ? mainStory.description.slice(0, 200) + (mainStory.description.length > 200 ? '…' : '') : 'It is one of the stronger Fallout-related developments in recent coverage.'}`
       },
       {
         heading: 'Why fans should pay attention',
@@ -1418,10 +1598,11 @@ function normalizeArticle(article, newsItems) {
         { heading: 'What to watch next', body: 'The next step is to follow official updates and the broader conversation around the topic.' }
       ];
 
+  const reportingOutlet = resolveReportingOutletFromBatch(newsItems);
   const keyFacts = Array.isArray(article?.keyFacts) && article.keyFacts.length >= 3
     ? article.keyFacts
     : [
-        `Source: ${mainStory.source || 'Trusted Fallout coverage'}`,
+        `Source: ${reportingOutlet || 'Trusted Fallout coverage'}`,
         `Category: ${getContentTypeLabel(contentType, trustLevel)}`,
         mainStory.description ? mainStory.description.slice(0, 140) : 'A development Fallout fans should know about.'
       ];
