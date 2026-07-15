@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "fallout:generate": "node tools/fallout-blog/generate.mjs",
+    "fallout:repair-history": "node tools/fallout-blog/repair-story-history.mjs",
     "test": "node --test tools/fallout-blog/generate.test.mjs"
   },
   "engines": {

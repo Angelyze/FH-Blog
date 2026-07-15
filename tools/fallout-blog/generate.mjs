@@ -1799,35 +1799,108 @@ function stripConflictMarkers(text = '') {
     .replace(/^>>>>>>>[^\n]*\n/gm, '');
 }
 
-export function salvageConflictedStoryHistory(raw = '') {
-  const stripped = stripConflictMarkers(raw);
+function getLastCapturedValue(text = '', pattern) {
+  const matches = [...text.matchAll(pattern)];
+  return matches.at(-1)?.[1] ?? null;
+}
+
+function collapseDuplicateJsonProperties(text = '', properties = ['coveredAt', 'articleTitle', 'title', 'source', 'contentType', 'topicFingerprint']) {
+  let result = text;
+
+  for (const property of properties) {
+    const linePattern = new RegExp(`^\\s*"${property}"\\s*:\\s*(?:"(?:\\\\.|[^"\\\\])*"|\\d+)\\s*,?\\s*$`, 'gm');
+    const matches = [...result.matchAll(linePattern)];
+    if (matches.length <= 1) continue;
+
+    for (let index = 0; index < matches.length - 1; index += 1) {
+      result = result.replace(matches[index][0], '');
+    }
+  }
+
+  return result;
+}
+
+export function extractHistoryEntryFromFragment(fragment = '') {
+  const cleaned = collapseDuplicateJsonProperties(stripConflictMarkers(fragment));
+  const fingerprint = getLastCapturedValue(cleaned, /"fingerprint"\s*:\s*"([^"]+)"/g);
+  const coveredAt = Number(getLastCapturedValue(cleaned, /"coveredAt"\s*:\s*(\d+)/g));
+
+  if (!fingerprint || !Number.isFinite(coveredAt)) return null;
+
+  return {
+    fingerprint,
+    topicFingerprint: getLastCapturedValue(cleaned, /"topicFingerprint"\s*:\s*"([^"]+)"/g) || fingerprint,
+    contentType: getLastCapturedValue(cleaned, /"contentType"\s*:\s*"([^"]+)"/g) || 'news',
+    title: getLastCapturedValue(cleaned, /"title"\s*:\s*"((?:\\.|[^"\\])*)"/g) || '',
+    articleTitle: getLastCapturedValue(cleaned, /"articleTitle"\s*:\s*"((?:\\.|[^"\\])*)"/g) || null,
+    source: getLastCapturedValue(cleaned, /"source"\s*:\s*"([^"]+)"/g) || '',
+    coveredAt
+  };
+}
+
+function collectSalvagedEntries(raw = '') {
+  const stripped = collapseDuplicateJsonProperties(stripConflictMarkers(raw));
+  const entries = [];
+  const seen = new Set();
+
+  const addEntry = (entry) => {
+    if (!entry?.fingerprint || seen.has(entry.fingerprint)) return;
+    seen.add(entry.fingerprint);
+    entries.push(entry);
+  };
 
   try {
     const parsed = JSON.parse(stripped);
     if (Array.isArray(parsed?.entries)) {
-      return filterRetainedStoryHistoryEntries(parsed.entries);
+      for (const entry of parsed.entries) addEntry(entry);
+      if (entries.length > 0) return entries;
     }
   } catch {
     // Fall back to per-entry extraction below.
   }
 
-  const entries = [];
-  const seen = new Set();
-  const entryPattern = /\{[^{}]*"fingerprint"\s*:\s*"([^"]+)"[\s\S]*?"coveredAt"\s*:\s*(\d+)\s*\}/g;
+  const entryPattern = /\{[^{}]*"fingerprint"\s*:\s*"[^"]+"[\s\S]*?"coveredAt"\s*:\s*\d+\s*\}/g;
   let match;
 
   while ((match = entryPattern.exec(stripped)) !== null) {
     try {
-      const entry = JSON.parse(stripConflictMarkers(match[0]));
-      if (!entry?.fingerprint || seen.has(entry.fingerprint)) continue;
-      seen.add(entry.fingerprint);
-      entries.push(entry);
+      addEntry(JSON.parse(collapseDuplicateJsonProperties(stripConflictMarkers(match[0]))));
     } catch {
-      // Skip malformed fragments.
+      addEntry(extractHistoryEntryFromFragment(match[0]));
     }
   }
 
-  return filterRetainedStoryHistoryEntries(entries);
+  if (entries.length > 0) return entries;
+
+  for (const segment of raw.split(/^<<<<<<<[^\n]*$/m)) {
+    const cleaned = collapseDuplicateJsonProperties(stripConflictMarkers(segment));
+
+    try {
+      const parsed = JSON.parse(cleaned);
+      if (Array.isArray(parsed?.entries)) {
+        for (const entry of parsed.entries) addEntry(entry);
+        continue;
+      }
+    } catch {
+      // Try fragment extraction on this segment.
+    }
+
+    let segmentMatch;
+    const segmentPattern = /\{[^{}]*"fingerprint"\s*:\s*"[^"]+"[\s\S]*?"coveredAt"\s*:\s*\d+\s*\}/g;
+    while ((segmentMatch = segmentPattern.exec(cleaned)) !== null) {
+      try {
+        addEntry(JSON.parse(collapseDuplicateJsonProperties(stripConflictMarkers(segmentMatch[0]))));
+      } catch {
+        addEntry(extractHistoryEntryFromFragment(segmentMatch[0]));
+      }
+    }
+  }
+
+  return entries;
+}
+
+export function salvageConflictedStoryHistory(raw = '') {
+  return filterRetainedStoryHistoryEntries(collectSalvagedEntries(raw).filter(Boolean));
 }
 
 async function readStoryHistoryEntries() {

@@ -36,8 +36,8 @@ jobs:
         with:
           node-version: 22
 
-      - name: Validate story history JSON
-        run: node -e "const fs=require('fs'); const raw=fs.readFileSync('data/story-history.json','utf8'); if (/^<<<<<<< /m.test(raw)) { throw new Error('story-history.json contains git conflict markers'); } JSON.parse(raw);"
+      - name: Repair story history if conflicted
+        run: npm run fallout:repair-history
 
       - name: Generate Fallout draft
         run: npm run fallout:generate
@@ -45,13 +45,13 @@ jobs:
       - name: Commit pipeline state
         if: always()
         run: |
-          node -e "const fs=require('fs'); const raw=fs.readFileSync('data/story-history.json','utf8'); if (/^<<<<<<< /m.test(raw)) { throw new Error('Refusing to commit conflicted story-history.json'); } JSON.parse(raw);"
+          npm run fallout:repair-history
           if ! git diff --quiet -- data/story-history.json data/feed-health.json 2>/dev/null; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add data/story-history.json data/feed-health.json
             git commit -m "chore(blog): update pipeline state"
-            git pull --rebase origin "${{ github.ref_name }}"
+            git pull --rebase --autostash origin "${{ github.ref_name }}"
             git push
             echo "Pipeline state committed to repository."
           else

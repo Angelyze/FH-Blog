@@ -62,6 +62,7 @@ import {
   passesRssRedditQualityGate,
   passesCustomRedditFeedQualityGate,
   passesCommunityQualityGate,
+  extractHistoryEntryFromFragment,
   salvageConflictedStoryHistory,
   parseRedditListing,
   parseRedditRssFeed,
@@ -656,7 +657,25 @@ test('passesCustomRedditFeedQualityGate allows deeper custom-feed slots without 
   );
 });
 
+test('extractHistoryEntryFromFragment keeps the newest duplicate field values', () => {
+  const coveredAt = Date.now();
+  const entry = extractHistoryEntryFromFragment(`{
+    "fingerprint": "abc123",
+    "topicFingerprint": "topic123",
+    "contentType": "news",
+    "title": "Fallout 76 update lands today",
+    "articleTitle": "Fallout 76 Update",
+    "source": "IGN",
+    "coveredAt": ${coveredAt}
+    "coveredAt": ${coveredAt + 1}
+  }`);
+
+  assert.equal(entry.fingerprint, 'abc123');
+  assert.equal(entry.coveredAt, coveredAt + 1);
+});
+
 test('salvageConflictedStoryHistory recovers entries from conflict markers', () => {
+  const coveredAt = Date.now();
   const raw = `{
   "entries": [
     {
@@ -667,7 +686,10 @@ test('salvageConflictedStoryHistory recovers entries from conflict markers', () 
       "articleTitle": "Fallout 76 Update",
       "source": "IGN",
 <<<<<<< HEAD
-      "coveredAt": ${Date.now()}
+      "coveredAt": ${coveredAt}
+=======
+      "coveredAt": ${coveredAt + 1}
+>>>>>>> branch
     }
   ]
 }`;
@@ -675,6 +697,7 @@ test('salvageConflictedStoryHistory recovers entries from conflict markers', () 
   const salvaged = salvageConflictedStoryHistory(raw);
   assert.equal(salvaged.length, 1);
   assert.equal(salvaged[0].fingerprint, 'abc123');
+  assert.equal(salvaged[0].coveredAt, coveredAt + 1);
 });
 
 test('passesCommunityQualityGate blocks RSS Reddit posts beyond the top hot slots', () => {
