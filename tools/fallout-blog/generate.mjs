@@ -467,6 +467,7 @@ const HIGH_VALUE_COMMUNITY_PATTERNS = [
 ];
 
 const RSS_REDDIT_MAX_HOT_RANK = 3;
+const RSS_CUSTOM_FEED_MAX_RANK = 25;
 
 const LOW_EFFORT_REDDIT_PATTERNS = [
   'discussion thread', 'megathread', 'daily thread', 'weekly thread', 'rant thread',
@@ -543,7 +544,24 @@ export function meetsHighEngagementThreshold(item = {}) {
   return (item.redditScore ?? 0) >= minScore && (item.redditComments ?? 0) >= minComments;
 }
 
-export function passesCommunityQualityGate(item = {}) {
+export function passesCustomRedditFeedQualityGate(item = {}) {
+  if (item.sourceKind !== 'reddit') return true;
+  if (item.isStickied || item.over18) return false;
+  if (isLowEffortRedditPost(item)) return false;
+  if (isNicheCommunityPost(item)) return false;
+
+  const rank = item.redditFeedRank ?? 99;
+  if (rank > RSS_CUSTOM_FEED_MAX_RANK) return false;
+
+  if (hasRedditEngagementMetrics(item)) {
+    return meetsEngagementThreshold(item);
+  }
+
+  return true;
+}
+
+export function passesCommunityQualityGate(item = {}, { useCustomFeedRules = false } = {}) {
+  if (useCustomFeedRules) return passesCustomRedditFeedQualityGate(item);
   if (item.sourceKind !== 'reddit') return true;
   if (item.isStickied || item.over18) return false;
   if (!meetsEngagementThreshold(item)) return false;
@@ -1769,12 +1787,67 @@ export async function enrichStories(stories, { limit = stories.length } = {}) {
   return [...enriched, ...stories.slice(targetStories.length)];
 }
 
+function filterRetainedStoryHistoryEntries(entries = []) {
+  const cutoff = Date.now() - HISTORY_RETENTION_DAYS * 24 * 60 * 60 * 1000;
+  return entries.filter((entry) => entry?.coveredAt >= cutoff);
+}
+
+function stripConflictMarkers(text = '') {
+  return text
+    .replace(/^<<<<<<<[^\n]*\n/gm, '')
+    .replace(/^=======\n/gm, '')
+    .replace(/^>>>>>>>[^\n]*\n/gm, '');
+}
+
+export function salvageConflictedStoryHistory(raw = '') {
+  const stripped = stripConflictMarkers(raw);
+
+  try {
+    const parsed = JSON.parse(stripped);
+    if (Array.isArray(parsed?.entries)) {
+      return filterRetainedStoryHistoryEntries(parsed.entries);
+    }
+  } catch {
+    // Fall back to per-entry extraction below.
+  }
+
+  const entries = [];
+  const seen = new Set();
+  const entryPattern = /\{[^{}]*"fingerprint"\s*:\s*"([^"]+)"[\s\S]*?"coveredAt"\s*:\s*(\d+)\s*\}/g;
+  let match;
+
+  while ((match = entryPattern.exec(stripped)) !== null) {
+    try {
+      const entry = JSON.parse(stripConflictMarkers(match[0]));
+      if (!entry?.fingerprint || seen.has(entry.fingerprint)) continue;
+      seen.add(entry.fingerprint);
+      entries.push(entry);
+    } catch {
+      // Skip malformed fragments.
+    }
+  }
+
+  return filterRetainedStoryHistoryEntries(entries);
+}
+
+async function readStoryHistoryEntries() {
+  const raw = await fs.readFile(HISTORY_FILE, 'utf8');
+
+  if (/^<<<<<<< /m.test(raw)) {
+    const salvaged = salvageConflictedStoryHistory(raw);
+    if (salvaged.length > 0) {
+      console.warn(`Story history contained git conflict markers; recovered ${salvaged.length} entr${salvaged.length === 1 ? 'y' : 'ies'}.`);
+      return salvaged;
+    }
+  }
+
+  const parsed = JSON.parse(raw);
+  return Array.isArray(parsed?.entries) ? parsed.entries : [];
+}
+
 async function loadStoryHistory() {
   try {
-    const raw = await fs.readFile(HISTORY_FILE, 'utf8');
-    const parsed = JSON.parse(raw);
-    const cutoff = Date.now() - HISTORY_RETENTION_DAYS * 24 * 60 * 60 * 1000;
-    return (Array.isArray(parsed?.entries) ? parsed.entries : []).filter((entry) => entry.coveredAt >= cutoff);
+    return filterRetainedStoryHistoryEntries(await readStoryHistoryEntries());
   } catch (error) {
     console.warn(`Story history unavailable (${error.message}); starting with empty history.`);
     return [];
@@ -1885,6 +1958,7 @@ export function getRedditCustomFeedSource() {
     tier: 'community',
     kind: 'reddit',
     dedicatedFallout: true,
+    isCustomFeed: true,
     minScore: 60,
     minComments: 15,
     primary: true
@@ -2035,11 +2109,19 @@ async function saveStoryHistory(existingEntries, selectedStories, article = {}) 
     coveredAt: now
   }));
 
-  const merged = [...existingEntries, ...newEntries];
-  const cutoff = Date.now() - HISTORY_RETENTION_DAYS * 24 * 60 * 60 * 1000;
+  let baseEntries = existingEntries;
+  if (baseEntries.length === 0) {
+    try {
+      baseEntries = filterRetainedStoryHistoryEntries(await readStoryHistoryEntries());
+    } catch {
+      baseEntries = [];
+    }
+  }
+
+  const merged = [...baseEntries, ...newEntries];
   const latestByTopic = new Map();
 
-  for (const entry of merged.filter((item) => item.coveredAt >= cutoff)) {
+  for (const entry of filterRetainedStoryHistoryEntries(merged)) {
     const topicKey = entry.topicFingerprint || entry.fingerprint;
     const previous = latestByTopic.get(topicKey);
     if (!previous || entry.coveredAt >= previous.coveredAt) {
@@ -2047,9 +2129,14 @@ async function saveStoryHistory(existingEntries, selectedStories, article = {}) 
     }
   }
 
-  const entries = [...latestByTopic.values()];
+  const entries = [...latestByTopic.values()].sort((a, b) => b.coveredAt - a.coveredAt);
+  const payload = JSON.stringify({ entries }, null, 2);
+  JSON.parse(payload);
+
   await fs.mkdir(path.dirname(HISTORY_FILE), { recursive: true });
-  await fs.writeFile(HISTORY_FILE, JSON.stringify({ entries }, null, 2));
+  const tempFile = `${HISTORY_FILE}.tmp`;
+  await fs.writeFile(tempFile, payload);
+  await fs.rename(tempFile, HISTORY_FILE);
   console.log(`Story history saved: ${entries.length} entr${entries.length === 1 ? 'y' : 'ies'}.`);
 }
 
@@ -2537,7 +2624,7 @@ async function fetchRedditCustomFeedItems(source, { maxAttempts = 3 } = {}) {
 
       const items = parseRedditRssFeed(text, source)
         .filter((item) => isRelevantFalloutItem(item, source))
-        .filter((item) => passesCommunityQualityGate(item))
+        .filter((item) => passesCommunityQualityGate(item, { useCustomFeedRules: true }))
         .map((item) => mapSourceItem(item, source))
         .sort((a, b) => b.score - a.score)
         .slice(0, 8);

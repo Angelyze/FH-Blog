@@ -60,7 +60,9 @@ import {
   meetsEngagementThreshold,
   meetsMinimumSourceQuality,
   passesRssRedditQualityGate,
+  passesCustomRedditFeedQualityGate,
   passesCommunityQualityGate,
+  salvageConflictedStoryHistory,
   parseRedditListing,
   parseRedditRssFeed,
   parseRssDate,
@@ -630,6 +632,49 @@ test('passesRssRedditQualityGate allows high-value community posts in the top ho
     }),
     true
   );
+});
+
+test('passesCustomRedditFeedQualityGate allows deeper custom-feed slots without engagement metadata', () => {
+  assert.equal(
+    passesCustomRedditFeedQualityGate({
+      sourceKind: 'reddit',
+      title: 'Incredible Vault Dweller cosplay from Dragon Con',
+      description: 'Handmade pip-boy and weathered armor from the Fallout TV series.',
+      redditFeedRank: 12
+    }),
+    true
+  );
+
+  assert.equal(
+    passesCustomRedditFeedQualityGate({
+      sourceKind: 'reddit',
+      title: 'Incredible Vault Dweller cosplay from Dragon Con',
+      description: 'Handmade pip-boy and weathered armor from the Fallout TV series.',
+      redditFeedRank: 30
+    }),
+    false
+  );
+});
+
+test('salvageConflictedStoryHistory recovers entries from conflict markers', () => {
+  const raw = `{
+  "entries": [
+    {
+      "fingerprint": "abc123",
+      "topicFingerprint": "topic123",
+      "contentType": "news",
+      "title": "Fallout 76 update lands today",
+      "articleTitle": "Fallout 76 Update",
+      "source": "IGN",
+<<<<<<< HEAD
+      "coveredAt": ${Date.now()}
+    }
+  ]
+}`;
+
+  const salvaged = salvageConflictedStoryHistory(raw);
+  assert.equal(salvaged.length, 1);
+  assert.equal(salvaged[0].fingerprint, 'abc123');
 });
 
 test('passesCommunityQualityGate blocks RSS Reddit posts beyond the top hot slots', () => {

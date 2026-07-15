@@ -1,13 +1,30 @@
 {
   "entries": [
     {
-      "fingerprint": "e35cad71cc2e98ba",
-      "topicFingerprint": "a8405b3f246c2119",
+      "fingerprint": "ab0274d0ff131564",
+      "topicFingerprint": "b11e0fb46e265e20",
       "contentType": "news",
-      "title": "As unionised Microsoft workers rally against Bethesda layoffs, Fallout 4's been filled with protest signs and OneBGS logoed vault suits by modders",
-      "articleTitle": "Fallout 4 Modders Join Protests as Obsidian Defends Studio DNA",
+      "title": "New Fallout Game Is New Focus For New Vegas Developer Obsidian Entertainment &#8211; Report",
+      "articleTitle": "Obsidian Reportedly Shifting Focus to New Fallout Game",
+      "source": "GameSpot",
+      "coveredAt": 1783871250237
+    },
+    {
+      "fingerprint": "9d4c910990d03109",
+      "topicFingerprint": "b7fbc1532c47a26f",
+      "contentType": "news",
+      "title": "Fallout 5, The Elder Scrolls 6, Blade, and More: As Xbox Layoffs Hit Hard, What's Going on at Bethesda?",
+      "articleTitle": "Report: Xbox Layoffs Hit Bethesda Game Studios and ZeniMax",
+      "source": "IGN",
+      "coveredAt": 1783872256234
+    },
+    {
+      "fingerprint": "b371f945d2b0b3f1",
+      "topicFingerprint": "bc3b374e23361df1",
+      "contentType": "news",
+      "title": "Fallout: New Vegas gets a Mojave interpretation of Oblivion's Dark Brotherhood, thanks to this assassin-focused faction quest mod",
+      "articleTitle": "Fallout: New Vegas Mod Adds Dark Brotherhood-Style Assassin Faction",
       "source": "Rock Paper Shotgun",
-<<<<<<< HEAD
       "coveredAt": 1784057183547
     },
     {
@@ -27,9 +44,15 @@
       "articleTitle": "Fallout Series Earns Emmy Nods Amid Rumors of Obsidian's Return",
       "source": "Amazon Newsroom",
       "coveredAt": 1784130930215
-=======
+    },
+    {
+      "fingerprint": "e35cad71cc2e98ba",
+      "topicFingerprint": "a8405b3f246c2119",
+      "contentType": "news",
+      "title": "As unionised Microsoft workers rally against Bethesda layoffs, Fallout 4's been filled with protest signs and OneBGS logoed vault suits by modders",
+      "articleTitle": "Fallout 4 Modders Join Protests as Obsidian Defends Studio DNA",
+      "source": "Rock Paper Shotgun",
       "coveredAt": 1784135555462
->>>>>>> 773aa8db46331dc0fadae627f454c2c9c7fc555d
     }
   ]
 }
