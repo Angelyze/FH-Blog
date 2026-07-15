@@ -4,6 +4,7 @@
       "fingerprint": "ab0274d0ff131564",
       "topicFingerprint": "b11e0fb46e265e20",
       "contentType": "news",
+<<<<<<< HEAD
       "title": "New Fallout Game Is New Focus For New Vegas Developer Obsidian Entertainment &#8211; Report",
       "articleTitle": "Obsidian Reportedly Shifting Focus to New Fallout Game",
       "source": "GameSpot",
@@ -53,6 +54,12 @@
       "articleTitle": "Fallout 4 Modders Join Protests as Obsidian Defends Studio DNA",
       "source": "Rock Paper Shotgun",
       "coveredAt": 1784135555462
+=======
+      "title": "As unionised Microsoft workers rally against Bethesda layoffs, Fallout 4's been filled with protest signs and OneBGS logoed vault suits by modders",
+      "articleTitle": "Fallout 4 Modders Protest Bethesda Layoffs with OneBGS Vault Suits",
+      "source": "Rock Paper Shotgun",
+      "coveredAt": 1784136047258
+>>>>>>> 7ae7b2bd5505cc09a7b50d94cb8a012e249a4437
     }
   ]
 }
