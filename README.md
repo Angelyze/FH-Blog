@@ -3,7 +3,7 @@
 Daily editorial automation for the **Fallout Hub Blog** — a trusted Fallout fan destination covering news, mods, and community highlights.
 
 ## What it does
-- Collects Fallout-related content from press, official channels, Reddit, and Nexus Mods
+- Collects Fallout-related content from press, official channels, Steam, and a curated Reddit custom feed
 - Rotates daily between **news**, **mod spotlights**, and **community highlights**
 - Ranks stories by relevance, freshness, and source quality
 - Enriches top stories with additional page context when available
@@ -13,8 +13,9 @@ Daily editorial automation for the **Fallout Hub Blog** — a trusted Fallout fa
 
 ## Local setup
 1. Copy `.env.example` to `.env` and fill in your values.
-2. Run `npm run fallout:generate`.
-3. Review the output in `artifacts/latest-draft.json`.
+2. Add `REDDIT_CUSTOM_FEED_URL` with your private Fallout multireddit/custom feed `.rss` URL.
+3. Run `npm run fallout:generate`.
+4. Review the output in `artifacts/latest-draft.json`.
 
 ## Required secrets for GitHub Actions
 - `GEMINI_API_KEY`
@@ -22,6 +23,11 @@ Daily editorial automation for the **Fallout Hub Blog** — a trusted Fallout fa
 - `GOOGLE_CLIENT_SECRET`
 - `GOOGLE_REFRESH_TOKEN`
 - `BLOGGER_BLOG_ID`
+- `REDDIT_CUSTOM_FEED_URL`
+
+Optional fallbacks:
+- `GEMINI_API_KEY_FALLBACK`
+- `GEMINI_API_KEY_FALLBACK_2`
 
 ## Editorial standards
 Fallout Hub posts are designed to be:

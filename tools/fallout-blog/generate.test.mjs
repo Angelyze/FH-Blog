@@ -25,8 +25,10 @@ import {
   isRelevantFalloutItem,
   getTitleValidationIssue,
   formatFeedWarnings,
+  getActiveFeedSourceNames,
   getActiveRedditSources,
   getRedditCustomFeedSource,
+  pruneFeedHealth,
   getRedditFetchStrategies,
   getRedditUserAgent,
   hasRedditCustomFeed,
@@ -262,6 +264,26 @@ test('hasFalloutFocus accepts Fallout-led stories without a competing franchise 
 test('hasFalloutTitleMention accepts shorthand game references', () => {
   assert.equal(hasFalloutTitleMention('Major FO76 update lands today'), true);
   assert.equal(hasFalloutTitleMention('PlayStation Store Summer Sale arrives on July 15'), false);
+});
+
+test('isRelevantFalloutItem rejects unrelated franchise headlines even when Fallout appears in the body', () => {
+  const ign = { name: 'IGN', category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true };
+
+  assert.equal(
+    isRelevantFalloutItem({
+      title: "X-Men '97 Season 2, Episode 5 Review & Recap",
+      description: 'IGN also notes ongoing Fallout and Xbox studio news in the same roundup.'
+    }, ign),
+    false
+  );
+
+  assert.equal(
+    isRelevantFalloutItem({
+      title: 'Microsoft Pulls Tony Hawk’s Pro Skater 1+2 From July 2026 Xbox Game Pass Lineup',
+      description: 'The story sits beside broader coverage of Bethesda and Fallout studio changes.'
+    }, ign),
+    false
+  );
 });
 
 test('isRelevantFalloutItem rejects off-topic press stories without Fallout in the headline', () => {
@@ -877,6 +899,35 @@ test('getRedditFetchStrategies uses JSON first for the primary subreddit even in
     getRedditFetchStrategies({ rssOnly: true, source: { primary: true } }),
     ['json', 'rss']
   );
+});
+
+test('pruneFeedHealth drops stale sources that are no longer active', () => {
+  const active = new Set(['IGN', 'Reddit — Custom Fallout Feed']);
+  const pruned = pruneFeedHealth({
+    IGN: { failureStreak: 0 },
+    'Reddit — Custom Fallout Feed': { failureStreak: 1 },
+    'r/fallout': { failureStreak: 3 },
+    'Fallout Wiki — New Pages': { failureStreak: 2 }
+  }, active);
+
+  assert.deepEqual(Object.keys(pruned).sort(), ['IGN', 'Reddit — Custom Fallout Feed']);
+  assert.equal(pruned['r/fallout'], undefined);
+  assert.equal(pruned['Fallout Wiki — New Pages'], undefined);
+});
+
+test('getActiveFeedSourceNames omits individual subreddits when a custom feed is configured', () => {
+  const previousFeed = process.env.REDDIT_CUSTOM_FEED_URL;
+  process.env.REDDIT_CUSTOM_FEED_URL = 'https://www.reddit.com/user/test/m/fallout-hub/.rss';
+
+  try {
+    const names = getActiveFeedSourceNames();
+    assert.equal(names.has('Reddit — Custom Fallout Feed'), true);
+    assert.equal(names.has('r/fallout'), false);
+    assert.equal(names.has('No Mutants Allowed'), false);
+  } finally {
+    if (previousFeed === undefined) delete process.env.REDDIT_CUSTOM_FEED_URL;
+    else process.env.REDDIT_CUSTOM_FEED_URL = previousFeed;
+  }
 });
 
 test('hasRedditCustomFeed disables individual subreddit sources', () => {

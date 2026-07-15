@@ -72,20 +72,6 @@ const CONTENT_SOURCES = [
   { name: 'Wccftech', url: 'https://www.wccftech.com/feed/', weight: 0.95, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
   { name: 'Siliconera', url: 'https://www.siliconera.com/feed/', weight: 0.95, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
   { name: 'Engadget', url: 'https://www.engadget.com/rss.xml', weight: 0.9, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
-  { name: 'Fallout Wiki — New Pages', url: 'https://fallout.fandom.com/wiki/Special:NewPages?feed=rss', weight: 1.2, category: 'community', tier: 'community', kind: 'rss', dedicatedFallout: true, excludeTitlePatterns: [
-    /^talk:/i,
-    /^user:/i,
-    /^user blog:/i,
-    /^category:/i,
-    /^template:/i,
-    /^file:/i,
-    /^help:/i,
-    /^draft:/i
-  ] },
-  { name: 'No Mutants Allowed', url: 'https://www.nma-fallout.com/forums/index.php?forums/-/index.rss', weight: 1.15, category: 'community', tier: 'community', kind: 'rss', dedicatedFallout: true, fallbackUrls: [
-    'https://www.nma-fallout.com/forums/index.php?latest-posts/index.rss'
-  ] },
-  { name: 'Duck and Cover', url: 'https://www.duckandcover.cx/forums/index.php?forums/-/index.rss', weight: 1.1, category: 'community', tier: 'community', kind: 'rss', dedicatedFallout: true },
   { name: 'Steam Community — Fallout 76', url: 'https://steamcommunity.com/games/1151340/rss/', weight: 1.15, category: 'news', tier: 'official', kind: 'rss', dedicatedFallout: true },
   { name: 'Steam Community — Fallout 4', url: 'https://steamcommunity.com/games/377160/rss/', weight: 1.1, category: 'mods', tier: 'official', kind: 'rss', dedicatedFallout: true },
   { name: 'Steam Community — New Vegas', url: 'https://steamcommunity.com/games/22380/rss/', weight: 1.0, category: 'news', tier: 'official', kind: 'rss', dedicatedFallout: true }
@@ -830,7 +816,11 @@ const OFF_TOPIC_PRESS_TITLE_PATTERNS = [
   /playstation store.*sale/i,
   /summer sale arrives/i,
   /^reset xbox\b/i,
-  /^xbox kills\b/i
+  /^xbox kills\b/i,
+  /^layoffs hit id software\b/i,
+  /^microsoft pulls\b/i,
+  /game pass lineup\b/i,
+  /review & recap/i
 ];
 
 const COMPETING_FRANCHISE_PATTERNS = [
@@ -848,7 +838,10 @@ const COMPETING_FRANCHISE_PATTERNS = [
   /\bdestiny(?:\s+\d+)?\b/i,
   /\bborderlands(?:\s+\d+)?\b/i,
   /\bthe witcher(?:\s+\d+)?\b/i,
-  /\bassassin'?s creed\b/i
+  /\bassassin'?s creed\b/i,
+  /\bx-men\b/i,
+  /\btony hawk\b/i,
+  /\bspider-noir\b/i
 ];
 
 export function hasCompetingFranchiseInTitle(title = '') {
@@ -1782,7 +1775,8 @@ async function loadStoryHistory() {
     const parsed = JSON.parse(raw);
     const cutoff = Date.now() - HISTORY_RETENTION_DAYS * 24 * 60 * 60 * 1000;
     return (Array.isArray(parsed?.entries) ? parsed.entries : []).filter((entry) => entry.coveredAt >= cutoff);
-  } catch {
+  } catch (error) {
+    console.warn(`Story history unavailable (${error.message}); starting with empty history.`);
     return [];
   }
 }
@@ -1797,11 +1791,11 @@ async function loadFeedHealth() {
   }
 }
 
-async function saveFeedHealth(sources = {}) {
+async function saveFeedHealth(sources = {}, { activeNames = getActiveFeedSourceNames() } = {}) {
   await fs.mkdir(path.dirname(FEED_HEALTH_FILE), { recursive: true });
   await fs.writeFile(FEED_HEALTH_FILE, JSON.stringify({
     updatedAt: new Date().toISOString(),
-    sources
+    sources: pruneFeedHealth(sources, activeNames)
   }, null, 2));
 }
 
@@ -1912,6 +1906,25 @@ export function getActiveRedditSources() {
   );
 
   return REDDIT_SOURCES.filter((source) => allowed.has(source.subreddit.toLowerCase()));
+}
+
+export function getActiveFeedSourceNames() {
+  const customReddit = getRedditCustomFeedSource();
+  return new Set([
+    ...CONTENT_SOURCES.map((source) => source.name),
+    ...(customReddit ? [customReddit.name] : []),
+    ...getActiveRedditSources().map((source) => source.name)
+  ]);
+}
+
+export function pruneFeedHealth(feedHealth = {}, activeNames = new Set()) {
+  const pruned = {};
+  for (const [name, stats] of Object.entries(feedHealth)) {
+    if (activeNames.has(name)) {
+      pruned[name] = stats;
+    }
+  }
+  return pruned;
 }
 
 let redditOAuthToken = null;
@@ -2522,12 +2535,18 @@ async function fetchRedditCustomFeedItems(source, { maxAttempts = 3 } = {}) {
         continue;
       }
 
-      return parseRedditRssFeed(text, source)
+      const items = parseRedditRssFeed(text, source)
         .filter((item) => isRelevantFalloutItem(item, source))
         .filter((item) => passesCommunityQualityGate(item))
         .map((item) => mapSourceItem(item, source))
         .sort((a, b) => b.score - a.score)
         .slice(0, 8);
+
+      if (items.length === 0) {
+        console.warn('Reddit custom feed fetched successfully but no items passed quality filters.');
+      }
+
+      return items;
     } catch (error) {
       errors.push(error.message || 'network error');
     }
@@ -2607,8 +2626,11 @@ async function fetchContentItems() {
   const skippedFeeds = [];
   const cachedSourceCount = Object.keys(feedHealth).length;
 
+  const activeFeedNames = getActiveFeedSourceNames();
+
   if (cachedSourceCount > 0) {
-    const unhealthyOnLoad = getUnhealthyFeedSources(feedHealth);
+    const unhealthyOnLoad = getUnhealthyFeedSources(feedHealth)
+      .filter((entry) => activeFeedNames.has(entry.name));
     console.log(`Feed health loaded: ${cachedSourceCount} source(s), ${unhealthyOnLoad.length} unhealthy.`);
   }
 
@@ -2665,6 +2687,7 @@ async function fetchContentItems() {
     try {
       const value = await fetchRedditCustomFeedItems(customRedditSource);
       recordSourceResult(customRedditSource.name, { status: 'fulfilled', value });
+      console.log(`Reddit custom feed returned ${value.length} item(s).`);
     } catch (error) {
       recordSourceResult(customRedditSource.name, { status: 'rejected', reason: error });
     }
@@ -2702,7 +2725,7 @@ async function fetchContentItems() {
     }
   }
 
-  await saveFeedHealth(feedHealth);
+  await saveFeedHealth(feedHealth, { activeNames: activeFeedNames });
 
   if (feedErrors.length > 0) {
     console.warn(`Feed warnings (${feedErrors.length}):`);
@@ -2711,7 +2734,8 @@ async function fetchContentItems() {
     }
   }
 
-  const unhealthy = getUnhealthyFeedSources(feedHealth);
+  const unhealthy = getUnhealthyFeedSources(feedHealth)
+    .filter((entry) => activeFeedNames.has(entry.name));
   if (unhealthy.length > 0) {
     console.warn(`Unhealthy feeds (${unhealthy.length}): ${unhealthy.map((entry) => `${entry.name} (${entry.failureStreak}x, ${entry.lastError})`).join(', ')}`);
   }
