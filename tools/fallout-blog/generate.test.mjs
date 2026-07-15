@@ -20,6 +20,9 @@ import {
   getStoryTopicFingerprint,
   getStoryTopicKey,
   hasFalloutFocus,
+  hasFalloutTitleMention,
+  isEligibleForGeneration,
+  isRelevantFalloutItem,
   getTitleValidationIssue,
   formatFeedWarnings,
   getRedditFetchStrategies,
@@ -104,10 +107,11 @@ test('assembleGenerationItems never mixes content types in one generation batch'
     mainStory,
     {
       source: 'Aftermath',
-      title: 'Obsidian defends its studio DNA',
+      title: 'Fallout studio Obsidian defends its RPG DNA after Xbox shifts',
       link: 'https://example.com/obsidian',
       contentType: 'news',
-      description: 'Aftermath reports on Obsidian leadership messaging after recent Xbox portfolio changes and what it means for RPG fans watching the studio closely.'
+      sourceTier: 'press',
+      description: 'Aftermath reports on Obsidian leadership messaging after recent Xbox portfolio changes and what it means for Fallout and RPG fans watching the studio closely.'
     },
     {
       source: 'r/FalloutMods',
@@ -247,6 +251,75 @@ test('hasFalloutFocus accepts Fallout-led stories without a competing franchise 
     hasFalloutFocus({
       title: 'New Fallout Game Is New Focus For Obsidian Entertainment - Report',
       description: 'Bloomberg reports Obsidian is shifting priorities toward Fallout.'
+    }),
+    true
+  );
+});
+
+test('hasFalloutTitleMention accepts shorthand game references', () => {
+  assert.equal(hasFalloutTitleMention('Major FO76 update lands today'), true);
+  assert.equal(hasFalloutTitleMention('PlayStation Store Summer Sale arrives on July 15'), false);
+});
+
+test('isRelevantFalloutItem rejects off-topic press stories without Fallout in the headline', () => {
+  const gameSpot = { name: 'GameSpot', category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true };
+
+  assert.equal(
+    isRelevantFalloutItem({
+      title: 'Diablo 4 Update Will Drown You In Mythics',
+      description: 'GameSpot compares the loot changes to Fallout 76 seasons.'
+    }, gameSpot),
+    false
+  );
+
+  assert.equal(
+    isRelevantFalloutItem({
+      title: 'The Elder Scrolls 6 Devs Fear More Delays After Layoffs',
+      description: 'Sources mention Bethesda may reprioritize Fallout afterward.'
+    }, gameSpot),
+    false
+  );
+
+  assert.equal(
+    isRelevantFalloutItem({
+      title: 'PlayStation Store Summer Sale arrives on July 15',
+      description: 'The sale includes discounts on Fallout 4 and Fallout 76.'
+    }, { name: 'PlayStation Blog', category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true }),
+    false
+  );
+});
+
+test('isRelevantFalloutItem accepts dedicated Fallout community forums without repeating Fallout in every title', () => {
+  const nma = { name: 'No Mutants Allowed', category: 'community', tier: 'community', kind: 'rss', dedicatedFallout: true };
+
+  assert.equal(
+    isRelevantFalloutItem({
+      title: 'Classic Fallout 2 modding thread',
+      description: 'Discussion about sfall scripting tweaks.'
+    }, nma),
+    true
+  );
+});
+
+test('isEligibleForGeneration blocks press stories that only mention Fallout in the body', () => {
+  assert.equal(
+    isEligibleForGeneration({
+      contentType: 'news',
+      sourceTier: 'press',
+      source: 'GameSpot',
+      title: 'Reset Xbox To What, Exactly?',
+      description: 'Aftermath discusses Xbox strategy and what it means for Fallout fans.'
+    }),
+    false
+  );
+
+  assert.equal(
+    isEligibleForGeneration({
+      contentType: 'news',
+      sourceTier: 'press',
+      source: 'IGN',
+      title: 'Fallout 5 and The Elder Scrolls 6 updates amid Xbox layoffs',
+      description: 'IGN reports on sweeping studio changes.'
     }),
     true
   );

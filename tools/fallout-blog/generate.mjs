@@ -39,29 +39,31 @@ const GENERATION_BATCH_LIMITS = {
 const CONTENT_TYPE_ROTATION_BONUS = 1.5;
 
 const CONTENT_SOURCES = [
-  { name: 'IGN', url: 'https://www.ign.com/rss/articles/feed', weight: 1.45, category: 'news', tier: 'press', kind: 'rss' },
-  { name: 'VGC', url: 'https://www.videogameschronicle.com/feed/', weight: 1.35, category: 'news', tier: 'press', kind: 'rss' },
-  { name: 'GamesRadar', url: 'https://www.gamesradar.com/rss', weight: 1.3, category: 'news', tier: 'press', kind: 'rss' },
-  { name: 'Eurogamer', url: 'https://www.eurogamer.net/rss', weight: 1.25, category: 'news', tier: 'press', kind: 'rss' },
-  { name: 'GameSpot', url: 'https://www.gamespot.com/feeds/news/', weight: 1.2, category: 'news', tier: 'press', kind: 'rss' },
-  { name: 'Polygon', url: 'https://www.polygon.com/feed/', weight: 1.15, category: 'news', tier: 'press', kind: 'rss' },
-  { name: 'The Verge', url: 'https://www.theverge.com/rss/index.xml', weight: 1.1, category: 'news', tier: 'press', kind: 'rss' },
-  { name: 'Steam — Fallout 76', url: 'https://store.steampowered.com/feeds/news/app/22370/?l=english&cc=US', weight: 1.2, category: 'news', tier: 'official', kind: 'rss' },
-  { name: 'Steam — Fallout 4', url: 'https://store.steampowered.com/feeds/news/app/377160/?l=english&cc=US', weight: 1.1, category: 'news', tier: 'official', kind: 'rss' },
-  { name: 'Steam — New Vegas', url: 'https://store.steampowered.com/feeds/news/app/22380/?l=english&cc=US', weight: 1.05, category: 'news', tier: 'official', kind: 'rss' },
-  { name: 'Xbox Wire', url: 'https://news.xbox.com/en-us/feed/', weight: 1.45, category: 'news', tier: 'official', kind: 'rss' },
-  { name: 'Bethesda — YouTube', url: 'https://www.youtube.com/feeds/videos.xml?channel_id=UCvZHe-SP3xC7DdOk4Ri8QBw', weight: 1.35, category: 'news', tier: 'official', kind: 'rss' },
-  { name: 'Amazon Newsroom', url: 'https://www.aboutamazon.com/news/rss', weight: 1.15, category: 'news', tier: 'press', kind: 'rss' },
-  { name: 'Kotaku', url: 'https://kotaku.com/rss', weight: 1.05, category: 'news', tier: 'press', kind: 'rss' },
-  { name: 'Rock Paper Shotgun', url: 'https://www.rockpapershotgun.com/feed/', weight: 1.0, category: 'news', tier: 'press', kind: 'rss' },
-  { name: 'PC Gamer', url: 'https://www.pcgamer.com/feed/', weight: 1.0, category: 'news', tier: 'press', kind: 'rss' },
-  { name: 'PCGamesN', url: 'https://www.pcgamesn.com/mainrss.xml', weight: 1.0, category: 'news', tier: 'press', kind: 'rss' },
-  { name: 'Shacknews', url: 'https://www.shacknews.com/feed/rss', weight: 0.95, category: 'news', tier: 'press', kind: 'rss' },
-  { name: 'DualShockers', url: 'https://www.dualshockers.com/feed/', weight: 0.95, category: 'news', tier: 'press', kind: 'rss' },
-  { name: 'PlayStation Blog', url: 'https://blog.playstation.com/feed/', weight: 1.15, category: 'news', tier: 'official', kind: 'rss', excludeTitlePatterns: [
+  { name: 'IGN', url: 'https://www.ign.com/rss/articles/feed', weight: 1.45, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
+  { name: 'VGC', url: 'https://www.videogameschronicle.com/feed/', weight: 1.35, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
+  { name: 'GamesRadar', url: 'https://www.gamesradar.com/rss', weight: 1.3, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
+  { name: 'Eurogamer', url: 'https://www.eurogamer.net/rss', weight: 1.25, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
+  { name: 'GameSpot', url: 'https://www.gamespot.com/feeds/news/', weight: 1.2, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
+  { name: 'Polygon', url: 'https://www.polygon.com/feed/', weight: 1.15, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
+  { name: 'The Verge', url: 'https://www.theverge.com/rss/index.xml', weight: 1.1, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
+  { name: 'Steam — Fallout 76', url: 'https://store.steampowered.com/feeds/news/app/1151340/?l=english&cc=US', weight: 1.2, category: 'news', tier: 'official', kind: 'rss', dedicatedFallout: true },
+  { name: 'Steam — Fallout 4', url: 'https://store.steampowered.com/feeds/news/app/377160/?l=english&cc=US', weight: 1.1, category: 'news', tier: 'official', kind: 'rss', dedicatedFallout: true },
+  { name: 'Steam — New Vegas', url: 'https://store.steampowered.com/feeds/news/app/22380/?l=english&cc=US', weight: 1.05, category: 'news', tier: 'official', kind: 'rss', dedicatedFallout: true },
+  { name: 'Xbox Wire', url: 'https://news.xbox.com/en-us/feed/', weight: 1.45, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
+  { name: 'Bethesda — YouTube', url: 'https://www.youtube.com/feeds/videos.xml?channel_id=UCvZHe-SP3xC7DdOk4Ri8QBw', weight: 1.35, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
+  { name: 'Amazon Newsroom', url: 'https://www.aboutamazon.com/news/rss', weight: 1.15, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
+  { name: 'Kotaku', url: 'https://kotaku.com/rss', weight: 1.05, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
+  { name: 'Rock Paper Shotgun', url: 'https://www.rockpapershotgun.com/feed/', weight: 1.0, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
+  { name: 'PC Gamer', url: 'https://www.pcgamer.com/feed/', weight: 1.0, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
+  { name: 'PCGamesN', url: 'https://www.pcgamesn.com/mainrss.xml', weight: 1.0, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
+  { name: 'Shacknews', url: 'https://www.shacknews.com/feed/rss', weight: 0.95, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
+  { name: 'DualShockers', url: 'https://www.dualshockers.com/feed/', weight: 0.95, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
+  { name: 'PlayStation Blog', url: 'https://blog.playstation.com/feed/', weight: 1.15, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true, excludeTitlePatterns: [
     /^share of the week/i,
     /^players'? choice/i,
-    /playstation store:.*top downloads/i
+    /playstation store:.*top downloads/i,
+    /playstation store.*summer sale/i,
+    /summer sale arrives/i
   ] },
   { name: 'Aftermath', url: 'https://aftermath.site/rss/', weight: 1.25, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
   { name: 'GamesIndustry', url: 'https://www.gamesindustry.biz/feed', weight: 1.2, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
@@ -70,7 +72,7 @@ const CONTENT_SOURCES = [
   { name: 'Wccftech', url: 'https://www.wccftech.com/feed/', weight: 0.95, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
   { name: 'Siliconera', url: 'https://www.siliconera.com/feed/', weight: 0.95, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
   { name: 'Engadget', url: 'https://www.engadget.com/rss.xml', weight: 0.9, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
-  { name: 'Fallout Wiki — New Pages', url: 'https://fallout.fandom.com/wiki/Special:NewPages?feed=rss', weight: 1.2, category: 'community', tier: 'community', kind: 'rss', excludeTitlePatterns: [
+  { name: 'Fallout Wiki — New Pages', url: 'https://fallout.fandom.com/wiki/Special:NewPages?feed=rss', weight: 1.2, category: 'community', tier: 'community', kind: 'rss', dedicatedFallout: true, excludeTitlePatterns: [
     /^talk:/i,
     /^user:/i,
     /^user blog:/i,
@@ -79,7 +81,14 @@ const CONTENT_SOURCES = [
     /^file:/i,
     /^help:/i,
     /^draft:/i
-  ] }
+  ] },
+  { name: 'No Mutants Allowed', url: 'https://www.nma-fallout.com/forums/index.php?forums/-/index.rss', weight: 1.15, category: 'community', tier: 'community', kind: 'rss', dedicatedFallout: true, fallbackUrls: [
+    'https://www.nma-fallout.com/forums/index.php?latest-posts/index.rss'
+  ] },
+  { name: 'Duck and Cover', url: 'https://www.duckandcover.cx/forums/index.php?forums/-/index.rss', weight: 1.1, category: 'community', tier: 'community', kind: 'rss', dedicatedFallout: true },
+  { name: 'Steam Community — Fallout 76', url: 'https://steamcommunity.com/games/1151340/rss/', weight: 1.15, category: 'news', tier: 'official', kind: 'rss', dedicatedFallout: true },
+  { name: 'Steam Community — Fallout 4', url: 'https://steamcommunity.com/games/377160/rss/', weight: 1.1, category: 'mods', tier: 'official', kind: 'rss', dedicatedFallout: true },
+  { name: 'Steam Community — New Vegas', url: 'https://steamcommunity.com/games/22380/rss/', weight: 1.0, category: 'news', tier: 'official', kind: 'rss', dedicatedFallout: true }
 ];
 
 const REDDIT_SOURCES = [
@@ -672,6 +681,7 @@ export function assembleGenerationItems(mainStory = {}, candidates = [], history
   const pool = candidates
     .filter((item) => item.contentType === contentType)
     .filter((item) => !isTopicCovered(item, historyEntries))
+    .filter((item) => isEligibleForGeneration(item))
     .filter((item) => {
       if (item.publishedAt && item.publishedAt < Date.now() - HISTORY_RETENTION_DAYS * 24 * 60 * 60 * 1000) {
         return false;
@@ -707,6 +717,7 @@ export function selectStoriesForGeneration(candidates = [], historyEntries = [],
     .filter((item) => {
       if (isTopicCovered(item, historyEntries)) return false;
       if (!meetsMinimumSourceQuality(item)) return false;
+      if (!isEligibleForGeneration(item)) return false;
 
       if (item.publishedAt && item.publishedAt < Date.now() - HISTORY_RETENTION_DAYS * 24 * 60 * 60 * 1000) {
         return false;
@@ -807,10 +818,19 @@ function extractItems(xmlText) {
 const FALLOUT_KEYWORDS = [
   'fallout 76', 'fallout 4', 'fallout 3', 'fallout 5', 'fallout 2', 'fallout 1',
   'new vegas', 'fo76', 'fo4', 'fnv', 'prime video', 'fallout tv', 'fallout series',
-  'vault dweller', 'vault-tec', 'appalachia', 'wasteland', 'atomic shop',
+  'vault dweller', 'vault-tec', 'appalachia', 'atomic shop',
   'brotherhood of steel', 'ncr', 'institute', 'pip-boy',
   'nexus mod', 'mod release', 'lucy', 'the ghoul', 'vault boy', 'power armor',
-  'cosplay', 'fan art', 'mod showcase', 'camp build', 'obsidian entertainment'
+  'mod showcase', 'camp build'
+];
+
+const FALLOUT_TITLE_MENTION_PATTERN = /\b(fallout(?:\s+(?:76|4|3|5|2|1|tv|series))?|fo76|fo4|fnv|new vegas)\b/i;
+
+const OFF_TOPIC_PRESS_TITLE_PATTERNS = [
+  /playstation store.*sale/i,
+  /summer sale arrives/i,
+  /^reset xbox\b/i,
+  /^xbox kills\b/i
 ];
 
 const COMPETING_FRANCHISE_PATTERNS = [
@@ -839,10 +859,28 @@ export function hasFalloutFocus(item = {}) {
   const title = String(item.title || '');
   const haystack = `${title} ${item.description || ''} ${item.link || ''}`.toLowerCase();
 
-  if (/\bfallout\b/i.test(title)) return true;
+  if (FALLOUT_TITLE_MENTION_PATTERN.test(title)) return true;
   if (hasCompetingFranchiseInTitle(title)) return false;
 
   return /\bfallout\b/i.test(haystack);
+}
+
+export function hasFalloutTitleMention(title = '') {
+  return FALLOUT_TITLE_MENTION_PATTERN.test(String(title || ''));
+}
+
+function isDedicatedFalloutSource(source = {}) {
+  return source.dedicatedFallout === true || source.kind === 'reddit';
+}
+
+export function isEligibleForGeneration(item = {}) {
+  if (item.sourceKind === 'reddit') return true;
+  if (/wiki|mutants allowed|duck and cover|steam community|steam —/i.test(item.source || '')) return true;
+  if (!hasFalloutFocus(item)) return false;
+  if (item.contentType === 'news' && item.sourceTier === 'press') {
+    return hasFalloutTitleMention(item.title);
+  }
+  return true;
 }
 
 const NOISE_TERMS = ['rumor', 'rumour', 'leak', 'leaked', 'speculation', 'datamine', 'insider claims', 'allegedly'];
@@ -2144,22 +2182,29 @@ export function formatFeedWarnings(feedErrors = []) {
   return feedErrors.map((error) => `  - ${error}`);
 }
 
-function isRelevantFalloutItem(item, source) {
+export function isRelevantFalloutItem(item, source) {
   const title = normalizeSyndicatedTitle(item.title || '', item.feedSource || '');
   if (isFeedTitleExcluded(title, source)) return false;
+  if (source.tier === 'press' && OFF_TOPIC_PRESS_TITLE_PATTERNS.some((pattern) => pattern.test(title))) {
+    return false;
+  }
 
   const normalizedItem = { ...item, title };
   const haystack = `${title} ${item.description} ${item.link || ''}`.toLowerCase();
   const hasRelevantKeyword = FALLOUT_KEYWORDS.some((term) => haystack.includes(term)) || haystack.includes('fallout');
   const hasNoise = NOISE_TERMS.some((term) => haystack.includes(term));
 
-  if (source.kind === 'reddit' || source.category === 'community' || source.category === 'mods') {
+  if (isDedicatedFalloutSource(source)) {
     return !hasNoise;
   }
 
   if (!hasFalloutFocus(normalizedItem)) return false;
 
-  if (source.requiresFalloutMatch) {
+  if (source.category === 'news' && source.tier === 'press' && !hasFalloutTitleMention(title)) {
+    return false;
+  }
+
+  if (source.requiresFalloutMatch || source.tier === 'press') {
     return hasRelevantKeyword && !hasNoise;
   }
 
@@ -2670,10 +2715,12 @@ async function main() {
   console.log(`Generation batch: ${generationBatch.length}/${batchLimit} ${mainStory.contentType} item(s) for ${batchMode}.`);
 
   const enrichedItems = await enrichStories(generationBatch);
-  const substantiveItems = enrichedItems.filter((item) => meetsMinimumSourceQuality(item));
+  const substantiveItems = enrichedItems
+    .filter((item) => meetsMinimumSourceQuality(item))
+    .filter((item) => isEligibleForGeneration(item));
 
   if (substantiveItems.length === 0) {
-    console.log('Only thin-source stories available today; skipping generation.');
+    console.log('Only thin-source or off-topic stories available today; skipping generation.');
     return;
   }
 
