@@ -24,13 +24,9 @@ jobs:
       GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
       GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
       BLOGGER_BLOG_ID: ${{ secrets.BLOGGER_BLOG_ID }}
+      REDDIT_CUSTOM_FEED_URL: ${{ secrets.REDDIT_CUSTOM_FEED_URL }}
       REDDIT_FETCH_DELAY_MS: 6000
       REDDIT_RATE_LIMIT_BACKOFF_MS: 8000
-      REDDIT_SUBREDDITS: fallout,fo76,falloutlore,FalloutMods,fo4,FalloutTV,fnv,classicfallout
-      REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
-      REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
-      REDDIT_USERNAME: ${{ secrets.REDDIT_USERNAME }}
-      REDDIT_PASSWORD: ${{ secrets.REDDIT_PASSWORD }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4

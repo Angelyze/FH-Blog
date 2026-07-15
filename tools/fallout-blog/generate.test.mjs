@@ -25,8 +25,11 @@ import {
   isRelevantFalloutItem,
   getTitleValidationIssue,
   formatFeedWarnings,
+  getActiveRedditSources,
+  getRedditCustomFeedSource,
   getRedditFetchStrategies,
   getRedditUserAgent,
+  hasRedditCustomFeed,
   hasRedditOAuthCredentials,
   getUnhealthyFeedSources,
   isFeedTitleExcluded,
@@ -874,6 +877,38 @@ test('getRedditFetchStrategies uses JSON first for the primary subreddit even in
     getRedditFetchStrategies({ rssOnly: true, source: { primary: true } }),
     ['json', 'rss']
   );
+});
+
+test('hasRedditCustomFeed disables individual subreddit sources', () => {
+  const previous = process.env.REDDIT_CUSTOM_FEED_URL;
+  process.env.REDDIT_CUSTOM_FEED_URL = 'https://www.reddit.com/user/test/m/fallout-hub/.rss';
+
+  try {
+    assert.equal(hasRedditCustomFeed(), true);
+    assert.equal(getRedditCustomFeedSource()?.name, 'Reddit — Custom Fallout Feed');
+    assert.equal(getActiveRedditSources().length, 0);
+  } finally {
+    if (previous === undefined) delete process.env.REDDIT_CUSTOM_FEED_URL;
+    else process.env.REDDIT_CUSTOM_FEED_URL = previous;
+  }
+});
+
+test('getActiveRedditSources honors REDDIT_SUBREDDITS when no custom feed is set', () => {
+  const previousFeed = process.env.REDDIT_CUSTOM_FEED_URL;
+  const previousSubs = process.env.REDDIT_SUBREDDITS;
+  delete process.env.REDDIT_CUSTOM_FEED_URL;
+  process.env.REDDIT_SUBREDDITS = 'fallout,FalloutMods';
+
+  try {
+    const active = getActiveRedditSources();
+    assert.equal(active.length, 2);
+    assert.deepEqual(active.map((source) => source.subreddit).sort(), ['FalloutMods', 'fallout']);
+  } finally {
+    if (previousFeed === undefined) delete process.env.REDDIT_CUSTOM_FEED_URL;
+    else process.env.REDDIT_CUSTOM_FEED_URL = previousFeed;
+    if (previousSubs === undefined) delete process.env.REDDIT_SUBREDDITS;
+    else process.env.REDDIT_SUBREDDITS = previousSubs;
+  }
 });
 
 test('getRedditFetchStrategies prefers OAuth when credentials are configured', () => {
