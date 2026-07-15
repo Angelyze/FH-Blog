@@ -467,7 +467,11 @@ const HIGH_VALUE_COMMUNITY_PATTERNS = [
 ];
 
 const RSS_REDDIT_MAX_HOT_RANK = 3;
-const RSS_CUSTOM_FEED_MAX_RANK = 25;
+// Reddit custom RSS feeds return ~25 entries; one daily fetch keeps rate-limit risk low.
+const REDDIT_CUSTOM_FEED_ITEM_LIMIT = Number.parseInt(process.env.REDDIT_CUSTOM_FEED_ITEM_LIMIT || '25', 10);
+const REDDIT_CUSTOM_FEED_MAX_RANK = Number.parseInt(process.env.REDDIT_CUSTOM_FEED_MAX_RANK || '30', 10);
+// Room for full Reddit feed plus press/official candidates without crowding the editorial pool.
+const COLLECTED_ITEM_POOL_LIMIT = Number.parseInt(process.env.COLLECTED_ITEM_POOL_LIMIT || '45', 10);
 
 const LOW_EFFORT_REDDIT_PATTERNS = [
   'discussion thread', 'megathread', 'daily thread', 'weekly thread', 'rant thread',
@@ -551,7 +555,7 @@ export function passesCustomRedditFeedQualityGate(item = {}) {
   if (isNicheCommunityPost(item)) return false;
 
   const rank = item.redditFeedRank ?? 99;
-  if (rank > RSS_CUSTOM_FEED_MAX_RANK) return false;
+  if (rank > REDDIT_CUSTOM_FEED_MAX_RANK) return false;
 
   if (hasRedditEngagementMetrics(item)) {
     return meetsEngagementThreshold(item);
@@ -560,8 +564,9 @@ export function passesCustomRedditFeedQualityGate(item = {}) {
   return true;
 }
 
-export function passesCommunityQualityGate(item = {}, { useCustomFeedRules = false } = {}) {
-  if (useCustomFeedRules) return passesCustomRedditFeedQualityGate(item);
+export function passesCommunityQualityGate(item = {}, { useCustomFeedRules } = {}) {
+  const customFeedRules = useCustomFeedRules ?? hasRedditCustomFeed();
+  if (customFeedRules) return passesCustomRedditFeedQualityGate(item);
   if (item.sourceKind !== 'reddit') return true;
   if (item.isStickied || item.over18) return false;
   if (!meetsEngagementThreshold(item)) return false;
@@ -2700,10 +2705,12 @@ async function fetchRedditCustomFeedItems(source, { maxAttempts = 3 } = {}) {
         .filter((item) => passesCommunityQualityGate(item, { useCustomFeedRules: true }))
         .map((item) => mapSourceItem(item, source))
         .sort((a, b) => b.score - a.score)
-        .slice(0, 8);
+        .slice(0, REDDIT_CUSTOM_FEED_ITEM_LIMIT);
 
       if (items.length === 0) {
         console.warn('Reddit custom feed fetched successfully but no items passed quality filters.');
+      } else {
+        console.log(`Reddit custom feed kept ${items.length}/${REDDIT_CUSTOM_FEED_ITEM_LIMIT} item(s) after quality filters.`);
       }
 
       return items;
@@ -2773,7 +2780,19 @@ function dedupeCollectedItems(collected = []) {
     unique.push(item);
   }
 
-  return unique.slice(0, 24);
+  return unique.slice(0, COLLECTED_ITEM_POOL_LIMIT);
+}
+
+export function getRedditCustomFeedItemLimit() {
+  return REDDIT_CUSTOM_FEED_ITEM_LIMIT;
+}
+
+export function getCollectedItemPoolLimit() {
+  return COLLECTED_ITEM_POOL_LIMIT;
+}
+
+export function getRedditCustomFeedMaxRank() {
+  return REDDIT_CUSTOM_FEED_MAX_RANK;
 }
 
 async function fetchContentItems() {
@@ -2847,7 +2866,7 @@ async function fetchContentItems() {
     try {
       const value = await fetchRedditCustomFeedItems(customRedditSource);
       recordSourceResult(customRedditSource.name, { status: 'fulfilled', value });
-      console.log(`Reddit custom feed returned ${value.length} item(s).`);
+      console.log(`Reddit custom feed fetched ${value.length} item(s).`);
     } catch (error) {
       recordSourceResult(customRedditSource.name, { status: 'rejected', reason: error });
     }

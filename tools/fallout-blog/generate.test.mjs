@@ -49,8 +49,11 @@ import {
   compareCandidatePriority,
   getAdjustedCandidateScore,
   getEditorialCandidateScore,
+  getCollectedItemPoolLimit,
   getGeminiApiKeys,
   getGeminiModelChain,
+  getRedditCustomFeedItemLimit,
+  getRedditCustomFeedMaxRank,
   getSourceDiversityAdjustment,
   getRedditPostJsonUrl,
   isGeminiQuotaError,
@@ -635,6 +638,12 @@ test('passesRssRedditQualityGate allows high-value community posts in the top ho
   );
 });
 
+test('reddit collection limits default to full-feed capacity without raising LLM cost', () => {
+  assert.equal(getRedditCustomFeedItemLimit(), 25);
+  assert.equal(getRedditCustomFeedMaxRank(), 30);
+  assert.equal(getCollectedItemPoolLimit(), 45);
+});
+
 test('passesCustomRedditFeedQualityGate allows deeper custom-feed slots without engagement metadata', () => {
   assert.equal(
     passesCustomRedditFeedQualityGate({
@@ -701,15 +710,43 @@ test('salvageConflictedStoryHistory recovers entries from conflict markers', () 
 });
 
 test('passesCommunityQualityGate blocks RSS Reddit posts beyond the top hot slots', () => {
-  assert.equal(
-    passesCommunityQualityGate({
-      sourceKind: 'reddit',
-      redditFeedRank: 5,
-      title: 'New Appalachia overhaul mod released on Nexus',
-      description: 'A major visual overhaul with updated textures and lighting.'
-    }),
-    false
-  );
+  const previousFeed = process.env.REDDIT_CUSTOM_FEED_URL;
+  delete process.env.REDDIT_CUSTOM_FEED_URL;
+
+  try {
+    assert.equal(
+      passesCommunityQualityGate({
+        sourceKind: 'reddit',
+        redditFeedRank: 5,
+        title: 'New Appalachia overhaul mod released on Nexus',
+        description: 'A major visual overhaul with updated textures and lighting.'
+      }),
+      false
+    );
+  } finally {
+    if (previousFeed === undefined) delete process.env.REDDIT_CUSTOM_FEED_URL;
+    else process.env.REDDIT_CUSTOM_FEED_URL = previousFeed;
+  }
+});
+
+test('passesCommunityQualityGate uses custom-feed rules when REDDIT_CUSTOM_FEED_URL is configured', () => {
+  const previousFeed = process.env.REDDIT_CUSTOM_FEED_URL;
+  process.env.REDDIT_CUSTOM_FEED_URL = 'https://www.reddit.com/user/test/m/fallout-hub/.rss';
+
+  try {
+    assert.equal(
+      passesCommunityQualityGate({
+        sourceKind: 'reddit',
+        redditFeedRank: 12,
+        title: 'Incredible Vault Dweller cosplay from Dragon Con',
+        description: 'Handmade pip-boy and weathered armor from the Fallout TV series.'
+      }),
+      true
+    );
+  } finally {
+    if (previousFeed === undefined) delete process.env.REDDIT_CUSTOM_FEED_URL;
+    else process.env.REDDIT_CUSTOM_FEED_URL = previousFeed;
+  }
 });
 
 test('compareCandidatePriority prefers Reddit items with engagement metrics', () => {
