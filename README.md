@@ -24,6 +24,7 @@ Daily editorial automation for the **Fallout Hub Blog** — a trusted Fallout fa
 - `GOOGLE_REFRESH_TOKEN`
 - `BLOGGER_BLOG_ID`
 - `REDDIT_CUSTOM_FEED_URL`
+- `DISCORD_WEBHOOK_URL` (for the daily Discord blog share workflow)
 
 Optional fallbacks:
 - `GEMINI_API_KEY_FALLBACK`
@@ -37,3 +38,11 @@ Fallout Hub posts are designed to be:
 
 ## LLM setup
 Use a Gemini API key from Google AI Studio and store it as `GEMINI_API_KEY`.
+
+## Discord announcements
+A separate workflow (`.github/workflows/discord-blog-share.yml`) checks the Blogger RSS feed once per day and posts newly **published** articles to your Discord server.
+
+1. Create a Discord webhook for your announcement channel.
+2. Add it to GitHub as `DISCORD_WEBHOOK_URL`.
+3. The first successful run bootstraps silently (marks existing posts as seen, no spam).
+4. After you publish a new post on Blogger, the next daily run shares it to Discord.

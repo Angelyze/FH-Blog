@@ -1,0 +1,46 @@
+name: Discord Blog Share
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 18 * * *'
+
+concurrency:
+  group: discord-blog-share-${{ github.repository }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  share-latest-post:
+    runs-on: ubuntu-latest
+    env:
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      BLOG_FEED_URL: https://www.fallouthub.blog/feeds/posts/default?alt=rss
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Share new Fallout Hub Blog posts on Discord
+        run: npm run discord:share
+
+      - name: Commit Discord share state
+        if: always()
+        run: |
+          if ! git diff --quiet -- data/discord-share-state.json 2>/dev/null; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add data/discord-share-state.json
+            git commit -m "chore(discord): update blog share state"
+            git pull --rebase --autostash origin "${{ github.ref_name }}"
+            git push
+            echo "Discord share state committed to repository."
+          else
+            echo "No Discord share state changes to commit."
+          fi
