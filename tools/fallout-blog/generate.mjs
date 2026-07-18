@@ -49,8 +49,8 @@ const CONTENT_SOURCES = [
   { name: 'Steam — Fallout 76', url: 'https://store.steampowered.com/feeds/news/app/1151340/?l=english&cc=US', weight: 1.2, category: 'news', tier: 'official', kind: 'rss', dedicatedFallout: true },
   { name: 'Steam — Fallout 4', url: 'https://store.steampowered.com/feeds/news/app/377160/?l=english&cc=US', weight: 1.1, category: 'news', tier: 'official', kind: 'rss', dedicatedFallout: true },
   { name: 'Steam — New Vegas', url: 'https://store.steampowered.com/feeds/news/app/22380/?l=english&cc=US', weight: 1.05, category: 'news', tier: 'official', kind: 'rss', dedicatedFallout: true },
-  { name: 'Xbox Wire', url: 'https://news.xbox.com/en-us/feed/', weight: 1.45, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
-  { name: 'Bethesda — YouTube', url: 'https://www.youtube.com/feeds/videos.xml?channel_id=UCvZHe-SP3xC7DdOk4Ri8QBw', weight: 1.35, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
+  { name: 'Xbox Wire', url: 'https://news.xbox.com/en-us/feed/', weight: 1.5, category: 'news', tier: 'official', kind: 'rss', requiresFalloutMatch: true },
+  { name: 'Bethesda — YouTube', url: 'https://www.youtube.com/feeds/videos.xml?channel_id=UCvZHe-SP3xC7DdOk4Ri8QBw', weight: 1.5, category: 'news', tier: 'official', kind: 'rss', requiresFalloutMatch: true },
   { name: 'Amazon Newsroom', url: 'https://www.aboutamazon.com/news/rss', weight: 1.15, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
   { name: 'Kotaku', url: 'https://kotaku.com/rss', weight: 1.05, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
   { name: 'Rock Paper Shotgun', url: 'https://www.rockpapershotgun.com/feed/', weight: 1.0, category: 'news', tier: 'press', kind: 'rss', requiresFalloutMatch: true },
@@ -237,10 +237,21 @@ const OUTLET_TITLE_PREFIX = /^(?:bloomberg|ign|gamespot|eurogamer|polygon|the ve
 const SPECIFIC_TOPIC_ANCHORS = new Set([
   'obsidian', 'bethesda', 'zenimax', 'fo76', 'fnv', 'wasteland', 'vault',
   'appalachia', 'brotherhood', 'prime', 'amazon', 'nexus', 'layoff', 'layoffs',
-  'avowed', 'elder', 'scrolls', 'starfield', 'xbox', 'microsoft', 'studio'
+  'avowed', 'elder', 'scrolls', 'starfield', 'xbox', 'microsoft', 'studio',
+  'remaster', 'remasters', 'preproduction', 'raven'
 ]);
 
 const TOPIC_ANCHOR_TOKENS = new Set(['fallout', ...SPECIFIC_TOPIC_ANCHORS]);
+
+// Same studio mega-package (e.g. FO5 + remasters + Raven Rock + Obsidian collab) — one article only
+const MEGA_EVENT_SIGNALS = [
+  'fallout 5', 'fallout5',
+  'remaster', 'remasters',
+  'pre-production', 'preproduction', 'pre production',
+  'raven rock',
+  'creation engine 3', 'creation engine',
+  'new vegas remaster', 'fallout 3 remaster'
+];
 
 export function normalizeTopicTitle(title = '') {
   return String(title).replace(OUTLET_TITLE_PREFIX, '').trim();
@@ -282,6 +293,25 @@ export function areTopicsSimilar(titleA = '', titleB = '', { allowAnchorMatch = 
   return intersection / union >= TOPIC_SIMILARITY_THRESHOLD;
 }
 
+export function getMegaEventSignals(item = {}) {
+  const haystack = `${item.title || ''} ${item.description || ''} ${item.articleTitle || ''}`.toLowerCase();
+  return MEGA_EVENT_SIGNALS.filter((signal) => haystack.includes(signal));
+}
+
+/** True when two items are angles on the same studio mega-announcement package. */
+export function shareMegaEventPackage(itemA = {}, itemB = {}) {
+  const signalsA = new Set(getMegaEventSignals(itemA));
+  const signalsB = new Set(getMegaEventSignals(itemB));
+  if (signalsA.size === 0 || signalsB.size === 0) return false;
+
+  const shared = [...signalsA].filter((signal) => signalsB.has(signal));
+  // Two shared package signals (e.g. fallout 5 + remaster) = same story for fans
+  if (shared.length >= 2) return true;
+  // Extremely specific one-off beats (unique enough to own the package alone)
+  if (shared.includes('raven rock')) return true;
+  return false;
+}
+
 export function isTopicCovered(item = {}, historyEntries = []) {
   const fingerprint = getStoryKey(item);
   const topicFingerprint = getStoryTopicKey(item);
@@ -294,6 +324,19 @@ export function isTopicCovered(item = {}, historyEntries = []) {
       return true;
     }
     if (entry.articleTitle && item.title && areTopicsSimilar(entry.articleTitle, item.title)) {
+      return true;
+    }
+
+    const historyAsItem = {
+      title: entry.title || '',
+      description: entry.articleTitle || '',
+      articleTitle: entry.articleTitle || ''
+    };
+    if (shareMegaEventPackage(item, historyAsItem)) return true;
+    if (entry.articleTitle && shareMegaEventPackage(item, {
+      title: entry.articleTitle,
+      description: entry.title || ''
+    })) {
       return true;
     }
   }
@@ -657,8 +700,14 @@ export function getContentTypeRotationBonus(contentType = 'news', typeCounts = {
 }
 
 export function getEditorialCandidateScore(item = {}, historyEntries = [], typeCounts = {}) {
-  return getAdjustedCandidateScore(item, historyEntries)
+  let score = getAdjustedCandidateScore(item, historyEntries)
     + getContentTypeRotationBonus(item.contentType, typeCounts);
+
+  // Fan-first ranking: official studio confirmations beat soft community filler
+  if (item.sourceTier === 'official') score += 2.5;
+  if (hasOfficialConfirmationSignals(item)) score += 3.5;
+
+  return score;
 }
 
 export function getGenerationBatchLimit(contentType = 'news') {
@@ -702,7 +751,13 @@ export function assembleGenerationItems(mainStory = {}, candidates = [], history
 
       return true;
     })
-    .sort((a, b) => getAdjustedCandidateScore(b, historyEntries) - getAdjustedCandidateScore(a, historyEntries));
+    // Fan-first: related mega-package angles (FO5 + remasters + Raven Rock) before unrelated same-type filler
+    .sort((a, b) => {
+      const relatedA = shareMegaEventPackage(mainStory, a) ? 1 : 0;
+      const relatedB = shareMegaEventPackage(mainStory, b) ? 1 : 0;
+      if (relatedB !== relatedA) return relatedB - relatedA;
+      return getAdjustedCandidateScore(b, historyEntries) - getAdjustedCandidateScore(a, historyEntries);
+    });
 
   const selected = [mainStory];
   const usedTopics = new Set([mainTopic]);
@@ -713,6 +768,11 @@ export function assembleGenerationItems(mainStory = {}, candidates = [], history
     const topicKey = getStoryTopicKey(item);
     if (usedTopics.has(topicKey)) continue;
     if (item.link === mainStory.link && item.title === mainStory.title) continue;
+    // Same mega-package angles still join the batch (one cohesive brief), but skip pure dupes
+    if (selected.some((existing) => areTopicsSimilar(existing.title, item.title)
+      && !shareMegaEventPackage(existing, item))) {
+      continue;
+    }
 
     selected.push(item);
     usedTopics.add(topicKey);
@@ -901,17 +961,32 @@ export function isEligibleForGeneration(item = {}) {
 
 const NOISE_TERMS = ['rumor', 'rumour', 'leak', 'leaked', 'speculation', 'datamine', 'insider claims', 'allegedly'];
 
+// Soft industry chatter only — do NOT include phrases that also appear in official studio notes
+// (e.g. "in development", "working on a new"), or confirmed news gets mislabeled as press-report.
 const REPORT_SIGNALS = [
-  'report', 'reportedly', 'according to', 'sources say', 'sources tell', 'insider',
+  'report', 'reportedly', 'according to sources', 'sources say', 'sources tell', 'insider',
   'claims that', 'said to be', 'is said to', 'people familiar', 'people with knowledge',
   'unconfirmed', 'could be', 'may be', 'shelving', 'shelved', 'greenlit', 're-focusing',
-  'shifting focus', 'in development', 'working on a new'
+  'shifting focus', '– report', '- report'
 ];
 
 const CONFIRMED_PRESS_SIGNALS = [
   'patch notes', 'now available', 'out now', 'launches today', 'is live', 'now live',
   'release date', 'official trailer', 'premiere date', 'maintenance update', 'scheduled for',
   'season begins', 'update is available', 'available to download'
+];
+
+// Press covering a first-party studio announcement (Bethesda X, studio note, official blog, etc.)
+const OFFICIAL_CONFIRMATION_SIGNALS = [
+  'officially confirmed', 'officially announced', 'officially in', 'now officially',
+  'has confirmed', 'have confirmed', 'confirms that', 'confirmed that', 'confirms fallout',
+  'bethesda confirmed', 'bethesda confirms', 'bethesda announced', 'bethesda announces',
+  'studio confirmed', 'studio confirms', 'studio announced', 'studio announces',
+  'in a statement', 'in an official', 'official statement', 'official announcement',
+  'studio note', 'note from bethesda', 'a note from bethesda', 'from bethesda game studios',
+  'happy to confirm', 'we can confirm', 'we are happy to confirm',
+  'pre-production', 'preproduction', 'pre production',
+  're-confirmed', 'reconfirmed', 'officially re-confirmed'
 ];
 
 const REPORTING_OUTLETS = [
@@ -978,7 +1053,7 @@ function scoreItem(item, source) {
   score += engagementBonus(item);
   if (item.sourceKind === 'reddit' && !hasRedditEngagementMetrics(item)) score -= 2.5;
 
-  if (source.tier === 'official') score += 1.8;
+  if (source.tier === 'official') score += 3.2;
   if (haystack.includes('fallout')) score += 1.5;
   if (haystack.includes('official') || haystack.includes('announced') || haystack.includes('confirmed')) score += 1.4;
   if (haystack.includes('trailer') || haystack.includes('premiere')) score += 0.9;
@@ -990,8 +1065,24 @@ function scoreItem(item, source) {
   if (isNicheCommunityPost(item)) score -= 3.5;
   if (NOISE_TERMS.some((term) => haystack.includes(term))) score -= 4;
   if (hasCompetingFranchiseInTitle(item.title || '') && !/\bfallout\b/i.test(item.title || '')) score -= 8;
+  // Prefer press that is covering an official studio confirmation over rumor-framed packages
+  if (hasOfficialConfirmationSignals(item)) score += 4.5;
 
   return score;
+}
+
+export function hasOfficialConfirmationSignals(item = {}) {
+  const haystack = `${item.title} ${item.description}`.toLowerCase();
+  if (NOISE_TERMS.some((term) => haystack.includes(term))) return false;
+  return OFFICIAL_CONFIRMATION_SIGNALS.some((signal) => haystack.includes(signal));
+}
+
+export function hasRumorFramingSignals(item = {}) {
+  const haystack = `${item.title} ${item.description}`.toLowerCase();
+  const title = item.title || '';
+  if (NOISE_TERMS.some((term) => haystack.includes(term))) return true;
+  if (/\breport\b/i.test(title) || /[–-]\s*report/i.test(title)) return true;
+  return REPORT_SIGNALS.some((signal) => haystack.includes(signal));
 }
 
 export function resolveReportingOutlet(item = {}) {
@@ -1088,8 +1179,14 @@ export function resolveReportingOutletFromSources(sources = [], newsItems = []) 
 }
 
 export function detectTrustLevel(item = {}, source = {}) {
-  if (source.tier === 'official') return 'official';
-  if (source.category === 'mods' || source.category === 'community') return 'community-highlight';
+  const tier = source.tier || item.sourceTier;
+  const category = source.category || item.contentType;
+
+  if (tier === 'official') return 'official';
+  if (category === 'mods' || category === 'community') return 'community-highlight';
+
+  // Press rewriting a first-party studio announcement → confirmed for fans, not a leak
+  if (hasOfficialConfirmationSignals(item)) return 'confirmed';
 
   const haystack = `${item.title} ${item.description}`.toLowerCase();
   const title = item.title || '';
@@ -1100,15 +1197,94 @@ export function detectTrustLevel(item = {}, source = {}) {
 
   if (hasReportSignal && !hasConfirmedSignal) return 'press-report';
   if (hasConfirmedSignal && !hasReportSignal) return 'confirmed';
-
   if (hasReportSignal && hasConfirmedSignal) return 'press-report';
 
-  if (/\b(obsidian|bethesda|microsoft|xbox|developer|studio)\b/.test(haystack)
+  // Soft industry chatter about future projects — only when framed as report/rumor
+  if (hasRumorFramingSignals(item)
+    && /\b(obsidian|bethesda|microsoft|xbox|developer|studio)\b/.test(haystack)
     && /\b(new game|sequel|spin-off|fallout 5|project|return to)\b/.test(haystack)) {
     return 'press-report';
   }
 
-  return source.tier === 'press' ? 'press-report' : 'confirmed';
+  return tier === 'press' ? 'press-report' : 'confirmed';
+}
+
+const TRUST_RANK = {
+  official: 4,
+  confirmed: 3,
+  'press-report': 2,
+  'community-highlight': 1
+};
+
+export function detectTrustLevelForBatch(newsItems = []) {
+  if (!Array.isArray(newsItems) || newsItems.length === 0) return 'confirmed';
+
+  const levels = newsItems.map((item) => (
+    item.trustLevel || detectTrustLevel(item, { tier: item.sourceTier, category: item.contentType })
+  ));
+
+  if (levels.includes('official')) return 'official';
+
+  const confirmedLike = newsItems.filter((item) => hasOfficialConfirmationSignals(item)).length;
+  if (confirmedLike > 0) return 'confirmed';
+  if (levels.includes('confirmed')) return 'confirmed';
+
+  // Multiple outlets covering the same package with confirmation language is enough
+  if (newsItems.length >= 2 && confirmedLike >= 1) return 'confirmed';
+
+  if (levels.includes('press-report')) return 'press-report';
+  if (levels.includes('community-highlight')) return 'community-highlight';
+  return levels[0] || 'confirmed';
+}
+
+export function prioritizeGenerationBatch(newsItems = []) {
+  if (!Array.isArray(newsItems) || newsItems.length <= 1) return newsItems;
+
+  return [...newsItems].sort((a, b) => {
+    const trustA = TRUST_RANK[detectTrustLevel(a, { tier: a.sourceTier, category: a.contentType })] || 0;
+    const trustB = TRUST_RANK[detectTrustLevel(b, { tier: b.sourceTier, category: b.contentType })] || 0;
+    if (trustB !== trustA) return trustB - trustA;
+
+    const confA = hasOfficialConfirmationSignals(a) ? 1 : 0;
+    const confB = hasOfficialConfirmationSignals(b) ? 1 : 0;
+    if (confB !== confA) return confB - confA;
+
+    return (b.score ?? 0) - (a.score ?? 0);
+  });
+}
+
+export function resolveStoryAttribution(newsItems = [], trustLevel = 'confirmed') {
+  const batch = Array.isArray(newsItems) ? newsItems.filter(Boolean) : [];
+  if (batch.length === 0) return 'the original report';
+
+  const officialItems = batch.filter((item) => item.sourceTier === 'official' || item.tier === 'official');
+  if (trustLevel === 'official' && officialItems.length > 0) {
+    return resolveReportingOutletFromBatch(officialItems);
+  }
+
+  const pressOutlets = [];
+  for (const item of batch) {
+    const name = item.source?.trim();
+    if (!name || pressOutlets.includes(name)) continue;
+    if (item.sourceTier === 'official') continue;
+    pressOutlets.push(name);
+  }
+
+  const coversOfficial = trustLevel === 'official'
+    || trustLevel === 'confirmed'
+    || batch.some((item) => hasOfficialConfirmationSignals(item));
+
+  const studioInCopy = batch.some((item) => (
+    /\bbethesda\b/i.test(`${item.title} ${item.description}`)
+  ));
+
+  if (coversOfficial && studioInCopy) {
+    if (pressOutlets.length === 0) return 'Bethesda Game Studios';
+    if (pressOutlets.length === 1) return `Bethesda Game Studios (via ${pressOutlets[0]})`;
+    return `Bethesda Game Studios (via ${formatOutletList(pressOutlets.slice(0, 3))})`;
+  }
+
+  return resolveReportingOutletFromBatch(batch);
 }
 
 export function getTrustLabel(trustLevel) {
@@ -1131,7 +1307,7 @@ export function getTrustNote(trustLevel) {
     case 'official':
       return 'Official source — verified announcement or update from Bethesda or an official channel.';
     case 'confirmed':
-      return 'Confirmed news — coverage of official announcements, patch notes, or established facts.';
+      return 'Confirmed news — studio-confirmed facts (and reliable coverage of them). Dates or extra details may still be TBA.';
     case 'press-report':
       return 'Press report — based on journalism cited below; not yet confirmed by the developer or publisher.';
     case 'community-highlight':
@@ -1144,27 +1320,42 @@ export function getTrustNote(trustLevel) {
 export function ensureTrustKeyFacts(keyFacts = [], mainStory = {}, trustLevel = 'confirmed', newsItems = [], resolvedSources = []) {
   const facts = [...keyFacts];
   const batch = newsItems.length > 0 ? newsItems : [mainStory];
-  const outlet = resolvedSources.length > 0
+  // Prefer outlets that actually appear in the article sources list (drop unused lead items).
+  const citedItems = resolvedSources.length > 0
+    ? batch.filter((item) => resolvedSources.some((source) => source.url === item.link))
+    : batch;
+  const attributionItems = citedItems.length > 0 ? citedItems : batch;
+  const outlet = trustLevel === 'press-report' && resolvedSources.length > 0 && citedItems.length > 0
     ? resolveReportingOutletFromSources(resolvedSources, batch)
-    : batch.length > 1
-      ? resolveReportingOutletFromBatch(batch)
-      : resolveReportingOutlet(batch[0]);
+    : resolveStoryAttribution(attributionItems, trustLevel);
 
   if (trustLevel === 'press-report') {
     const disclaimer = `Reported by ${outlet}; not yet confirmed by the developer or publisher.`;
     const withoutStaleDisclaimer = facts.filter((fact) => (
       !/^Reported by .*; not yet confirmed/i.test(fact)
       && !/not yet confirmed by the developer or publisher/i.test(fact)
+      && !/^Confirmed via official/i.test(fact)
+      && !/^Source: official/i.test(fact)
     ));
     withoutStaleDisclaimer.unshift(disclaimer);
     return withoutStaleDisclaimer.slice(0, 6);
   }
 
-  if (trustLevel === 'official') {
-    const officialFact = `Source: official ${mainStory.source || 'channel'} announcement.`;
-    if (!facts.some((fact) => /official/i.test(fact))) {
-      facts.unshift(officialFact);
-    }
+  if (trustLevel === 'official' || trustLevel === 'confirmed') {
+    const coversOfficial = trustLevel === 'official'
+      || attributionItems.some((item) => hasOfficialConfirmationSignals(item))
+      || /\bbethesda\b/i.test(`${mainStory.title} ${mainStory.description}`);
+    const officialFact = coversOfficial
+      ? `Confirmed via official Bethesda communications; coverage from ${resolveReportingOutletFromBatch(attributionItems)}.`
+      : `Source: ${outlet}.`;
+    const withoutStale = facts.filter((fact) => (
+      !/^Reported by .*; not yet confirmed/i.test(fact)
+      && !/not yet confirmed by the developer or publisher/i.test(fact)
+      && !/^Confirmed via official/i.test(fact)
+      && !/^Source: official/i.test(fact)
+    ));
+    withoutStale.unshift(officialFact);
+    return withoutStale.slice(0, 6);
   }
 
   return facts.slice(0, 6);
@@ -1187,6 +1378,7 @@ export function ensurePrimarySource(sources = [], mainStory = {}) {
 
 function isSupportingSourceRelevant(item = {}, mainStory = {}) {
   if (areTopicsSimilar(item.title || '', mainStory.title || '')) return true;
+  if (shareMegaEventPackage(item, mainStory)) return true;
 
   const mainHaystack = `${mainStory.title} ${mainStory.description}`.toLowerCase();
   const itemHaystack = `${item.title} ${item.description}`.toLowerCase();
@@ -1253,25 +1445,22 @@ export function resolveArticleSources(sources = [], newsItems = []) {
 
 export function validateArticleTrust(article = {}, newsItems = []) {
   const mainStory = newsItems[0] || {};
-  const trustLevel = detectTrustLevel(mainStory, {
-    tier: mainStory.sourceTier,
-    category: mainStory.contentType
-  });
+  const trustLevel = detectTrustLevelForBatch(newsItems);
   const sources = resolveArticleSources(article.sources, newsItems);
-  const citedOutlet = resolveReportingOutletFromSources(sources, newsItems);
+  const citedOutlet = resolveStoryAttribution(newsItems, trustLevel);
   const keyFacts = ensureTrustKeyFacts(article.keyFacts, mainStory, trustLevel, newsItems, sources);
   const intro = trustLevel === 'press-report'
     ? sanitizeMisattributedPressText(article.intro, citedOutlet)
-    : article.intro;
+    : sanitizeOverhedgedOfficialCopy(article.intro, trustLevel);
   const subtitle = trustLevel === 'press-report'
     ? sanitizeMisattributedPressText(article.subtitle, citedOutlet)
-    : article.subtitle;
+    : sanitizeOverhedgedOfficialCopy(article.subtitle, trustLevel);
   const sections = Array.isArray(article.sections)
     ? article.sections.map((section) => ({
       ...section,
       body: trustLevel === 'press-report'
         ? sanitizeMisattributedPressText(section.body, citedOutlet)
-        : section.body
+        : sanitizeOverhedgedOfficialCopy(section.body, trustLevel)
     }))
     : article.sections;
 
@@ -1288,6 +1477,21 @@ export function validateArticleTrust(article = {}, newsItems = []) {
   };
 }
 
+/** Soften leftover leak-style hedging when the batch is actually official/confirmed. */
+export function sanitizeOverhedgedOfficialCopy(text = '', trustLevel = 'confirmed') {
+  if (!text || (trustLevel !== 'confirmed' && trustLevel !== 'official')) return text;
+
+  return text
+    .replace(/\bthis press report\b/gi, 'this official update')
+    .replace(/\bpress report\b/gi, 'official update')
+    .replace(/\bnot yet confirmed by the developer or publisher\b/gi, 'with release windows still unannounced')
+    .replace(/\bnot been confirmed by the developer or publisher\b/gi, 'still lack firm release windows')
+    .replace(/\bunconfirmed by the developer(?:\/publisher)?\b/gi, 'without announced release dates')
+    .replace(/\breportedly\b/gi, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
+
 function getContentTypeGuidance(contentType, trustLevel = 'confirmed') {
   const trustGuidance = trustLevel === 'press-report'
     ? `TRUST LEVEL: PRESS REPORT (unconfirmed by developer/publisher)
@@ -1301,14 +1505,21 @@ function getContentTypeGuidance(contentType, trustLevel = 'confirmed') {
 - The conclusion MUST remind readers that official confirmation is still pending`
     : trustLevel === 'official'
       ? `TRUST LEVEL: OFFICIAL
-- This comes from an official Bethesda or platform source — write with confidence
-- Still cite the official source clearly`
+- This comes from an official Bethesda or platform source — write with confidence for fans
+- Lead with what Bethesda/the official channel confirmed; cite that source first
+- Only hedge details that are still missing (dates, windows, unstated scope) — never hedge that the announcement itself is real
+- Do not frame this as a leak or unconfirmed press report`
       : trustLevel === 'community-highlight'
         ? `TRUST LEVEL: COMMUNITY HIGHLIGHT
 - Make clear this is fan-created content, not official news`
         : `TRUST LEVEL: CONFIRMED NEWS
-- Report on established facts from official announcements or patch notes
-- Cite sources clearly; do not embellish beyond what sources support`;
+- These are established facts from official studio communications and reliable coverage of them
+- Lead with what Bethesda/the studio confirmed — press outlets are secondary coverage, not the origin of the news
+- Write with confidence for fans: Fallout 5 pre-production, remasters, Obsidian collabs, expansions, etc. are facts when sources say confirmed
+- ONLY hedge release dates, exact windows, or details the studio explicitly left unannounced
+- NEVER say "not yet confirmed by the developer" when the sources describe an official confirmation
+- keyFacts MUST open with a confirmed-via-official framing, not a press-report disclaimer
+- Sources should list the strongest coverage URLs; mention official Bethesda channels in keyFacts when the copy supports it`;
 
   switch (contentType) {
     case 'mods':
@@ -1342,6 +1553,7 @@ CONTENT TYPE: NEWS
 function getContentTypeLabel(contentType, trustLevel = 'confirmed') {
   if (trustLevel === 'press-report') return 'Press Report';
   if (trustLevel === 'official') return 'Official Update';
+  if (trustLevel === 'confirmed' && contentType === 'news') return 'Official News';
 
   switch (contentType) {
     case 'mods':
@@ -1373,34 +1585,57 @@ function buildPromptContext(newsItems = []) {
 
 function buildPromptTrustSection(trustLevel, reportingOutlet, { multiSource = false } = {}) {
   const attributionRule = multiSource
-    ? `- Reporting outlets in this batch: ${reportingOutlet}. Only name an outlet in the intro, body, or keyFacts if its URL appears in your sources array`
-    : `- Primary reporting outlet to attribute: ${reportingOutlet}`;
+    ? `- Attribution for this package: ${reportingOutlet}. Name press outlets only for URLs in your sources array; when trust is confirmed/official, lead with Bethesda/the studio`
+    : `- Primary attribution: ${reportingOutlet}`;
+
+  const trustRule = trustLevel === 'press-report'
+    ? '- If trustLevel is "press-report", every section making a claim must attribute it to the cited outlet(s) or "the report"'
+    : trustLevel === 'confirmed' || trustLevel === 'official'
+      ? '- If trustLevel is "confirmed" or "official", state studio-confirmed facts confidently; cite press as coverage of the announcement, not as unconfirmed rumors'
+      : '- If trustLevel is "community-highlight", make clear this is fan-created content';
 
   return `TRUST AND EDITORIAL STANDARDS:
 - Use ONLY the material below. Never invent facts, dates, quotes, patch notes, or creator names.
 - trustLevel for this post: ${trustLevel} (${getTrustLabel(trustLevel)})
 ${attributionRule}
-- If trustLevel is "press-report", every section making a claim must attribute it to the cited outlet(s) or "the report"
-- If trustLevel is "confirmed", write about established facts but still cite sources
-- If trustLevel is "community-highlight", make clear this is fan-created content
-- If a detail is missing from the sources, say "details are still limited" instead of guessing
+${trustRule}
+- Fans come first: prioritize clarity, accuracy, and usefulness over hedging that confuses confirmed news with leaks
+- If a detail is missing from the sources, say "details are still limited" or "no release window yet" instead of guessing
 - Include a keyFacts array with 3-5 bullet points a busy reader can scan in 10 seconds`;
 }
 
 function buildSharedArticleRequirements(contentType, trustLevel, reportingOutlet, { multiSource = false } = {}) {
-  const introAttribution = multiSource
-    ? 'attribute each claim to the specific cited outlet(s) in your sources array and note it is not confirmed by the developer/publisher'
-    : `clearly state this is reported by ${reportingOutlet} and not confirmed by the developer/publisher`;
+  let introAttribution;
+  let subtitleRule;
+  let conclusionRule;
+
+  if (trustLevel === 'press-report') {
+    introAttribution = multiSource
+      ? 'attribute each claim to the specific cited outlet(s) in your sources array and note it is not confirmed by the developer/publisher'
+      : `clearly state this is reported by ${reportingOutlet} and not confirmed by the developer/publisher`;
+    subtitleRule = 'for press-report, mention it is based on reporting';
+    conclusionRule = 'for press-report, note official confirmation is still pending';
+  } else if (trustLevel === 'confirmed' || trustLevel === 'official') {
+    introAttribution = multiSource
+      ? `open with what Bethesda/the studio confirmed, then note coverage from the cited outlets (${reportingOutlet})`
+      : `open with the official confirmation and credit ${reportingOutlet}; do not call this unconfirmed`;
+    subtitleRule = 'for confirmed/official, frame as official studio news fans can trust';
+    conclusionRule = 'for confirmed/official, remind fans that dates/windows may still be TBA without casting doubt on the confirmation itself';
+  } else {
+    introAttribution = 'set up the community or mod story clearly for fans';
+    subtitleRule = 'explain why fans should care';
+    conclusionRule = 'end with a useful fan takeaway';
+  }
 
   return `ARTICLE REQUIREMENTS:
 - seoDescription: a standalone meta description of 120-160 characters (target exactly 150). One or two tight sentences for Blogger/Google search snippets.
 - title: specific, ${MIN_TITLE_CHARS}-${MAX_TITLE_CHARS} characters, click-worthy without clickbait — name the game, mod, event, or creator when possible
-- subtitle: one sentence explaining the value proposition; for press-report, mention it is based on reporting
-- intro: 3-4 sentences with a strong hook; if press-report, ${introAttribution}
+- subtitle: one sentence explaining the value proposition; ${subtitleRule}
+- intro: 3-4 sentences with a strong hook; ${introAttribution}
 - keyFacts: 3-5 short scannable bullet points (only facts supported by sources)
 - sections: exactly 5 or 6 sections, each with "heading" and "body" (4-6 sentences, roughly 80-130 words each)
 - takeaway: one standout insight sentence fans might quote when sharing
-- conclusion: 2-3 sentences with a clear final perspective; for press-report, note official confirmation is still pending
+- conclusion: 2-3 sentences with a clear final perspective; ${conclusionRule}
 - cta: one conversational question that fits the content type
 - contentType: "${contentType}"
 - trustLevel: "${trustLevel}"
@@ -1412,24 +1647,28 @@ Return valid JSON only with these fields: title, seoDescription, subtitle, intro
 
 function buildNewsPrompt(newsItems, context) {
   const mainStory = newsItems[0];
-  const trustLevel = mainStory.trustLevel || detectTrustLevel(mainStory, { tier: mainStory.sourceTier, category: 'news' });
-  const reportingOutlet = resolveReportingOutletFromBatch(newsItems);
+  const trustLevel = detectTrustLevelForBatch(newsItems);
+  const reportingOutlet = resolveStoryAttribution(newsItems, trustLevel);
   const isMultiAngle = newsItems.length > 1;
 
   const formatRules = isMultiAngle
     ? `NEWS BRIEF RULES (${newsItems.length} sourced angles):
-- Lead with the strongest headline: ${mainStory.title}
-- Weave the other sourced items into one cohesive Fallout news brief — different outlets, official channels, or complementary angles are welcome
+- Lead with the strongest fan-relevant fact: ${mainStory.title}
+- Weave the other sourced items into one cohesive Fallout news brief
+- When this package is an official studio confirmation covered by multiple outlets, treat it as ONE confirmed story — not separate rumors
 - Keep every section tied to material below; this is one briefing, not a random link dump
-- Separate official facts from press reports and explain why fans should care`
+- Separate confirmed studio facts from still-unknown details (dates, exact scope)
+- Every section should answer "why does a Fallout fan care?" with practical impact (games, remaster, show, mods, or franchise roadmap)`
     : `NEWS WRITING RULES:
 - Lead with the most newsworthy confirmed or reported fact first
 - Name the game, platform, studio, or show when known from sources
-- Separate official facts from press reports and fan reaction
+- Separate official/confirmed facts from pure press-report rumors and fan reaction
 - Use an informative newsroom tone — not hype, not rumor-chasing
-- Help readers understand timing, scope, and why the franchise conversation shifted`;
+- Help readers understand timing, scope, and why the franchise conversation shifted
+- Prioritize usefulness for players and fans over industry-insider jargon`;
 
   return `You are the lead editor of ${BRAND_NAME}, writing a Fallout NEWS brief fans will trust and share.
+Goal: the best possible article for Fallout fans — accurate, clear, shareable, and honest about what is confirmed vs still TBA.
 
 ${getContentTypeGuidance('news', trustLevel)}
 
@@ -1447,8 +1686,8 @@ ${buildSharedArticleRequirements('news', trustLevel, reportingOutlet, { multiSou
 
 function buildModsPrompt(newsItems, context) {
   const mainStory = newsItems[0];
-  const trustLevel = mainStory.trustLevel || detectTrustLevel(mainStory, { tier: mainStory.sourceTier, category: 'mods' });
-  const reportingOutlet = resolveReportingOutletFromBatch(newsItems);
+  const trustLevel = detectTrustLevelForBatch(newsItems);
+  const reportingOutlet = resolveStoryAttribution(newsItems, trustLevel);
   const isRoundup = newsItems.length > 1;
 
   const formatRules = isRoundup
@@ -1483,8 +1722,8 @@ ${buildSharedArticleRequirements('mods', trustLevel, reportingOutlet)}`;
 
 function buildCommunityPrompt(newsItems, context) {
   const mainStory = newsItems[0];
-  const trustLevel = mainStory.trustLevel || detectTrustLevel(mainStory, { tier: mainStory.sourceTier, category: 'community' });
-  const reportingOutlet = resolveReportingOutletFromBatch(newsItems);
+  const trustLevel = detectTrustLevelForBatch(newsItems);
+  const reportingOutlet = resolveStoryAttribution(newsItems, trustLevel);
   const isRoundup = newsItems.length > 1;
 
   const formatRules = isRoundup
@@ -1548,21 +1787,29 @@ function buildFallbackArticle(newsItems) {
   const mainStory = newsItems[0];
   const supportingStories = newsItems.slice(1, 3);
   const supportText = supportingStories.map((item) => item.title).join(' and ');
-  const reportingOutlet = resolveReportingOutletFromBatch(newsItems);
+  const trustLevel = detectTrustLevelForBatch(newsItems);
+  const reportingOutlet = resolveStoryAttribution(newsItems, trustLevel);
+  const isConfirmed = trustLevel === 'confirmed' || trustLevel === 'official';
 
   return {
     title: ensureArticleTitle(`${mainStory.title}: what it means for the Wasteland right now`, mainStory),
-    subtitle: `A ${getContentTypeLabel(mainStory.contentType || 'news').toLowerCase()} from ${reportingOutlet}, explained for Fallout fans.`,
+    subtitle: isConfirmed
+      ? `Official Fallout news for fans, based on studio confirmation and coverage from ${reportingOutlet}.`
+      : `A ${getContentTypeLabel(mainStory.contentType || 'news', trustLevel).toLowerCase()} from ${reportingOutlet}, explained for Fallout fans.`,
     intro: `Fallout fans have no shortage of headlines to track, but some stories cut through the noise more than others. ${mainStory.title} is one of those — worth reading closely whether you mainline Fallout 76, replay New Vegas, or follow the Prime Video series.`,
     keyFacts: [
-      `Source: ${reportingOutlet}`,
-      `Topic: ${getContentTypeLabel(mainStory.contentType || 'news')}`,
+      isConfirmed
+        ? `Confirmed via official communications; coverage from ${resolveReportingOutletFromBatch(newsItems)}.`
+        : `Source: ${reportingOutlet}`,
+      `Topic: ${getContentTypeLabel(mainStory.contentType || 'news', trustLevel)}`,
       mainStory.description ? mainStory.description.slice(0, 120) : 'A notable Fallout development worth following.'
     ],
     sections: [
       {
         heading: 'What happened',
-        body: `The headline driving today's conversation is ${mainStory.title}, reported by ${reportingOutlet}. ${mainStory.description ? mainStory.description.slice(0, 200) + (mainStory.description.length > 200 ? '…' : '') : 'It is one of the stronger Fallout-related developments in recent coverage.'}`
+        body: isConfirmed
+          ? `Bethesda and related coverage confirm the core of today's story: ${mainStory.title}. ${mainStory.description ? mainStory.description.slice(0, 200) + (mainStory.description.length > 200 ? '…' : '') : 'It is one of the stronger Fallout-related developments for fans right now.'}`
+          : `The headline driving today's conversation is ${mainStory.title}, reported by ${reportingOutlet}. ${mainStory.description ? mainStory.description.slice(0, 200) + (mainStory.description.length > 200 ? '…' : '') : 'It is one of the stronger Fallout-related developments in recent coverage.'}`
       },
       {
         heading: 'Why fans should pay attention',
@@ -1578,18 +1825,21 @@ function buildFallbackArticle(newsItems) {
       }
     ],
     takeaway: 'When Fallout coverage moves from background noise to front-page news, it is usually because something is about to matter to players — not just pundits.',
-    conclusion: 'For now, the smart play is to follow the story closely, stay skeptical of unconfirmed chatter, and see what official channels confirm next.',
+    conclusion: isConfirmed
+      ? 'The studio has spoken — the smart play now is to track dates and follow-ups as Bethesda and partners share more.'
+      : 'For now, the smart play is to follow the story closely, stay skeptical of unconfirmed chatter, and see what official channels confirm next.',
     cta: 'Which part of this story matters most to you — the games, the show, or the wider franchise?',
     contentType: mainStory.contentType || 'news',
-    trustLevel: mainStory.trustLevel || detectTrustLevel(mainStory, { tier: mainStory.sourceTier, category: mainStory.contentType }),
+    trustLevel,
     sources: newsItems.slice(0, 4).map((item) => ({ title: item.title, url: item.link || 'https://fallout.fandom.com/wiki/Fallout_Wiki', type: item.sourceTier || 'press' }))
   };
 }
 
 function normalizeArticle(article, newsItems) {
-  const mainStory = newsItems[0] || {};
+  const orderedItems = prioritizeGenerationBatch(newsItems);
+  const mainStory = orderedItems[0] || {};
   const contentType = article?.contentType || mainStory.contentType || 'news';
-  const trustLevel = detectTrustLevel(mainStory, { tier: mainStory.sourceTier, category: contentType });
+  const trustLevel = detectTrustLevelForBatch(orderedItems);
   const sections = Array.isArray(article?.sections) && article.sections.length > 0
     ? article.sections
     : [
@@ -1598,7 +1848,7 @@ function normalizeArticle(article, newsItems) {
         { heading: 'What to watch next', body: 'The next step is to follow official updates and the broader conversation around the topic.' }
       ];
 
-  const reportingOutlet = resolveReportingOutletFromBatch(newsItems);
+  const reportingOutlet = resolveStoryAttribution(orderedItems, trustLevel);
   const keyFacts = Array.isArray(article?.keyFacts) && article.keyFacts.length >= 3
     ? article.keyFacts
     : [
@@ -1618,9 +1868,9 @@ function normalizeArticle(article, newsItems) {
     conclusion: article?.conclusion || 'The best takeaway is to stay close to official updates and trusted coverage until more details arrive.',
     cta: article?.cta || 'What do you think is the most interesting part of this story?',
     contentType,
-    trustLevel: article?.trustLevel || trustLevel,
-    sources: resolveArticleSources(article?.sources, newsItems)
-  }, newsItems);
+    trustLevel,
+    sources: resolveArticleSources(article?.sources, orderedItems)
+  }, orderedItems);
 }
 
 function escapeHtml(value) {
@@ -2956,7 +3206,10 @@ function dedupeCollectedItems(collected = []) {
   for (const item of collected.sort((a, b) => b.score - a.score)) {
     const topicKey = getStoryTopicKey(item);
     if (seenTopics.has(topicKey)) continue;
-    if (unique.some((existing) => areTopicsSimilar(existing.title, item.title))) continue;
+    if (unique.some((existing) => (
+      areTopicsSimilar(existing.title, item.title)
+      || shareMegaEventPackage(existing, item)
+    ))) continue;
     seenTopics.add(topicKey);
     unique.push(item);
   }
@@ -3114,8 +3367,32 @@ async function fetchContentItems() {
   };
 }
 
-function getBloggerLabels() {
-  return [];
+export function getBloggerLabels(article = {}) {
+  const labels = new Set();
+  const trustLevel = article.trustLevel || 'confirmed';
+  const contentType = article.contentType || 'news';
+  const haystack = `${article.title || ''} ${article.subtitle || ''} ${article.intro || ''}`.toLowerCase();
+
+  if (contentType === 'mods') labels.add('Mod Spotlight');
+  else if (contentType === 'community') labels.add('Community Spotlight');
+  else labels.add('News');
+
+  if (trustLevel === 'press-report') labels.add('Press Report');
+  if (trustLevel === 'official' || (trustLevel === 'confirmed' && contentType === 'news')) {
+    labels.add('Official');
+  }
+
+  if (/\bfallout 76\b|\bfo76\b/.test(haystack)) labels.add('Fallout 76');
+  if (/\bfallout 4\b|\bfo4\b/.test(haystack)) labels.add('Fallout 4');
+  if (/\bnew vegas\b|\bfnv\b/.test(haystack)) labels.add('Fallout: New Vegas');
+  if (/\bfallout 5\b/.test(haystack)) labels.add('Fallout 5');
+  if (/\bfallout 3\b/.test(haystack)) labels.add('Fallout 3');
+  if (/\bobsidian\b/.test(haystack)) labels.add('Obsidian');
+  if (/\bbethesda\b/.test(haystack)) labels.add('Bethesda');
+  if (/\bremaster/.test(haystack)) labels.add('Remaster');
+  if (/\btv\b|\bprime\b|\bemmy/.test(haystack)) labels.add('Fallout TV Show');
+
+  return [...labels].slice(0, 15);
 }
 
 async function createBloggerDraft(article) {
@@ -3165,9 +3442,9 @@ async function main() {
 
   const mainStory = featuredItems[0];
   const batchLimit = getGenerationBatchLimit(mainStory.contentType);
-  const generationBatch = assembleGenerationItems(mainStory, contentItems, localHistory, {
+  const generationBatch = prioritizeGenerationBatch(assembleGenerationItems(mainStory, contentItems, localHistory, {
     maxItems: batchLimit
-  });
+  }));
 
   if (generationBatch.length === 0) {
     console.log('No fresh Fallout stories to post; skipping generation.');
@@ -3175,19 +3452,24 @@ async function main() {
   }
 
   const editorialScore = getEditorialCandidateScore(mainStory, localHistory, getContentTypeCounts(localHistory));
+  const batchTrust = detectTrustLevelForBatch(generationBatch);
   const batchMode = generationBatch.length > 1 ? 'multi-angle roundup' : 'single spotlight';
   console.log(`Editorial pick: ${mainStory.contentType} (score ${editorialScore.toFixed(1)}) — "${mainStory.title}"`);
-  console.log(`Generation batch: ${generationBatch.length}/${batchLimit} ${mainStory.contentType} item(s) for ${batchMode}.`);
+  console.log(`Generation batch: ${generationBatch.length}/${batchLimit} ${mainStory.contentType} item(s) for ${batchMode} [${batchTrust}].`);
 
   const enrichedItems = await enrichStories(generationBatch);
-  const substantiveItems = enrichedItems
-    .filter((item) => meetsMinimumSourceQuality(item))
-    .filter((item) => isEligibleForGeneration(item));
+  const substantiveItems = prioritizeGenerationBatch(
+    enrichedItems
+      .filter((item) => meetsMinimumSourceQuality(item))
+      .filter((item) => isEligibleForGeneration(item))
+  );
 
   if (substantiveItems.length === 0) {
     console.log('Only thin-source or off-topic stories available today; skipping generation.');
     return;
   }
+
+  console.log(`Trust for fans: ${detectTrustLevelForBatch(substantiveItems)} — attribution: ${resolveStoryAttribution(substantiveItems, detectTrustLevelForBatch(substantiveItems))}`);
 
   let article;
   let generationError = null;
@@ -3229,7 +3511,19 @@ async function main() {
       bloggerPost = await createBloggerDraft(article);
       if (bloggerPost) {
         console.log('Blogger draft created successfully.');
-        await saveStoryHistory(localHistory, substantiveItems.slice(0, 1), article);
+        // Mark every sourced angle as covered so multi-outlet packages (FO5 + remasters +
+        // Raven Rock, etc.) cannot regenerate as a near-duplicate the next day.
+        const historyStories = [
+          ...substantiveItems,
+          {
+            title: article.title,
+            description: substantiveItems.map((item) => item.title).join(' · '),
+            source: BRAND_NAME,
+            contentType: substantiveItems[0]?.contentType || 'news',
+            link: substantiveItems[0]?.link || ''
+          }
+        ];
+        await saveStoryHistory(localHistory, historyStories, article);
       }
     } catch (error) {
       bloggerError = error;
@@ -3237,11 +3531,13 @@ async function main() {
     }
   }
 
+  const finalTrust = detectTrustLevelForBatch(substantiveItems);
   const output = {
     generatedAt: new Date().toISOString(),
     brand: BRAND_NAME,
     featuredContentType: substantiveItems[0]?.contentType || 'news',
-    featuredTrustLevel: substantiveItems[0]?.trustLevel || 'confirmed',
+    featuredTrustLevel: finalTrust,
+    attribution: resolveStoryAttribution(substantiveItems, finalTrust),
     selectedNews: substantiveItems,
     article,
     articleWordCount: getArticleWordCount(article),

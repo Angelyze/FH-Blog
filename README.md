@@ -36,6 +36,12 @@ Fallout Hub posts are designed to be:
 - **Useful** — key facts up front, clear explanation of why fans should care
 - **Shareable** — specific titles, strong hooks, and insight worth passing along
 
+### Fan-first pipeline rules
+- **Official > confirmed press coverage > unconfirmed press reports > community**
+- Multi-outlet packages on one studio announcement (e.g. FO5 + remasters + Raven Rock) become **one** article
+- Confirmed studio news is not hedged as a leak; only TBA dates/windows stay soft
+- Optional: add a first-party link to `data/manual-seeds.json` with `"tier": "official"` when press is slow
+
 ## LLM setup
 Use a Gemini API key from Google AI Studio and store it as `GEMINI_API_KEY`.
 

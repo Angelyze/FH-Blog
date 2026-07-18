@@ -1,6 +1,33 @@
 {
   "entries": [
     {
+      "fingerprint": "bethesda-mega-2026-07-17a",
+      "topicFingerprint": "bethesda-mega-fo5",
+      "contentType": "news",
+      "title": "Fallout 5 Is Really Happening, Along With Fallout 3 And Fallout: New Vegas Remasters",
+      "articleTitle": "Bethesda Confirms Fallout 5, Remasters, and New Obsidian Project",
+      "source": "GameSpot",
+      "coveredAt": 1784246400000
+    },
+    {
+      "fingerprint": "bethesda-mega-2026-07-17b",
+      "topicFingerprint": "bethesda-mega-fo5b",
+      "contentType": "news",
+      "title": "Fallout 5 Is In Preproduction And Fallout 3 And New Vegas Remasters Are On The Way",
+      "articleTitle": "Bethesda Confirms Fallout 5, Remasters, and New Obsidian Project",
+      "source": "Kotaku",
+      "coveredAt": 1784246400000
+    },
+    {
+      "fingerprint": "bethesda-mega-2026-07-17c",
+      "topicFingerprint": "bethesda-mega-raven",
+      "contentType": "news",
+      "title": "Fallout 3 Prequel Raven Rock To Launch in 2027 Inside Fallout 76",
+      "articleTitle": "Bethesda Confirms Fallout 5, Remasters, and New Obsidian Project",
+      "source": "Insider Gaming",
+      "coveredAt": 1784246400000
+    },
+    {
       "fingerprint": "76ba998ef4244b2d",
       "topicFingerprint": "c6f4f2fafb5589f6",
       "contentType": "news",

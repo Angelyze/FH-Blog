@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   areTopicsSimilar,
+  shareMegaEventPackage,
   assembleGenerationItems,
   buildArticleHtml,
   buildStorySummaryForPrompt,
@@ -10,12 +11,15 @@ import {
   countWords,
   detectContentType,
   detectTrustLevel,
+  detectTrustLevelForBatch,
   ensureSeoDescription,
   ensureTrustKeyFacts,
+  hasOfficialConfirmationSignals,
   extractFeedItems,
   freshnessBonus,
   getArticleWordCount,
   getBloggerInsertUrl,
+  getBloggerLabels,
   getStoryFingerprint,
   getStoryTopicFingerprint,
   getStoryTopicKey,
@@ -74,9 +78,12 @@ import {
   pickFeaturedStory,
   recordFeedHealthResult,
   resolveArticleSources,
+  prioritizeGenerationBatch,
   resolveReportingOutlet,
   resolveReportingOutletFromBatch,
   resolveReportingOutletFromSources,
+  resolveStoryAttribution,
+  sanitizeOverhedgedOfficialCopy,
   selectStoriesForGeneration,
   trimToCharCount
 } from './generate.mjs';
@@ -551,6 +558,107 @@ test('detectTrustLevel marks official patch notes as confirmed', () => {
   );
 });
 
+test('detectTrustLevel treats press coverage of Bethesda studio confirmations as confirmed', () => {
+  const item = {
+    title: 'Fallout 5 Is Really Happening, Along With Fallout 3 And Fallout: New Vegas Remasters',
+    description: 'Bethesda confirmed Fallout 5 is in pre-production and remasters for Fallout 3 and New Vegas are in development.',
+    sourceTier: 'press',
+    source: 'GameSpot'
+  };
+
+  assert.equal(hasOfficialConfirmationSignals(item), true);
+  assert.equal(detectTrustLevel(item, { tier: 'press', category: 'news' }), 'confirmed');
+});
+
+test('detectTrustLevelForBatch upgrades multi-outlet official packages to confirmed', () => {
+  const batch = [
+    {
+      title: 'Fallout 5 Is In Preproduction And Fallout 3 And New Vegas Remasters Are On The Way',
+      description: 'Kotaku reports Bethesda confirmed Fallout 5 pre-production and remasters in an official studio note.',
+      source: 'Kotaku',
+      sourceTier: 'press',
+      contentType: 'news',
+      score: 12
+    },
+    {
+      title: 'Fallout 3 Prequel Raven Rock To Launch in 2027 Inside Fallout 76',
+      description: 'Insider Gaming covers Bethesda\'s officially announced Raven Rock expansion for Fallout 76.',
+      source: 'Insider Gaming',
+      sourceTier: 'press',
+      contentType: 'news',
+      score: 10
+    }
+  ];
+
+  assert.equal(detectTrustLevelForBatch(batch), 'confirmed');
+  assert.match(
+    resolveStoryAttribution(batch, 'confirmed'),
+    /Bethesda Game Studios \(via/
+  );
+});
+
+test('prioritizeGenerationBatch puts confirmation coverage ahead of softer items', () => {
+  const ordered = prioritizeGenerationBatch([
+    {
+      title: 'Cool cosplay thread',
+      description: 'Fans share vault suits.',
+      sourceTier: 'community',
+      contentType: 'community',
+      score: 20
+    },
+    {
+      title: 'Bethesda confirms Fallout 5 pre-production',
+      description: 'Officially confirmed remasters and Obsidian collab in a studio note.',
+      sourceTier: 'press',
+      contentType: 'news',
+      score: 11
+    }
+  ]);
+
+  assert.match(ordered[0].title, /Bethesda confirms/i);
+});
+
+test('sanitizeOverhedgedOfficialCopy removes leak-style language from confirmed copy', () => {
+  const cleaned = sanitizeOverhedgedOfficialCopy(
+    'This press report outlines plans not yet confirmed by the developer or publisher.',
+    'confirmed'
+  );
+
+  assert.doesNotMatch(cleaned, /press report/i);
+  assert.doesNotMatch(cleaned, /not yet confirmed by the developer/i);
+  assert.match(cleaned, /official update/i);
+});
+
+test('ensureTrustKeyFacts uses confirmed framing for studio confirmations', () => {
+  const facts = ensureTrustKeyFacts(
+    ['Fallout 5 is in pre-production on Creation Engine 3.'],
+    {
+      title: 'Fallout 5 Is Really Happening, Along With Fallout 3 And Fallout: New Vegas Remasters',
+      description: 'Bethesda confirmed Fallout 5 is in pre-production.',
+      source: 'GameSpot',
+      sourceTier: 'press'
+    },
+    'confirmed',
+    [
+      {
+        title: 'Fallout 5 Is Really Happening, Along With Fallout 3 And Fallout: New Vegas Remasters',
+        description: 'Bethesda confirmed Fallout 5 is in pre-production.',
+        source: 'GameSpot',
+        sourceTier: 'press'
+      },
+      {
+        title: 'Fallout 5 Is In Preproduction',
+        description: 'Kotaku covers Bethesda\'s official confirmation of remasters.',
+        source: 'Kotaku',
+        sourceTier: 'press'
+      }
+    ]
+  );
+
+  assert.match(facts[0], /Confirmed via official Bethesda/i);
+  assert.doesNotMatch(facts[0], /not yet confirmed/i);
+});
+
 test('ensureTrustKeyFacts adds disclaimer for press-report stories', () => {
   const facts = ensureTrustKeyFacts(
     ['Obsidian is reportedly refocusing on Fallout.'],
@@ -578,6 +686,38 @@ test('trimToCharCount trims at a word boundary', () => {
   const trimmed = trimToCharCount('Fallout 76 Season 18 is live with new daily challenges, refreshed rewards, and quality-of-life fixes for returning players in Appalachia this week.', 150);
   assert.ok(countChars(trimmed) <= 150);
   assert.doesNotMatch(trimmed, /\s$/);
+});
+
+test('shareMegaEventPackage links FO5 remaster package angles as one story', () => {
+  assert.equal(
+    shareMegaEventPackage(
+      {
+        title: 'Fallout 5 Is Really Happening, Along With Fallout 3 And Fallout: New Vegas Remasters',
+        description: 'Bethesda confirmed Fallout 5 pre-production and remasters.'
+      },
+      {
+        title: 'Fallout 5 Is In Preproduction And Fallout 3 And New Vegas Remasters Are On The Way',
+        description: 'Kotaku covers the same official studio confirmation.'
+      }
+    ),
+    true
+  );
+
+  assert.equal(
+    isTopicCovered(
+      {
+        title: 'Fallout 3 Prequel Raven Rock To Launch in 2027 Inside Fallout 76',
+        description: 'Raven Rock expansion announced alongside Fallout 5 pre-production and remasters.'
+      },
+      [{
+        title: 'Fallout 5 Is Really Happening, Along With Fallout 3 And Fallout: New Vegas Remasters',
+        articleTitle: 'Bethesda Confirms Fallout 5, Remasters, and New Obsidian Project',
+        topicFingerprint: 'abc',
+        coveredAt: Date.now()
+      }]
+    ),
+    true
+  );
 });
 
 test('areTopicsSimilar matches paraphrased headlines', () => {
@@ -1317,6 +1457,22 @@ test('getBloggerInsertUrl requests draft creation via query parameter', () => {
     getBloggerInsertUrl('123456789'),
     'https://www.googleapis.com/blogger/v3/blogs/123456789/posts?isDraft=true'
   );
+});
+
+test('getBloggerLabels tags official news for fans and search', () => {
+  const labels = getBloggerLabels({
+    title: 'Bethesda Confirms Fallout 5, Remasters, and New Obsidian Project',
+    intro: 'Fallout 5 is in pre-production; Fallout 3 and New Vegas remasters are in development.',
+    contentType: 'news',
+    trustLevel: 'confirmed'
+  });
+
+  assert.ok(labels.includes('News'));
+  assert.ok(labels.includes('Official'));
+  assert.ok(labels.includes('Fallout 5'));
+  assert.ok(labels.includes('Bethesda'));
+  assert.ok(labels.includes('Obsidian'));
+  assert.ok(!labels.includes('Press Report'));
 });
 
 test('getStoryTopicFingerprint matches same headline across sources', () => {
