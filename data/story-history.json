@@ -1,139 +1,112 @@
 {
   "entries": [
     {
-<<<<<<< HEAD
-      "fingerprint": "bethesda-mega-2026-07-17a",
-      "topicFingerprint": "bethesda-mega-fo5",
-=======
-      "fingerprint": "d1781aa146002615",
-      "topicFingerprint": "4d81283aa9feb744",
-      "contentType": "news",
-      "title": "Fallout 5 Is In Preproduction And Fallout 3 And New Vegas Remasters Are On The Way",
-      "articleTitle": "Fallout 5 in Preproduction as Fallout 3 and New Vegas Remasters Loom",
-      "source": "Kotaku",
-      "coveredAt": 1784359769334
+      "fingerprint": "837c2d221f34cdbe",
+      "topicFingerprint": "eb22ab3bc091ca7a",
+      "contentType": "community",
+      "title": "Celebrating the FNV news with this art piece",
+      "articleTitle": "Fallout Hub Community Spotlight: FNV Art, Fresh Reviews, and Lore",
+      "source": "Reddit — Custom Fallout Feed",
+      "coveredAt": 1784371432214
+    },
+    {
+      "fingerprint": "d465f589570fc212",
+      "topicFingerprint": "7131483854f7b43e",
+      "contentType": "community",
+      "title": "I beat New Vegas for the first time today. (first fallout game as well)",
+      "articleTitle": "Fallout Hub Community Spotlight: FNV Art, Fresh Reviews, and Lore",
+      "source": "Reddit — Custom Fallout Feed",
+      "coveredAt": 1784371432214
+    },
+    {
+      "fingerprint": "725012d463260e1e",
+      "topicFingerprint": "90d40addfbe8e272",
+      "contentType": "community",
+      "title": "Fo3 and FNV remakes confirmed",
+      "articleTitle": "Fallout Hub Community Spotlight: FNV Art, Fresh Reviews, and Lore",
+      "source": "Reddit — Custom Fallout Feed",
+      "coveredAt": 1784371432214
+    },
+    {
+      "fingerprint": "513095d80829f633",
+      "topicFingerprint": "d58dcd79faaa3547",
+      "contentType": "community",
+      "title": "Ayo WALMART! WTF?!",
+      "articleTitle": "Fallout Hub Community Spotlight: FNV Art, Fresh Reviews, and Lore",
+      "source": "Reddit — Custom Fallout Feed",
+      "coveredAt": 1784371432214
+    },
+    {
+      "fingerprint": "94c760ecbe11d200",
+      "topicFingerprint": "b206de15567be98d",
+      "contentType": "community",
+      "title": "how mfs feel after saying the NCR is bad because of prison labor and corruption when the alternative is genuinely getting raped, robbed and enslaved",
+      "articleTitle": "Fallout Hub Community Spotlight: FNV Art, Fresh Reviews, and Lore",
+      "source": "Reddit — Custom Fallout Feed",
+      "coveredAt": 1784371432214
+    },
+    {
+      "fingerprint": "6ae6514e0686c061",
+      "topicFingerprint": "ff55321dc638ef23",
+      "contentType": "community",
+      "title": "Fallout Hub Community Spotlight: FNV Art, Fresh Reviews, and Lore",
+      "articleTitle": "Fallout Hub Community Spotlight: FNV Art, Fresh Reviews, and Lore",
+      "source": "Fallout Hub",
+      "coveredAt": 1784371432214
     },
     {
       "fingerprint": "7fd3f65a67a91ef1",
       "topicFingerprint": "dada9cb04fde08a9",
->>>>>>> f1ba281c4b40f8ac6d0d968b5175295305b36c7e
       "contentType": "news",
       "title": "Fallout 5 Is Really Happening, Along With Fallout 3 And Fallout: New Vegas Remasters",
-      "articleTitle": "Bethesda Confirms Fallout 5, Remasters, and New Obsidian Project",
+      "articleTitle": "Bethesda Confirms Fallout 5, Plus Fallout 3 & New Vegas Remasters",
       "source": "GameSpot",
-<<<<<<< HEAD
-      "coveredAt": 1784246400000
+      "coveredAt": 1784370516661
     },
     {
-      "fingerprint": "bethesda-mega-2026-07-17b",
-      "topicFingerprint": "bethesda-mega-fo5b",
+      "fingerprint": "40e170ef6620dfa2",
+      "topicFingerprint": "b259a1d24421bf8e",
       "contentType": "news",
-      "title": "Fallout 5 Is In Preproduction And Fallout 3 And New Vegas Remasters Are On The Way",
-      "articleTitle": "Bethesda Confirms Fallout 5, Remasters, and New Obsidian Project",
+      "title": "Fallout 5 is \"currently in preproduction\": Bethesda breaks silence on long-awaited RPG",
+      "articleTitle": "Bethesda Confirms Fallout 5, Plus Fallout 3 & New Vegas Remasters",
+      "source": "GamesRadar",
+      "coveredAt": 1784370516661
+    },
+    {
+      "fingerprint": "ed0461361d31edfb",
+      "topicFingerprint": "cfa75ea3aa908d37",
+      "contentType": "news",
+      "title": "Will Elder Scrolls 6 And Fallout 5 Go Exclusive? Todd Howard Says It&#8217;s Too Early To Comment",
+      "articleTitle": "Bethesda Confirms Fallout 5, Plus Fallout 3 & New Vegas Remasters",
       "source": "Kotaku",
-      "coveredAt": 1784246400000
+      "coveredAt": 1784370516661
     },
     {
-      "fingerprint": "bethesda-mega-2026-07-17c",
-      "topicFingerprint": "bethesda-mega-raven",
+      "fingerprint": "de21fb1470d31209",
+      "topicFingerprint": "5b6ac65ba299d668",
       "contentType": "news",
-      "title": "Fallout 3 Prequel Raven Rock To Launch in 2027 Inside Fallout 76",
-      "articleTitle": "Bethesda Confirms Fallout 5, Remasters, and New Obsidian Project",
-      "source": "Insider Gaming",
-      "coveredAt": 1784246400000
-=======
-      "coveredAt": 1784302741993
-    },
-    {
-      "fingerprint": "c1ed494b0aa74e9b",
-      "topicFingerprint": "aee2373df9d5d8a7",
-      "contentType": "community",
-      "title": "Hot take, I'm glad Chris Avallone isn't writing the new Fallout game nor coming back to Fallout.",
-      "articleTitle": "Fallout Community Debates Chris Avallone, Ulysses, and NCR Politics",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1784274886561
->>>>>>> f1ba281c4b40f8ac6d0d968b5175295305b36c7e
-    },
-    {
-      "fingerprint": "76ba998ef4244b2d",
-      "topicFingerprint": "c6f4f2fafb5589f6",
-      "contentType": "news",
-      "title": "Fallout: New Vegas Senior Designer Chris Avellone Admits He Feels 'Embarrassed' by TV Show's Dialogue",
-      "articleTitle": "Chris Avellone 'Embarrassed' by Fallout TV Show Dialogue",
-      "source": "IGN",
-      "coveredAt": 1784188777085
-    },
-    {
-      "fingerprint": "f29f83371459a4d9",
-      "topicFingerprint": "f974a9e63e8bbe80",
-      "contentType": "community",
-      "title": "Feral Ghouls were always \"zombies\" in Fallout. It's just that many people started with Fallout 3 and later games.",
-      "articleTitle": "Fallout Fan Discoveries: Ghoul History, Set Photos, and Epic Battles",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1784138164952
-    },
-    {
-      "fingerprint": "14a2532ee79c97f8",
-      "topicFingerprint": "11061d7300f9c258",
-      "contentType": "community",
-      "title": "I Photographed NCR Ranger Cosplayers in the Michigan Dunes",
-      "articleTitle": "NCR Rangers in the Dunes and More Fan Highlights from the Fallout",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1784136831982
-    },
-    {
-      "fingerprint": "34788ffb0794cca5",
-      "topicFingerprint": "0dee450b1200735f",
-      "contentType": "news",
-      "title": "Obsidian still have \"the same DNA\" that went into New Vegas and KOTOR 2, The Outer Worlds 2 director insists, following chatter around layoffs",
-      "articleTitle": "Obsidian Director Defends Studio DNA Amid Fallout Sequel Reports",
-      "source": "Rock Paper Shotgun",
-      "coveredAt": 1784136614796
-    },
-    {
-      "fingerprint": "e35cad71cc2e98ba",
-      "topicFingerprint": "a8405b3f246c2119",
-      "contentType": "news",
-      "title": "As unionised Microsoft workers rally against Bethesda layoffs, Fallout 4's been filled with protest signs and OneBGS logoed vault suits by modders",
-      "articleTitle": "Fallout 4 Modders Protest Bethesda Layoffs with OneBGS Vault Suits",
-      "source": "Rock Paper Shotgun",
-      "coveredAt": 1784136047258
-    },
-    {
-      "fingerprint": "6f2c60bc4a51149b",
-      "topicFingerprint": "84cfd1b07bc97c71",
-      "contentType": "news",
-      "title": "Amazon MGM Studios and Prime Video earn 68 Emmy Award nominations for \"Spider-Noir,\" 'Fallout,' and more",
-      "articleTitle": "Fallout Series Earns Emmy Nods Amid Rumors of Obsidian's Return",
-      "source": "Amazon Newsroom",
-      "coveredAt": 1784130930215
-    },
-    {
-      "fingerprint": "8dc4c22f2c353ad3",
-      "topicFingerprint": "dc1f838c4ea14c34",
-      "contentType": "news",
-      "title": "Fallout's second season has been nominated for more Emmys, even if it's significantly fewer than last time",
-      "articleTitle": "Fallout Season 2 Earns Emmy Nods Amidst Ongoing Franchise Shifts",
-      "source": "Eurogamer",
-      "coveredAt": 1784102097502
+      "title": "Fallout Didn’t Make Itself",
+      "articleTitle": "Bethesda Confirms Fallout 5, Plus Fallout 3 & New Vegas Remasters",
+      "source": "Aftermath",
+      "coveredAt": 1784370516661
     },
     {
       "fingerprint": "b371f945d2b0b3f1",
       "topicFingerprint": "bc3b374e23361df1",
       "contentType": "news",
       "title": "Fallout: New Vegas gets a Mojave interpretation of Oblivion's Dark Brotherhood, thanks to this assassin-focused faction quest mod",
-      "articleTitle": "Fallout: New Vegas Mod Adds Dark Brotherhood-Style Assassin Faction",
+      "articleTitle": "Bethesda Confirms Fallout 5, Plus Fallout 3 & New Vegas Remasters",
       "source": "Rock Paper Shotgun",
-      "coveredAt": 1784057183547
+      "coveredAt": 1784370516661
     },
     {
-      "fingerprint": "9d4c910990d03109",
-      "topicFingerprint": "b7fbc1532c47a26f",
+      "fingerprint": "e2b879c9b70cf177",
+      "topicFingerprint": "2c8f4d10069b6559",
       "contentType": "news",
-      "title": "Fallout 5, The Elder Scrolls 6, Blade, and More: As Xbox Layoffs Hit Hard, What's Going on at Bethesda?",
-      "articleTitle": "Report: Xbox Layoffs Hit Bethesda Game Studios and ZeniMax",
-      "source": "IGN",
-      "coveredAt": 1783872256234
+      "title": "Bethesda Confirms Fallout 5, Plus Fallout 3 & New Vegas Remasters",
+      "articleTitle": "Bethesda Confirms Fallout 5, Plus Fallout 3 & New Vegas Remasters",
+      "source": "Fallout Hub",
+      "coveredAt": 1784370516661
     },
     {
       "fingerprint": "ab0274d0ff131564",
