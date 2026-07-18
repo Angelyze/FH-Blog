@@ -1,12 +1,27 @@
 {
   "entries": [
     {
+<<<<<<< HEAD
       "fingerprint": "bethesda-mega-2026-07-17a",
       "topicFingerprint": "bethesda-mega-fo5",
+=======
+      "fingerprint": "d1781aa146002615",
+      "topicFingerprint": "4d81283aa9feb744",
+      "contentType": "news",
+      "title": "Fallout 5 Is In Preproduction And Fallout 3 And New Vegas Remasters Are On The Way",
+      "articleTitle": "Fallout 5 in Preproduction as Fallout 3 and New Vegas Remasters Loom",
+      "source": "Kotaku",
+      "coveredAt": 1784359769334
+    },
+    {
+      "fingerprint": "7fd3f65a67a91ef1",
+      "topicFingerprint": "dada9cb04fde08a9",
+>>>>>>> f1ba281c4b40f8ac6d0d968b5175295305b36c7e
       "contentType": "news",
       "title": "Fallout 5 Is Really Happening, Along With Fallout 3 And Fallout: New Vegas Remasters",
       "articleTitle": "Bethesda Confirms Fallout 5, Remasters, and New Obsidian Project",
       "source": "GameSpot",
+<<<<<<< HEAD
       "coveredAt": 1784246400000
     },
     {
@@ -26,6 +41,18 @@
       "articleTitle": "Bethesda Confirms Fallout 5, Remasters, and New Obsidian Project",
       "source": "Insider Gaming",
       "coveredAt": 1784246400000
+=======
+      "coveredAt": 1784302741993
+    },
+    {
+      "fingerprint": "c1ed494b0aa74e9b",
+      "topicFingerprint": "aee2373df9d5d8a7",
+      "contentType": "community",
+      "title": "Hot take, I'm glad Chris Avallone isn't writing the new Fallout game nor coming back to Fallout.",
+      "articleTitle": "Fallout Community Debates Chris Avallone, Ulysses, and NCR Politics",
+      "source": "Reddit — Custom Fallout Feed",
+      "coveredAt": 1784274886561
+>>>>>>> f1ba281c4b40f8ac6d0d968b5175295305b36c7e
     },
     {
       "fingerprint": "76ba998ef4244b2d",
