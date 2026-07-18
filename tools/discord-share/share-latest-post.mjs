@@ -10,6 +10,10 @@ const DEFAULT_BRAND_NAME = 'Fallout Hub';
 const DEFAULT_EMBED_COLOR = 0xff9000;
 const DEFAULT_MAX_POSTS_PER_RUN = 3;
 const DEFAULT_EXCERPT_CHARS = 280;
+const FETCH_HEADERS = {
+  'User-Agent': 'FalloutHubBlogDiscordShare/1.0 (+https://www.fallouthub.blog)',
+  Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+};
 
 export function stripHtml(text = '') {
   return text
@@ -31,6 +35,54 @@ export function parseRssDate(value = '') {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
+function decodeXmlEntities(value = '') {
+  return value
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'");
+}
+
+export function extractFirstImageUrl(html = '') {
+  if (!html) return null;
+
+  const patterns = [
+    /<meta[^>]+property=["']og:image(?::secure_url)?["'][^>]+content=["']([^"']+)["']/i,
+    /<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image(?::secure_url)?["']/i,
+    /<meta[^>]+name=["']twitter:image(?::src)?["'][^>]+content=["']([^"']+)["']/i,
+    /<meta[^>]+content=["']([^"']+)["'][^>]+name=["']twitter:image(?::src)?["']/i,
+    /<media:content[^>]+url=["']([^"']+)["'][^>]*>/i,
+    /<media:thumbnail[^>]+url=["']([^"']+)["'][^>]*>/i,
+    /<img[^>]+src=["']([^"']+)["']/i
+  ];
+
+  for (const pattern of patterns) {
+    const match = html.match(pattern);
+    const url = decodeXmlEntities(match?.[1] || '').trim();
+    if (url && /^https?:\/\//i.test(url)) return url;
+  }
+
+  return null;
+}
+
+export function extractMetaContent(html = '', names = []) {
+  for (const name of names) {
+    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const patterns = [
+      new RegExp(`<meta[^>]+(?:property|name)=["']${escaped}["'][^>]+content=["']([^"']+)["']`, 'i'),
+      new RegExp(`<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name)=["']${escaped}["']`, 'i')
+    ];
+    for (const pattern of patterns) {
+      const match = html.match(pattern);
+      const value = decodeXmlEntities(match?.[1] || '').trim();
+      if (value) return value;
+    }
+  }
+  return null;
+}
+
 export function parseBlogFeedItems(xmlText = '') {
   const itemRegex = /<item\b[^>]*>([\s\S]*?)<\/item>/gi;
   const items = [];
@@ -42,16 +94,23 @@ export function parseBlogFeedItems(xmlText = '') {
     const linkMatch = block.match(/<link><!\[CDATA\[([\s\S]*?)\]\]><\/link>|<link>([\s\S]*?)<\/link>/i);
     const guidMatch = block.match(/<guid[^>]*>(?:<!\[CDATA\[([\s\S]*?)\]\]>|([\s\S]*?))<\/guid>/i);
     const descriptionMatch = block.match(/<description><!\[CDATA\[([\s\S]*?)\]\]><\/description>|<description>([\s\S]*?)<\/description>/i);
+    const contentMatch = block.match(/<content:encoded><!\[CDATA\[([\s\S]*?)\]\]><\/content:encoded>|<content:encoded>([\s\S]*?)<\/content:encoded>/i);
     const pubDateMatch = block.match(/<pubDate>([\s\S]*?)<\/pubDate>/i);
 
     const title = stripHtml(titleMatch?.[1] || titleMatch?.[2] || '');
     const link = stripHtml(linkMatch?.[1] || linkMatch?.[2] || '');
     const id = stripHtml(guidMatch?.[1] || guidMatch?.[2] || link);
-    const description = stripHtml(descriptionMatch?.[1] || descriptionMatch?.[2] || '');
+    const rawDescription = descriptionMatch?.[1] || descriptionMatch?.[2] || '';
+    const rawContent = contentMatch?.[1] || contentMatch?.[2] || '';
+    const description = stripHtml(rawDescription || rawContent);
     const publishedAt = parseRssDate(pubDateMatch?.[1]);
+    // Prefer media:content / media:thumbnail on the item, then body/description images
+    const imageUrl = extractFirstImageUrl(block)
+      || extractFirstImageUrl(rawContent)
+      || extractFirstImageUrl(rawDescription);
 
     if (!title || !link || !id) continue;
-    items.push({ id, title, link, description, publishedAt });
+    items.push({ id, title, link, description, publishedAt, imageUrl });
   }
 
   return items.sort((a, b) => (a.publishedAt ?? 0) - (b.publishedAt ?? 0));
@@ -71,19 +130,52 @@ export function buildDiscordPayload(post = {}, {
   embedColor = DEFAULT_EMBED_COLOR
 } = {}) {
   const timestamp = post.publishedAt ? new Date(post.publishedAt).toISOString() : undefined;
+  const description = buildPostExcerpt(post.ogDescription || post.description);
+  const imageUrl = post.imageUrl || null;
+
+  const embed = {
+    title: post.title,
+    url: post.link,
+    description,
+    color: embedColor,
+    footer: { text: 'fallouthub.blog' },
+    ...(timestamp ? { timestamp } : {})
+  };
+
+  // Large OG image under the description (Discord layout: title → description → image → footer)
+  if (imageUrl) {
+    embed.image = { url: imageUrl };
+  }
 
   return {
     username: brandName,
-    embeds: [
-      {
-        title: post.title,
-        url: post.link,
-        description: buildPostExcerpt(post.description),
-        color: embedColor,
-        footer: { text: 'fallouthub.blog' },
-        ...(timestamp ? { timestamp } : {})
-      }
-    ]
+    embeds: [embed]
+  };
+}
+
+export async function fetchPostOpenGraph(postUrl = '') {
+  if (!postUrl) return { imageUrl: null, ogDescription: null };
+
+  try {
+    const response = await fetch(postUrl, { headers: FETCH_HEADERS });
+    if (!response.ok) return { imageUrl: null, ogDescription: null };
+
+    const html = await response.text();
+    return {
+      imageUrl: extractFirstImageUrl(html),
+      ogDescription: extractMetaContent(html, ['og:description', 'twitter:description', 'description'])
+    };
+  } catch {
+    return { imageUrl: null, ogDescription: null };
+  }
+}
+
+export async function enrichPostForDiscord(post = {}) {
+  const og = await fetchPostOpenGraph(post.link);
+  return {
+    ...post,
+    imageUrl: og.imageUrl || post.imageUrl || null,
+    ogDescription: og.ogDescription || null
   };
 }
 
@@ -144,7 +236,7 @@ export async function saveShareState(state, stateFile = DEFAULT_STATE_FILE) {
 export async function fetchBlogFeed(feedUrl = DEFAULT_FEED_URL) {
   const response = await fetch(feedUrl, {
     headers: {
-      'User-Agent': 'FalloutHubBlogDiscordShare/1.0 (+https://www.fallouthub.blog)',
+      ...FETCH_HEADERS,
       Accept: 'application/rss+xml, application/atom+xml, application/xml, text/xml;q=0.9, */*;q=0.8'
     }
   });
@@ -202,13 +294,14 @@ export async function shareLatestBlogPosts({
   }
 
   for (const post of result.posts) {
-    const payload = buildDiscordPayload(post);
+    const enriched = await enrichPostForDiscord(post);
+    const payload = buildDiscordPayload(enriched);
     if (dryRun) {
-      console.log(`[dry-run] Would share: ${post.title} (${post.link})`);
+      console.log(`[dry-run] Would share: ${post.title} (${post.link})${enriched.imageUrl ? ` [image: ${enriched.imageUrl}]` : ' [no image]'}`);
       continue;
     }
     await postToDiscordWebhook(webhookUrl, payload);
-    console.log(`Shared on Discord: ${post.title}`);
+    console.log(`Shared on Discord: ${post.title}${enriched.imageUrl ? ' (with OG image)' : ' (no OG image found)'}`);
   }
 
   if (!dryRun) {
