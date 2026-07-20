@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "5fc92d523da8d538",
+      "topicFingerprint": "92bde025ea81075e",
+      "contentType": "community",
+      "title": "something i would like to discuss",
+      "articleTitle": "Passing the Pip-Boy: A Young Fan’s Tribute to a Fallout Dad",
+      "source": "Reddit — Custom Fallout Feed",
+      "coveredAt": 1784577050162
+    },
+    {
+      "fingerprint": "d1ee12c36577e22a",
+      "topicFingerprint": "329cce59c1adddbd",
+      "contentType": "community",
+      "title": "Passing the Pip-Boy: A Young Fan’s Tribute to a Fallout Dad",
+      "articleTitle": "Passing the Pip-Boy: A Young Fan’s Tribute to a Fallout Dad",
+      "source": "Fallout Hub",
+      "coveredAt": 1784577050162
+    },
+    {
       "fingerprint": "dd6008f9235693ca",
       "topicFingerprint": "d1f4e1fb979be41c",
       "contentType": "news",
