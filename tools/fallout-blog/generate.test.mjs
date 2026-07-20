@@ -3,6 +3,11 @@ import assert from 'node:assert/strict';
 import {
   areTopicsSimilar,
   shareMegaEventPackage,
+  getAuthorVoiceGuide,
+  isWeakPackageBuzz,
+  hasDistinctFollowUpBeat,
+  getFollowUpBeatKeys,
+  isBuzzEnrichmentCandidate,
   assembleGenerationItems,
   buildArticleHtml,
   buildStorySummaryForPrompt,
@@ -688,6 +693,16 @@ test('trimToCharCount trims at a word boundary', () => {
   assert.doesNotMatch(trimmed, /\s$/);
 });
 
+test('getAuthorVoiceGuide frames posts as human Fallout Hub editor voice', () => {
+  const voice = getAuthorVoiceGuide('community');
+  assert.match(voice, /Angelyze/);
+  assert.match(voice, /Fallout Hub/);
+  assert.match(voice, /BANNED BOT PHRASES/);
+  assert.match(voice, /treasure trove/i);
+  assert.match(voice, /FH Companion/);
+  assert.doesNotMatch(voice, /lead editor of a corporate/i);
+});
+
 test('shareMegaEventPackage links FO5 remaster package angles as one story', () => {
   assert.equal(
     shareMegaEventPackage(
@@ -717,6 +732,97 @@ test('shareMegaEventPackage links FO5 remaster package angles as one story', () 
       }]
     ),
     true
+  );
+});
+
+const PACKAGE_HISTORY = [{
+  title: 'Fallout 5 Is Really Happening, Along With Fallout 3 And Fallout: New Vegas Remasters',
+  articleTitle: 'Bethesda Confirms Fallout 5, Plus Fallout 3 & New Vegas Remasters',
+  topicFingerprint: 'pkg-history',
+  coveredAt: Date.now()
+}];
+
+test('weak remaster theories are blocked as leads after the core package, but exclusivity follow-ups stay open', () => {
+  const theory = {
+    title: "Fallout 3 Fans Think They've Figured Out The Remaster Release Date",
+    description: 'Fan theory about when the Fallout 3 remaster might arrive after Bethesda confirmed remasters and Fallout 5 pre-production.',
+    contentType: 'news',
+    sourceTier: 'press'
+  };
+  const exclusivity = {
+    title: "Xbox still isn't revealing if the new Fallout games are console exclusives",
+    description: 'Microsoft and Xbox will not say whether Fallout 5 or the remasters will be console exclusives for Game Pass.',
+    contentType: 'news',
+    sourceTier: 'press'
+  };
+  const pureRehash = {
+    title: 'Fallout 5 Is Really Happening, Along With Fallout 3 And Fallout: New Vegas Remasters',
+    description: 'Another outlet recaps Bethesda confirming Fallout 5 pre-production and remasters in the same studio note.',
+    contentType: 'news',
+    sourceTier: 'press'
+  };
+
+  assert.equal(isWeakPackageBuzz(theory), true);
+  assert.equal(hasDistinctFollowUpBeat(exclusivity), true);
+  assert.ok(getFollowUpBeatKeys(exclusivity).includes('platform-exclusivity'));
+
+  assert.equal(isTopicCovered(theory, PACKAGE_HISTORY), true);
+  assert.equal(isTopicCovered(pureRehash, PACKAGE_HISTORY), true);
+  assert.equal(isTopicCovered(exclusivity, PACKAGE_HISTORY), false);
+});
+
+test('weak package buzz can enrich a distinct follow-up lead for fans', () => {
+  const exclusivity = {
+    title: "Xbox still isn't revealing if the new Fallout games are console exclusives",
+    description: 'Xbox stays silent on exclusivity for Fallout 5 and the remasters after the official studio confirmation this week.',
+    contentType: 'news',
+    sourceTier: 'press',
+    link: 'https://www.polygon.com/xbox-fallout-exclusivity'
+  };
+  const theory = {
+    title: "Fallout 3 Fans Think They've Figured Out The Remaster Release Date",
+    description: 'Fans speculate about a Fallout 3 remaster release date after Bethesda confirmed remasters are in development.',
+    contentType: 'news',
+    sourceTier: 'press',
+    link: 'https://www.thegamer.com/fallout-3-remaster-date-theory'
+  };
+
+  assert.equal(isBuzzEnrichmentCandidate(theory, exclusivity, PACKAGE_HISTORY), true);
+
+  const batch = assembleGenerationItems(exclusivity, [exclusivity, theory], PACKAGE_HISTORY, { maxItems: 5 });
+  assert.equal(batch[0].title, exclusivity.title);
+  assert.ok(batch.some((item) => item.title === theory.title));
+  assert.ok(batch.some((item) => item.enrichmentRole === 'buzz'));
+});
+
+test('detectTrustLevel does not confirm weak remaster theories as studio news', () => {
+  const theory = {
+    title: "Fallout 3 Fans Think They've Figured Out The Remaster Release Date",
+    description: 'Fan theory about Fallout 3 remaster timing; also mentions pre-production of Fallout 5 in the same package.',
+    contentType: 'news',
+    sourceTier: 'press'
+  };
+  assert.equal(detectTrustLevel(theory, { tier: 'press', category: 'news' }), 'press-report');
+
+  const exclusivity = {
+    title: "Xbox still isn't revealing if the new Fallout games are console exclusives",
+    description: 'Xbox will not confirm exclusivity for Fallout 5 or the remasters despite fan questions all week.',
+    contentType: 'news',
+    sourceTier: 'press'
+  };
+  assert.equal(
+    detectTrustLevelForBatch([exclusivity, theory]),
+    'press-report'
+  );
+});
+
+test('isDuplicateArticleTitle allows exclusivity titles after the core package article', () => {
+  assert.equal(
+    isDuplicateArticleTitle(
+      'Xbox Silent on Exclusivity for New Fallout 5 and Remasters',
+      PACKAGE_HISTORY
+    ),
+    false
   );
 });
 

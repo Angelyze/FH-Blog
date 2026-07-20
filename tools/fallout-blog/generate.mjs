@@ -29,6 +29,14 @@ const REDDIT_RATE_LIMIT_BACKOFF_MS = Number.parseInt(process.env.REDDIT_RATE_LIM
 const PERSISTENT_BLOCK_FAILURE_STREAK = 2;
 const FEED_USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 const BRAND_NAME = 'Fallout Hub';
+/** Public-facing editor voice — real fan-site host, not a corporate newsroom bot */
+const AUTHOR_NAME = 'Angelyze';
+const AUTHOR_SITE_URL = 'https://www.fallouthub.blog';
+const AUTHOR_COMMUNITY = {
+  discord: 'https://discord.gg/BHX5BTgQmv',
+  app: 'FH Companion',
+  socials: 'Facebook, X, Instagram, Steam, Twitch, and YouTube under Fallout Hub / Vault-Tec Inc. / Fallout Pages'
+};
 
 const CONTENT_TYPES = ['news', 'mods', 'community'];
 const GENERATION_BATCH_LIMITS = {
@@ -243,7 +251,7 @@ const SPECIFIC_TOPIC_ANCHORS = new Set([
 
 const TOPIC_ANCHOR_TOKENS = new Set(['fallout', ...SPECIFIC_TOPIC_ANCHORS]);
 
-// Same studio mega-package (e.g. FO5 + remasters + Raven Rock + Obsidian collab) — one article only
+// Same studio mega-package (e.g. FO5 + remasters + Raven Rock + Obsidian collab) — one core story
 const MEGA_EVENT_SIGNALS = [
   'fallout 5', 'fallout5',
   'remaster', 'remasters',
@@ -251,6 +259,44 @@ const MEGA_EVENT_SIGNALS = [
   'raven rock',
   'creation engine 3', 'creation engine',
   'new vegas remaster', 'fallout 3 remaster'
+];
+
+// Distinct follow-up questions fans still need after the core package is covered
+const FOLLOW_UP_BEAT_RULES = [
+  {
+    key: 'platform-exclusivity',
+    pattern: /\b(exclusive|exclusivity|exclusives|console exclusive|xbox exclusive|multiplatform|multi-platform|platform exclusive|game pass|xbox game pass|still isn'?t revealing|won'?t (?:say|comment|reveal)|not commenting|too early to comment|silent on)\b/i
+  },
+  {
+    key: 'pricing',
+    pattern: /\b(price|pricing|pre-?order|preorder|msrp|\$\d+)\b/i
+  },
+  {
+    key: 'trailer-gameplay',
+    pattern: /\b(gameplay trailer|reveal trailer|official trailer|first gameplay|gameplay reveal)\b/i
+  },
+  {
+    key: 'hard-schedule',
+    pattern: /\b(delay(?:ed)?|launch window|ships in|coming 20\d\d|release window|dated for|set to launch)\b/i
+  }
+];
+
+// Thin theory/buzz — useful as context, not as a standalone lead once the package is covered
+const WEAK_PACKAGE_BUZZ_PATTERNS = [
+  /\bfans think\b/i,
+  /\bfan theor(?:y|ies)\b/i,
+  /\btheor(?:y|ies|ize|izing)\b/i,
+  /\bspeculat(?:e|es|ion|ing)\b/i,
+  /\bfigured out\b/i,
+  /\bsparks?\b/i,
+  /\bbuzz\b/i,
+  /\bcould mean\b/i,
+  /\bmight mean\b/i,
+  /\bthink they(?:'ve| have)\b/i,
+  /\brelease (?:date )?theory\b/i,
+  /\bdate theory\b/i,
+  /\bseems to (?:hint|suggest)\b/i,
+  /\bpossibly (?:hinting|suggesting)\b/i
 ];
 
 export function normalizeTopicTitle(title = '') {
@@ -298,6 +344,14 @@ export function getMegaEventSignals(item = {}) {
   return MEGA_EVENT_SIGNALS.filter((signal) => haystack.includes(signal));
 }
 
+function historyEntryAsItem(entry = {}) {
+  return {
+    title: entry.title || '',
+    description: entry.articleTitle || entry.description || '',
+    articleTitle: entry.articleTitle || ''
+  };
+}
+
 /** True when two items are angles on the same studio mega-announcement package. */
 export function shareMegaEventPackage(itemA = {}, itemB = {}) {
   const signalsA = new Set(getMegaEventSignals(itemA));
@@ -305,13 +359,78 @@ export function shareMegaEventPackage(itemA = {}, itemB = {}) {
   if (signalsA.size === 0 || signalsB.size === 0) return false;
 
   const shared = [...signalsA].filter((signal) => signalsB.has(signal));
-  // Two shared package signals (e.g. fallout 5 + remaster) = same story for fans
+  // Two shared package signals (e.g. fallout 5 + remaster) = same core package
   if (shared.length >= 2) return true;
   // Extremely specific one-off beats (unique enough to own the package alone)
   if (shared.includes('raven rock')) return true;
   return false;
 }
 
+export function isPackageRelated(item = {}) {
+  return getMegaEventSignals(item).length > 0
+    || /\b(fallout 5|fallout5|remaster|roadmap|raven rock)\b/i.test(
+      `${item.title || ''} ${item.description || ''} ${item.articleTitle || ''}`
+    );
+}
+
+/** Fan theories / pure buzz about the FO5-remaster package — context, not a full lead. */
+export function isWeakPackageBuzz(item = {}) {
+  if (!isPackageRelated(item)) return false;
+  const haystack = `${item.title || ''} ${item.description || ''} ${item.articleTitle || ''}`;
+  return WEAK_PACKAGE_BUZZ_PATTERNS.some((pattern) => pattern.test(haystack));
+}
+
+/** Distinct fan-value beats (exclusivity, pricing, trailer…) beyond the core package. */
+export function getFollowUpBeatKeys(item = {}) {
+  const haystack = `${item.title || ''} ${item.description || ''} ${item.articleTitle || ''}`;
+  const beats = [];
+
+  for (const rule of FOLLOW_UP_BEAT_RULES) {
+    if (!rule.pattern.test(haystack)) continue;
+    // Fan "release date theory" is buzz, not a hard schedule beat
+    if (rule.key === 'hard-schedule' && isWeakPackageBuzz(item)) continue;
+    beats.push(rule.key);
+  }
+
+  return beats;
+}
+
+export function hasDistinctFollowUpBeat(item = {}) {
+  return getFollowUpBeatKeys(item).length > 0;
+}
+
+export function shareFollowUpBeats(itemA = {}, itemB = {}) {
+  const beatsA = new Set(getFollowUpBeatKeys(itemA));
+  if (beatsA.size === 0) return false;
+  return getFollowUpBeatKeys(itemB).some((beat) => beatsA.has(beat));
+}
+
+export function historyCoversMegaPackage(item = {}, historyEntries = []) {
+  if (!isPackageRelated(item)) return false;
+
+  return historyEntries.some((entry) => {
+    const historyItem = historyEntryAsItem(entry);
+    if (shareMegaEventPackage(item, historyItem)) return true;
+    if (entry.articleTitle && shareMegaEventPackage(item, {
+      title: entry.articleTitle,
+      description: entry.title || ''
+    })) {
+      return true;
+    }
+    return false;
+  });
+}
+
+export function historyCoversFollowUpBeat(item = {}, historyEntries = []) {
+  if (!hasDistinctFollowUpBeat(item)) return false;
+  return historyEntries.some((entry) => shareFollowUpBeats(item, historyEntryAsItem(entry)));
+}
+
+/**
+ * Whether this item should not lead a new article.
+ * Core package rehashes and weak theories stay blocked after the mega-news post;
+ * distinct follow-ups (e.g. Xbox exclusivity) remain eligible for fans.
+ */
 export function isTopicCovered(item = {}, historyEntries = []) {
   const fingerprint = getStoryKey(item);
   const topicFingerprint = getStoryTopicKey(item);
@@ -320,26 +439,61 @@ export function isTopicCovered(item = {}, historyEntries = []) {
     if (entry.fingerprint === fingerprint || entry.topicFingerprint === topicFingerprint) {
       return true;
     }
-    if (entry.title && item.title && areTopicsSimilar(entry.title, item.title)) {
-      return true;
-    }
-    if (entry.articleTitle && item.title && areTopicsSimilar(entry.articleTitle, item.title)) {
-      return true;
-    }
 
-    const historyAsItem = {
-      title: entry.title || '',
-      description: entry.articleTitle || '',
-      articleTitle: entry.articleTitle || ''
-    };
-    if (shareMegaEventPackage(item, historyAsItem)) return true;
-    if (entry.articleTitle && shareMegaEventPackage(item, {
-      title: entry.articleTitle,
-      description: entry.title || ''
-    })) {
+    const historyItem = historyEntryAsItem(entry);
+    const titleSimilar = (
+      (entry.title && item.title && areTopicsSimilar(entry.title, item.title))
+      || (entry.articleTitle && item.title && areTopicsSimilar(entry.articleTitle, item.title))
+    );
+
+    if (titleSimilar) {
+      // Similar wording but a different fan-value beat (e.g. exclusivity vs confirmation)
+      if (hasDistinctFollowUpBeat(item) && !shareFollowUpBeats(item, historyItem)) {
+        continue;
+      }
       return true;
     }
   }
+
+  // Weak theory/buzz about an already-covered package → never lead alone
+  if (isWeakPackageBuzz(item) && historyCoversMegaPackage(item, historyEntries)) {
+    return true;
+  }
+
+  // Distinct follow-up already written → block; new beat → allow
+  if (hasDistinctFollowUpBeat(item)) {
+    return historyCoversFollowUpBeat(item, historyEntries);
+  }
+
+  // Pure package rehash (no new beat) after the core story ran
+  if (historyCoversMegaPackage(item, historyEntries)) {
+    return true;
+  }
+
+  return false;
+}
+
+/** Related weak buzz / soft package chatter that can enrich a stronger lead. */
+export function isBuzzEnrichmentCandidate(item = {}, mainStory = {}, historyEntries = []) {
+  if (!item?.title || !mainStory?.title) return false;
+  if (item.link && mainStory.link && item.link === mainStory.link) return false;
+  if (item.contentType && mainStory.contentType && item.contentType !== mainStory.contentType) {
+    return false;
+  }
+
+  // Franchise follow-ups (exclusivity about "new Fallout games") can still absorb FO5/remaster buzz
+  const related = shareMegaEventPackage(item, mainStory)
+    || areTopicsSimilar(item.title, mainStory.title)
+    || (isPackageRelated(item) && isPackageRelated(mainStory))
+    || (isWeakPackageBuzz(item) && isPackageRelated(item) && (
+      hasDistinctFollowUpBeat(mainStory) || isPackageRelated(mainStory)
+    ));
+
+  if (!related) return false;
+
+  // Prefer true weak buzz, or covered package angles that still add fan context
+  if (isWeakPackageBuzz(item)) return true;
+  if (isTopicCovered(item, historyEntries) && !hasDistinctFollowUpBeat(item)) return true;
 
   return false;
 }
@@ -412,11 +566,25 @@ export function ensureArticleTitle(title = '', mainStory = {}) {
 
 export function isDuplicateArticleTitle(title = '', historyEntries = [], { withinDays = TITLE_HISTORY_DAYS } = {}) {
   const cutoff = Date.now() - withinDays * 24 * 60 * 60 * 1000;
+  const titleAsItem = { title, description: title, articleTitle: title };
 
   return historyEntries.some((entry) => {
     if (entry.coveredAt < cutoff) return false;
+
+    // Distinct follow-up beat in the new title → not a title duplicate of the core package
+    if (hasDistinctFollowUpBeat(titleAsItem) && !shareFollowUpBeats(titleAsItem, historyEntryAsItem(entry))) {
+      return false;
+    }
+
     if (entry.articleTitle && areTopicsSimilar(entry.articleTitle, title, { allowAnchorMatch: false })) return true;
     if (entry.title && areTopicsSimilar(entry.title, title, { allowAnchorMatch: false })) return true;
+
+    // Block regenerated package rehash titles that share mega signals without a new beat
+    if (!hasDistinctFollowUpBeat(titleAsItem)
+      && shareMegaEventPackage(titleAsItem, historyEntryAsItem(entry))) {
+      return true;
+    }
+
     return false;
   });
 }
@@ -705,7 +873,17 @@ export function getEditorialCandidateScore(item = {}, historyEntries = [], typeC
 
   // Fan-first ranking: official studio confirmations beat soft community filler
   if (item.sourceTier === 'official') score += 2.5;
-  if (hasOfficialConfirmationSignals(item)) score += 3.5;
+  if (hasOfficialConfirmationSignals(item) && !isWeakPackageBuzz(item)) score += 3.5;
+
+  // Distinct follow-ups (exclusivity, pricing, etc.) stay valuable after the core package
+  if (hasDistinctFollowUpBeat(item) && !historyCoversFollowUpBeat(item, historyEntries)) {
+    score += 2.8;
+  }
+
+  // Weak theories should not outrank real news when the package is already covered
+  if (isWeakPackageBuzz(item) && historyCoversMegaPackage(item, historyEntries)) {
+    score -= 4;
+  }
 
   return score;
 }
@@ -736,46 +914,70 @@ export function assembleGenerationItems(mainStory = {}, candidates = [], history
   const limit = Math.min(maxItems, getGenerationBatchLimit(contentType));
   const mainTopic = getStoryTopicKey(mainStory);
 
+  const baseFilters = (item) => {
+    if (item.contentType !== contentType) return false;
+    if (!isEligibleForGeneration(item)) return false;
+    if (item.publishedAt && item.publishedAt < Date.now() - HISTORY_RETENTION_DAYS * 24 * 60 * 60 * 1000) {
+      return false;
+    }
+    if (item.sourceKind === 'reddit' && !passesCommunityQualityGate(item)) {
+      return false;
+    }
+    return true;
+  };
+
   const pool = candidates
-    .filter((item) => item.contentType === contentType)
+    .filter(baseFilters)
     .filter((item) => !isTopicCovered(item, historyEntries))
-    .filter((item) => isEligibleForGeneration(item))
-    .filter((item) => {
-      if (item.publishedAt && item.publishedAt < Date.now() - HISTORY_RETENTION_DAYS * 24 * 60 * 60 * 1000) {
-        return false;
-      }
-
-      if (item.sourceKind === 'reddit' && !passesCommunityQualityGate(item)) {
-        return false;
-      }
-
-      return true;
-    })
-    // Fan-first: related mega-package angles (FO5 + remasters + Raven Rock) before unrelated same-type filler
+    // Fan-first: related package angles + distinct follow-ups before unrelated filler
     .sort((a, b) => {
-      const relatedA = shareMegaEventPackage(mainStory, a) ? 1 : 0;
-      const relatedB = shareMegaEventPackage(mainStory, b) ? 1 : 0;
+      const relatedA = shareMegaEventPackage(mainStory, a) || shareFollowUpBeats(mainStory, a) ? 1 : 0;
+      const relatedB = shareMegaEventPackage(mainStory, b) || shareFollowUpBeats(mainStory, b) ? 1 : 0;
       if (relatedB !== relatedA) return relatedB - relatedA;
       return getAdjustedCandidateScore(b, historyEntries) - getAdjustedCandidateScore(a, historyEntries);
     });
 
+  // Weak theories / soft package chatter: enrich the lead even when they cannot lead alone
+  const buzzPool = candidates
+    .filter(baseFilters)
+    .filter((item) => isBuzzEnrichmentCandidate(item, mainStory, historyEntries))
+    .sort((a, b) => getAdjustedCandidateScore(b, historyEntries) - getAdjustedCandidateScore(a, historyEntries));
+
   const selected = [mainStory];
   const usedTopics = new Set([mainTopic]);
 
-  for (const item of pool) {
-    if (selected.length >= limit) break;
-
+  const tryAdd = (item, { allowSimilarPackage = false } = {}) => {
+    if (selected.length >= limit) return false;
     const topicKey = getStoryTopicKey(item);
-    if (usedTopics.has(topicKey)) continue;
-    if (item.link === mainStory.link && item.title === mainStory.title) continue;
-    // Same mega-package angles still join the batch (one cohesive brief), but skip pure dupes
+    if (usedTopics.has(topicKey)) return false;
+    if (item.link === mainStory.link && item.title === mainStory.title) return false;
+    if (selected.some((existing) => existing.link && item.link && existing.link === item.link)) return false;
+
     if (selected.some((existing) => areTopicsSimilar(existing.title, item.title)
-      && !shareMegaEventPackage(existing, item))) {
-      continue;
+      && !shareMegaEventPackage(existing, item)
+      && !shareFollowUpBeats(existing, item)
+      && !allowSimilarPackage)) {
+      return false;
     }
 
-    selected.push(item);
+    selected.push({
+      ...item,
+      // Mark buzz so prompts can frame it as context, not the main claim
+      enrichmentRole: isWeakPackageBuzz(item) ? 'buzz' : (item.enrichmentRole || 'source')
+    });
     usedTopics.add(topicKey);
+    return true;
+  };
+
+  for (const item of pool) {
+    if (selected.length >= limit) break;
+    tryAdd(item);
+  }
+
+  // Fill remaining slots with fan buzz that makes the main story more complete
+  for (const item of buzzPool) {
+    if (selected.length >= limit) break;
+    tryAdd(item, { allowSimilarPackage: true });
   }
 
   return selected;
@@ -1185,8 +1387,13 @@ export function detectTrustLevel(item = {}, source = {}) {
   if (tier === 'official') return 'official';
   if (category === 'mods' || category === 'community') return 'community-highlight';
 
+  // Fan theories / soft buzz must never inherit "confirmed studio news" framing
+  if (isWeakPackageBuzz(item) || item.enrichmentRole === 'buzz') {
+    return 'press-report';
+  }
+
   // Press rewriting a first-party studio announcement → confirmed for fans, not a leak
-  if (hasOfficialConfirmationSignals(item)) return 'confirmed';
+  if (hasOfficialConfirmationSignals(item) && !isWeakPackageBuzz(item)) return 'confirmed';
 
   const haystack = `${item.title} ${item.description}`.toLowerCase();
   const title = item.title || '';
@@ -1206,6 +1413,11 @@ export function detectTrustLevel(item = {}, source = {}) {
     return 'press-report';
   }
 
+  // Platform silence / exclusivity follow-ups are industry reporting, not studio confirmation
+  if (hasDistinctFollowUpBeat(item) && getFollowUpBeatKeys(item).includes('platform-exclusivity')) {
+    return 'press-report';
+  }
+
   return tier === 'press' ? 'press-report' : 'confirmed';
 }
 
@@ -1219,34 +1431,59 @@ const TRUST_RANK = {
 export function detectTrustLevelForBatch(newsItems = []) {
   if (!Array.isArray(newsItems) || newsItems.length === 0) return 'confirmed';
 
+  const lead = newsItems[0];
+  const leadLevel = lead.trustLevel || detectTrustLevel(lead, {
+    tier: lead.sourceTier,
+    category: lead.contentType
+  });
+
+  // Lead is a distinct follow-up or weak buzz → trust follows the lead, not package rehash support
+  if (lead && (hasDistinctFollowUpBeat(lead) || isWeakPackageBuzz(lead) || lead.enrichmentRole === 'buzz')) {
+    if (leadLevel === 'official') return 'official';
+    return leadLevel;
+  }
+
   const levels = newsItems.map((item) => (
     item.trustLevel || detectTrustLevel(item, { tier: item.sourceTier, category: item.contentType })
   ));
 
   if (levels.includes('official')) return 'official';
 
-  const confirmedLike = newsItems.filter((item) => hasOfficialConfirmationSignals(item)).length;
+  const confirmedLike = newsItems.filter((item) => (
+    hasOfficialConfirmationSignals(item) && !isWeakPackageBuzz(item) && item.enrichmentRole !== 'buzz'
+  )).length;
   if (confirmedLike > 0) return 'confirmed';
   if (levels.includes('confirmed')) return 'confirmed';
 
-  // Multiple outlets covering the same package with confirmation language is enough
   if (newsItems.length >= 2 && confirmedLike >= 1) return 'confirmed';
 
   if (levels.includes('press-report')) return 'press-report';
   if (levels.includes('community-highlight')) return 'community-highlight';
-  return levels[0] || 'confirmed';
+  return levels[0] || leadLevel || 'confirmed';
 }
 
 export function prioritizeGenerationBatch(newsItems = []) {
   if (!Array.isArray(newsItems) || newsItems.length <= 1) return newsItems;
+
+  const lead = newsItems[0];
+  // Keep the editorial lead first so exclusivity (etc.) is not buried under package rehashes
+  if (lead && (hasDistinctFollowUpBeat(lead) || isWeakPackageBuzz(lead))) {
+    const rest = newsItems.slice(1).sort((a, b) => {
+      const buzzA = a.enrichmentRole === 'buzz' || isWeakPackageBuzz(a) ? 0 : 1;
+      const buzzB = b.enrichmentRole === 'buzz' || isWeakPackageBuzz(b) ? 0 : 1;
+      if (buzzB !== buzzA) return buzzB - buzzA;
+      return (b.score ?? 0) - (a.score ?? 0);
+    });
+    return [lead, ...rest];
+  }
 
   return [...newsItems].sort((a, b) => {
     const trustA = TRUST_RANK[detectTrustLevel(a, { tier: a.sourceTier, category: a.contentType })] || 0;
     const trustB = TRUST_RANK[detectTrustLevel(b, { tier: b.sourceTier, category: b.contentType })] || 0;
     if (trustB !== trustA) return trustB - trustA;
 
-    const confA = hasOfficialConfirmationSignals(a) ? 1 : 0;
-    const confB = hasOfficialConfirmationSignals(b) ? 1 : 0;
+    const confA = hasOfficialConfirmationSignals(a) && !isWeakPackageBuzz(a) ? 1 : 0;
+    const confB = hasOfficialConfirmationSignals(b) && !isWeakPackageBuzz(b) ? 1 : 0;
     if (confB !== confA) return confB - confA;
 
     return (b.score ?? 0) - (a.score ?? 0);
@@ -1492,11 +1729,55 @@ export function sanitizeOverhedgedOfficialCopy(text = '', trustLevel = 'confirme
     .trim();
 }
 
+/**
+ * Who is writing: a real Fallout fan running a long-lived community hub.
+ * Sourced from fallouthub.blog About + community footprint (not a faceless wire service).
+ */
+export function getAuthorVoiceGuide(contentType = 'news') {
+  const typeNote = contentType === 'community'
+    ? `You are sharing community work the way a fellow fan would in Discord or on the blog — proud of the scene, not writing a corporate "creator spotlight" press kit.`
+    : contentType === 'mods'
+      ? `You are recommending mods the way a veteran player would: practical, specific, and honest about who the mod is for.`
+      : `You are breaking news for players who live this franchise — clear, useful, and human, never a wire rewrite.`;
+
+  return `WHO YOU ARE (write as this person — first person is OK in intro/conclusion/cta):
+- You are ${AUTHOR_NAME}, the human editor behind ${BRAND_NAME} (${AUTHOR_SITE_URL}) — a long-running Fallout fan website and community hub, not a corporate outlet
+- Your world is the whole franchise: classics (1/2/Tactics), FO3, New Vegas, FO4, 76, Shelter, the TV show, mods, lore, and fan creations
+- You also run community spaces (${AUTHOR_COMMUNITY.socials}), a Discord, and the ${AUTHOR_COMMUNITY.app} app — you talk like someone who actually hangs out with fans
+- You sound like a knowledgeable Fallout friend who runs a site: warm, direct, occasionally dry or wry, never corporate
+- You respect creators by name and link; you never steal credit or oversell fan work as official news
+
+${typeNote}
+
+NATURAL VOICE (mandatory — posts must not sound AI-generated):
+- Write like a human blog post a fan would enjoy reading out loud — professional enough for a serious site, casual enough for Discord
+- Prefer concrete detail over empty praise: what the art shows, what the player hated (Cazadors), what Xbox actually refused to answer
+- Vary sentence length and section length. Not every section needs the same 5-sentence shape
+- One real opinion or reaction per piece is good ("this is the kind of hype-posting I get", "honestly the remake thread is mostly hope") when grounded in the sources
+- Keep light Fallout flavor only when it fits — do not force "see you in the wastes" every time
+- Contractions are fine (it's, don't, we're). Second person ("you'll care if…") is fine
+
+BANNED BOT PHRASES (never use these or close paraphrases):
+- treasure trove, buzzing with excitement, fever pitch, absolute best, incredible passion/depth
+- wonderful reminder, vibrant as ever, keep exploring keep creating
+- testament to, showcases the incredible, in today's wasteland, dive into / diving into
+- "Welcome back to Fallout Hub, where we…" template intros
+- "Why fans are talking about this:" essay closers that restate the whole post
+- stacking synonyms (stunning + gorgeous + striking + beautiful) for the same thing
+- explaining jokes or memes like a teacher ("this kind of satirical meta-humor is a staple…")
+
+STRUCTURE THAT FEELS HUMAN:
+- Open with the interesting thing, not a brand mission statement
+- Community roundups: uneven sections OK — longer on the best item, shorter on memes
+- Do not end every section with a moral about "what this proves about the community"
+- CTA should sound like a real question you'd ask in comments or Discord, not a classroom prompt`;
+}
+
 function getContentTypeGuidance(contentType, trustLevel = 'confirmed') {
   const trustGuidance = trustLevel === 'press-report'
     ? `TRUST LEVEL: PRESS REPORT (unconfirmed by developer/publisher)
 - This story is based on journalism, NOT an official announcement
-- The intro MUST state that this is reported by [outlet] and not confirmed by the developer/publisher
+- The intro MUST make clear this is reported by [outlet] and not confirmed by the developer/publisher — in natural wording, not a legal disclaimer stamp on every sentence
 - Attribute claims clearly but vary phrasing — do not open more than two sections with "According to the report"
 - Use hedging language: "reportedly", "is said to", "the report claims" where appropriate
 - When Bethesda or Xbox news affects Fallout, keep the franchise impact in every section — not just Elder Scrolls
@@ -1511,7 +1792,7 @@ function getContentTypeGuidance(contentType, trustLevel = 'confirmed') {
 - Do not frame this as a leak or unconfirmed press report`
       : trustLevel === 'community-highlight'
         ? `TRUST LEVEL: COMMUNITY HIGHLIGHT
-- Make clear this is fan-created content, not official news`
+- Make clear this is fan-created content, not official news — say it like a fan host, not a compliance footer`
         : `TRUST LEVEL: CONFIRMED NEWS
 - These are established facts from official studio communications and reliable coverage of them
 - Lead with what Bethesda/the studio confirmed — press outlets are secondary coverage, not the origin of the news
@@ -1530,14 +1811,16 @@ CONTENT TYPE: MOD SPOTLIGHT
 - Credit the creator and point readers to the original mod page or thread
 - Mention game, platform, or compatibility details only if present in the sources
 - Help readers decide whether it is worth checking out
-- Never present mods as official Bethesda content`;
+- Never present mods as official Bethesda content
+- Sound like a player who installs mods, not a store listing`;
     case 'community':
       return `${trustGuidance}
 
 CONTENT TYPE: COMMUNITY HIGHLIGHT
-- Spotlight fan creativity: art, cosplay, builds, lore discussion, or projects worth seeing
-- Credit the creator or community thread clearly
-- Explain why this is interesting to Fallout fans and worth sharing
+- Spotlight fan creativity: art, cosplay, builds, lore discussion, memes, or projects worth seeing
+- Credit the creator or community thread clearly (username + subreddit/link when known)
+- Say why YOU (as a Fallout Hub host) bothered to share it — one specific reason beats three empty adjectives
+- Let Reddit/community voice show through lightly; do not sanitize every meme into museum language
 - Frame as community-driven, not official news`;
     default:
       return `${trustGuidance}
@@ -1546,7 +1829,8 @@ CONTENT TYPE: NEWS
 - Accuracy and attribution come first — this is why readers trust ${BRAND_NAME}
 - Only state facts supported by the provided sources
 - Separate confirmed information from fan reaction or interpretation
-- If details are limited, say so honestly instead of filling gaps`;
+- If details are limited, say so honestly instead of filling gaps
+- Explain impact for players in plain language, not industry-speak`;
   }
 }
 
@@ -1573,10 +1857,16 @@ function buildPromptContext(newsItems = []) {
         : 'recent';
       const itemTrust = item.trustLevel || detectTrustLevel(item, { tier: item.sourceTier, category: item.contentType });
       const summary = buildStorySummaryForPrompt(item);
+      const role = item.enrichmentRole === 'buzz' || isWeakPackageBuzz(item)
+        ? 'Role: FAN BUZZ / SOFT CONTEXT only — mention briefly if useful; never treat as confirmed fact'
+        : index === 0
+          ? 'Role: MAIN STORY — lead the article with this'
+          : 'Role: SUPPORTING SOURCE — weave in where it strengthens the main story';
       return `${index + 1}. ${item.title}
    Source: ${item.source}
    Type: ${getContentTypeLabel(item.contentType || 'news', itemTrust)}
    Trust: ${getTrustLabel(itemTrust)}
+   ${role}
    Published: ${ageLabel}
    Summary: ${summary}${item.link ? `\n   URL: ${item.link}` : ''}`;
     })
@@ -1601,7 +1891,8 @@ ${attributionRule}
 ${trustRule}
 - Fans come first: prioritize clarity, accuracy, and usefulness over hedging that confuses confirmed news with leaks
 - If a detail is missing from the sources, say "details are still limited" or "no release window yet" instead of guessing
-- Include a keyFacts array with 3-5 bullet points a busy reader can scan in 10 seconds`;
+- Include a keyFacts array with 3-5 bullet points a busy reader can scan in 10 seconds
+- Accuracy never means sounding like a robot — keep the ${AUTHOR_NAME} / ${BRAND_NAME} human voice while staying factual`;
 }
 
 function buildSharedArticleRequirements(contentType, trustLevel, reportingOutlet, { multiSource = false } = {}) {
@@ -1611,32 +1902,32 @@ function buildSharedArticleRequirements(contentType, trustLevel, reportingOutlet
 
   if (trustLevel === 'press-report') {
     introAttribution = multiSource
-      ? 'attribute each claim to the specific cited outlet(s) in your sources array and note it is not confirmed by the developer/publisher'
-      : `clearly state this is reported by ${reportingOutlet} and not confirmed by the developer/publisher`;
-    subtitleRule = 'for press-report, mention it is based on reporting';
-    conclusionRule = 'for press-report, note official confirmation is still pending';
+      ? 'attribute each claim to the specific cited outlet(s) in your sources array and note it is not confirmed by the developer/publisher — in plain human wording'
+      : `make clear early that this is reported by ${reportingOutlet} and not confirmed by the developer/publisher, without stiff disclaimer language`;
+    subtitleRule = 'for press-report, hint it is based on reporting without sounding like a legal notice';
+    conclusionRule = 'for press-report, note official confirmation is still pending in a natural way';
   } else if (trustLevel === 'confirmed' || trustLevel === 'official') {
     introAttribution = multiSource
       ? `open with what Bethesda/the studio confirmed, then note coverage from the cited outlets (${reportingOutlet})`
       : `open with the official confirmation and credit ${reportingOutlet}; do not call this unconfirmed`;
-    subtitleRule = 'for confirmed/official, frame as official studio news fans can trust';
+    subtitleRule = 'for confirmed/official, frame as real studio news fans can act on — still human, not a press-release reprint';
     conclusionRule = 'for confirmed/official, remind fans that dates/windows may still be TBA without casting doubt on the confirmation itself';
   } else {
-    introAttribution = 'set up the community or mod story clearly for fans';
-    subtitleRule = 'explain why fans should care';
-    conclusionRule = 'end with a useful fan takeaway';
+    introAttribution = 'hook like a human host sharing something cool with friends — no brand mission statement';
+    subtitleRule = 'one natural sentence on why this is worth a click';
+    conclusionRule = 'close like a person wrapping a post, not a template';
   }
 
   return `ARTICLE REQUIREMENTS:
-- seoDescription: a standalone meta description of 120-160 characters (target exactly 150). One or two tight sentences for Blogger/Google search snippets.
-- title: specific, ${MIN_TITLE_CHARS}-${MAX_TITLE_CHARS} characters, click-worthy without clickbait — name the game, mod, event, or creator when possible
-- subtitle: one sentence explaining the value proposition; ${subtitleRule}
-- intro: 3-4 sentences with a strong hook; ${introAttribution}
+- seoDescription: a standalone meta description of 120-160 characters (target exactly 150). Natural human phrasing, not keyword stuffing.
+- title: specific, ${MIN_TITLE_CHARS}-${MAX_TITLE_CHARS} characters — sound like a real blog headline a Fallout fan would click, not "Brand Community Spotlight: Keyword, Keyword, and Keyword"
+- subtitle: one sentence; ${subtitleRule}
+- intro: 2-4 sentences; ${introAttribution}. Do NOT start with "Welcome back to ${BRAND_NAME}" or similar template
 - keyFacts: 3-5 short scannable bullet points (only facts supported by sources)
-- sections: exactly 5 or 6 sections, each with "heading" and "body" (4-6 sentences, roughly 80-130 words each)
-- takeaway: one standout insight sentence fans might quote when sharing
-- conclusion: 2-3 sentences with a clear final perspective; ${conclusionRule}
-- cta: one conversational question that fits the content type
+- sections: 4 to 6 sections (4 is fine if the material is thin). Each has "heading" and "body". Bodies may vary in length (about 50-130 words) — uneven is more human than identical blocks
+- takeaway: one sharp line in your voice — an insight, not a slogan
+- conclusion: 2-3 sentences; ${conclusionRule}. Optional light nod to the wider ${BRAND_NAME} community only if it fits naturally
+- cta: one conversational question you'd actually ask readers in comments or Discord
 - contentType: "${contentType}"
 - trustLevel: "${trustLevel}"
 - sources: array of {title, url, type} using ONLY URLs from SOURCE MATERIAL below — omit tangential supporting links
@@ -1651,24 +1942,38 @@ function buildNewsPrompt(newsItems, context) {
   const reportingOutlet = resolveStoryAttribution(newsItems, trustLevel);
   const isMultiAngle = newsItems.length > 1;
 
+  const hasBuzz = newsItems.some((item) => item.enrichmentRole === 'buzz' || isWeakPackageBuzz(item));
+  const buzzRule = hasBuzz
+    ? `- Items marked FAN BUZZ / SOFT CONTEXT are for color only (fan theories, date speculation, social buzz). Mention briefly so fans know the conversation; do NOT build the article around them or present them as confirmed`
+    : '';
+  const followUpRule = hasDistinctFollowUpBeat(mainStory)
+    ? `- This is a DISTINCT FOLLOW-UP beat (e.g. exclusivity, pricing, trailer), not a rehash of the original FO5/remaster confirmation. Lead with the new question fans care about`
+    : '';
+
   const formatRules = isMultiAngle
     ? `NEWS BRIEF RULES (${newsItems.length} sourced angles):
 - Lead with the strongest fan-relevant fact: ${mainStory.title}
-- Weave the other sourced items into one cohesive Fallout news brief
+- Weave the other sourced items into one cohesive Fallout news post in your voice
 - When this package is an official studio confirmation covered by multiple outlets, treat it as ONE confirmed story — not separate rumors
 - Keep every section tied to material below; this is one briefing, not a random link dump
 - Separate confirmed studio facts from still-unknown details (dates, exact scope)
-- Every section should answer "why does a Fallout fan care?" with practical impact (games, remaster, show, mods, or franchise roadmap)`
+- Say why a player should care in practical terms (game, remaster, show, mods, platforms) with no empty hype
+${followUpRule}
+${buzzRule}`
     : `NEWS WRITING RULES:
 - Lead with the most newsworthy confirmed or reported fact first
 - Name the game, platform, studio, or show when known from sources
 - Separate official/confirmed facts from pure press-report rumors and fan reaction
-- Use an informative newsroom tone — not hype, not rumor-chasing
-- Help readers understand timing, scope, and why the franchise conversation shifted
-- Prioritize usefulness for players and fans over industry-insider jargon`;
+- Sound like a careful fan-site editor: clear and professional, not stiff wire copy
+- Help readers understand timing, scope, and what is still unknown
+- Prioritize usefulness for players over industry-insider jargon
+${followUpRule}
+${buzzRule}`;
 
-  return `You are the lead editor of ${BRAND_NAME}, writing a Fallout NEWS brief fans will trust and share.
-Goal: the best possible article for Fallout fans — accurate, clear, shareable, and honest about what is confirmed vs still TBA.
+  return `You are ${AUTHOR_NAME}, writing for ${BRAND_NAME} — a Fallout NEWS post your community will trust and actually want to read.
+Goal: accurate, clear, shareable, honest about confirmed vs TBA — and unmistakably written by a human Fallout fan, not a bot.
+
+${getAuthorVoiceGuide('news')}
 
 ${getContentTypeGuidance('news', trustLevel)}
 
@@ -1704,7 +2009,9 @@ function buildModsPrompt(newsItems, context) {
 - Mention game, platform, requirements, or compatibility only if present in sources
 - Avoid breaking-news tone — this is a useful recommendation, not an announcement`;
 
-  return `You are the lead editor of ${BRAND_NAME}, writing ${isRoundup ? 'a MOD ROUNDUP' : 'a MOD SPOTLIGHT'} for Fallout players deciding what to install next.
+  return `You are ${AUTHOR_NAME}, writing ${isRoundup ? 'a MOD ROUNDUP' : 'a MOD SPOTLIGHT'} for ${BRAND_NAME} readers who want to know what is worth installing.
+
+${getAuthorVoiceGuide('mods')}
 
 ${getContentTypeGuidance('mods', trustLevel)}
 
@@ -1729,17 +2036,22 @@ function buildCommunityPrompt(newsItems, context) {
   const formatRules = isRoundup
     ? `COMMUNITY ROUNDUP RULES (${newsItems.length} highlights):
 - Lead with the strongest community story: ${mainStory.title}
-- Give each highlight clear credit and explain why fans would share it
-- Keep the tone celebratory and human — this is fan culture, not a press release
-- Do not mix in unrelated industry news or mod releases unless they are listed below`
+- Uneven sections are good — more space for the best piece (art, first playthrough), shorter for memes
+- Credit each creator; keep Reddit energy where it fits without being crude beyond the sources
+- Do not moralize every highlight ("this proves the community is vibrant")
+- Do not mix in unrelated industry news or mod releases unless they are listed below
+- Title should feel hand-picked, not "Community Spotlight: A, B, and C"`
     : `COMMUNITY HIGHLIGHT RULES:
 - Celebrate the creator, build, artwork, cosplay, lore thread, or project clearly
-- Make the opening feel human and shareable, not like a press release
-- Explain why this stands out in the fandom and who will appreciate it
-- Credit the source thread or creator path from the summaries
+- Open like you're sharing a cool find with friends, not issuing a press release
+- One specific reason this stands out beats a paragraph of generic praise
+- Credit the source thread or creator from the summaries
 - Never frame fan work as official news or a Bethesda announcement`;
 
-  return `You are the lead editor of ${BRAND_NAME}, spotlighting ${isRoundup ? 'the best Fallout community moments' : 'something the Fallout community created and would enjoy sharing'}.
+  return `You are ${AUTHOR_NAME}, hosting a community post on ${BRAND_NAME} — the same fan hub that runs Discord, socials, and the ${AUTHOR_COMMUNITY.app} app.
+Write like you personally picked these highlights for people who live Fallout, not like an AI summarizing Reddit.
+
+${getAuthorVoiceGuide('community')}
 
 ${getContentTypeGuidance('community', trustLevel)}
 
@@ -1761,10 +2073,10 @@ function buildPrompt(newsItems, { expansion = false, previousArticle = null } = 
   const contextText = buildPromptContext(newsItems);
 
   const expansionNote = expansion
-    ? `IMPORTANT: The previous draft was too short and too generic. Rewrite it as a substantially deeper article.
+    ? `IMPORTANT: The previous draft was too short, too generic, or too bot-like. Rewrite it as a deeper article in ${AUTHOR_NAME}'s natural ${BRAND_NAME} voice.
 Previous draft title: ${previousArticle?.title || 'unknown'}
 Previous word count: ${getArticleWordCount(previousArticle || {})}
-You must exceed ${MIN_ARTICLE_WORDS} words and include more concrete detail from the summaries below.\n\n`
+You must exceed ${MIN_ARTICLE_WORDS} words, add more concrete detail from the summaries below, and strip corporate/AI filler phrasing.\n\n`
     : '';
 
   let body;
@@ -1860,13 +2172,13 @@ function normalizeArticle(article, newsItems) {
   return validateArticleTrust({
     title: ensureArticleTitle(article?.title, mainStory),
     seoDescription: article?.seoDescription || '',
-    subtitle: article?.subtitle || `Your daily ${getContentTypeLabel(contentType, trustLevel).toLowerCase()} from ${BRAND_NAME}.`,
-    intro: article?.intro || 'The latest Fallout headlines are worth following because they can shape the conversation around the franchise in the days ahead.',
+    subtitle: article?.subtitle || `What ${BRAND_NAME} readers should know right now.`,
+    intro: article?.intro || 'Here is the latest Fallout story worth your time — and what is still up in the air.',
     keyFacts,
     sections,
-    takeaway: article?.takeaway || 'The best Fallout coverage explains not just what happened, but why players and fans should care.',
-    conclusion: article?.conclusion || 'The best takeaway is to stay close to official updates and trusted coverage until more details arrive.',
-    cta: article?.cta || 'What do you think is the most interesting part of this story?',
+    takeaway: article?.takeaway || 'Know what is confirmed, what is still TBA, and what actually matters for players.',
+    conclusion: article?.conclusion || 'I will keep watching official channels and the community conversation as more details land.',
+    cta: article?.cta || 'What part of this are you most interested in — or most skeptical about?',
     contentType,
     trustLevel,
     sources: resolveArticleSources(article?.sources, orderedItems)
@@ -3451,38 +3763,56 @@ async function main() {
     return;
   }
 
+  // Don't spend Gemini budget on leads that will be blocked at publish time
+  if (isTopicCovered(mainStory, localHistory)) {
+    console.log(`Editorial pick already covered — skipping generation: "${mainStory.title}"`);
+    return;
+  }
+
   const editorialScore = getEditorialCandidateScore(mainStory, localHistory, getContentTypeCounts(localHistory));
   const batchTrust = detectTrustLevelForBatch(generationBatch);
   const batchMode = generationBatch.length > 1 ? 'multi-angle roundup' : 'single spotlight';
+  const buzzCount = generationBatch.filter((item) => item.enrichmentRole === 'buzz' || isWeakPackageBuzz(item)).length;
+  const beatKeys = getFollowUpBeatKeys(mainStory);
   console.log(`Editorial pick: ${mainStory.contentType} (score ${editorialScore.toFixed(1)}) — "${mainStory.title}"`);
-  console.log(`Generation batch: ${generationBatch.length}/${batchLimit} ${mainStory.contentType} item(s) for ${batchMode} [${batchTrust}].`);
+  if (beatKeys.length > 0) {
+    console.log(`Follow-up beat(s) for fans: ${beatKeys.join(', ')}`);
+  }
+  console.log(`Generation batch: ${generationBatch.length}/${batchLimit} ${mainStory.contentType} item(s) for ${batchMode} [${batchTrust}]${buzzCount ? ` (+${buzzCount} buzz context)` : ''}.`);
 
   const enrichedItems = await enrichStories(generationBatch);
-  const substantiveItems = prioritizeGenerationBatch(
-    enrichedItems
-      .filter((item) => meetsMinimumSourceQuality(item))
-      .filter((item) => isEligibleForGeneration(item))
-  );
+  const qualityOk = (item) => meetsMinimumSourceQuality(item) && isEligibleForGeneration(item);
+  const leadKey = `${mainStory.link || ''}|${mainStory.title || ''}`;
+  const enrichedLead = enrichedItems.find((item) => `${item.link || ''}|${item.title || ''}` === leadKey)
+    || enrichedItems[0];
 
-  if (substantiveItems.length === 0) {
+  if (!enrichedLead || !qualityOk(enrichedLead)) {
     console.log('Only thin-source or off-topic stories available today; skipping generation.');
     return;
   }
 
-  console.log(`Trust for fans: ${detectTrustLevelForBatch(substantiveItems)} — attribution: ${resolveStoryAttribution(substantiveItems, detectTrustLevelForBatch(substantiveItems))}`);
+  // Keep editorial lead first so exclusivity (etc.) is never replaced by a package rehash
+  const orderedSubstantive = [
+    enrichedLead,
+    ...prioritizeGenerationBatch(
+      enrichedItems.filter((item) => item !== enrichedLead && qualityOk(item))
+    )
+  ];
+
+  console.log(`Trust for fans: ${detectTrustLevelForBatch(orderedSubstantive)} — attribution: ${resolveStoryAttribution(orderedSubstantive, detectTrustLevelForBatch(orderedSubstantive))}`);
 
   let article;
   let generationError = null;
   let mode = 'llm-generated';
 
   try {
-    article = await generateArticle(substantiveItems);
-    article = normalizeArticle(article, substantiveItems);
+    article = await generateArticle(orderedSubstantive);
+    article = normalizeArticle(article, orderedSubstantive);
     console.log(`LLM article generated successfully (${getArticleWordCount(article)} words, ${article.contentType}, ${article.trustLevel}).`);
   } catch (error) {
     generationError = error;
     mode = 'fallback-template';
-    article = normalizeArticle(buildFallbackArticle(substantiveItems), substantiveItems);
+    article = normalizeArticle(buildFallbackArticle(orderedSubstantive), orderedSubstantive);
     console.warn(`LLM generation failed, using fallback article: ${error.message}`);
   }
 
@@ -3503,7 +3833,7 @@ async function main() {
       ? ` (${countChars(article.title)} chars: "${article.title}")`
       : '';
     console.warn(`Blogger draft skipped: ${publishSkippedReason}${titleDetail}`);
-  } else if (isTopicCovered(substantiveItems[0], localHistory) || isDuplicateArticleTitle(article.title, localHistory)) {
+  } else if (isTopicCovered(mainStory, localHistory) || isDuplicateArticleTitle(article.title, localHistory)) {
     publishSkippedReason = 'already-covered';
     console.warn(`Blogger draft skipped: "${article.title}" matches a recently covered story.`);
   } else {
@@ -3511,16 +3841,16 @@ async function main() {
       bloggerPost = await createBloggerDraft(article);
       if (bloggerPost) {
         console.log('Blogger draft created successfully.');
-        // Mark every sourced angle as covered so multi-outlet packages (FO5 + remasters +
-        // Raven Rock, etc.) cannot regenerate as a near-duplicate the next day.
+        // Mark lead + supporting angles. Buzz is marked too so it cannot re-lead later,
+        // but distinct follow-up beats remain open until written as a lead.
         const historyStories = [
-          ...substantiveItems,
+          ...orderedSubstantive,
           {
             title: article.title,
-            description: substantiveItems.map((item) => item.title).join(' · '),
+            description: orderedSubstantive.map((item) => item.title).join(' · '),
             source: BRAND_NAME,
-            contentType: substantiveItems[0]?.contentType || 'news',
-            link: substantiveItems[0]?.link || ''
+            contentType: orderedSubstantive[0]?.contentType || 'news',
+            link: orderedSubstantive[0]?.link || ''
           }
         ];
         await saveStoryHistory(localHistory, historyStories, article);
@@ -3531,14 +3861,15 @@ async function main() {
     }
   }
 
-  const finalTrust = detectTrustLevelForBatch(substantiveItems);
+  const finalTrust = detectTrustLevelForBatch(orderedSubstantive);
   const output = {
     generatedAt: new Date().toISOString(),
     brand: BRAND_NAME,
-    featuredContentType: substantiveItems[0]?.contentType || 'news',
+    featuredContentType: orderedSubstantive[0]?.contentType || 'news',
     featuredTrustLevel: finalTrust,
-    attribution: resolveStoryAttribution(substantiveItems, finalTrust),
-    selectedNews: substantiveItems,
+    attribution: resolveStoryAttribution(orderedSubstantive, finalTrust),
+    selectedNews: orderedSubstantive,
+    followUpBeats: getFollowUpBeatKeys(mainStory),
     article,
     articleWordCount: getArticleWordCount(article),
     seoDescriptionCharCount: countChars(article.seoDescription),
