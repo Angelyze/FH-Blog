@@ -2,6 +2,8 @@
 
 Daily editorial automation for the **Fallout Hub Blog** — a trusted Fallout fan destination covering news, mods, and community highlights.
 
+**Full system blueprint (for humans or LLMs rebuilding this):** [`docs/EDITORIAL-AUTOMATION-SPEC.md`](docs/EDITORIAL-AUTOMATION-SPEC.md) — CMS-agnostic architecture, editorial logic, trust rules, generation/expansion, adapters, and porting checklist. Blogger is only one optional publish target.
+
 ## What it does
 - Collects Fallout-related content from press, official channels, Steam, and a curated Reddit custom feed
 - Rotates daily between **news**, **mod spotlights**, and **community highlights**
