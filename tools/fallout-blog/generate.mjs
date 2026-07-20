@@ -2982,10 +2982,27 @@ async function getBloggerAccessToken() {
   });
 
   if (!tokenResponse.ok) {
-    throw new Error('Failed to refresh Blogger access token');
+    let detail = `HTTP ${tokenResponse.status}`;
+    try {
+      const errBody = await tokenResponse.json();
+      // Google returns error + error_description (no secrets) — helps diagnose expired/revoked tokens
+      const code = errBody.error || 'unknown_error';
+      const description = errBody.error_description || errBody.error_uri || '';
+      detail = description ? `${code}: ${description}` : code;
+    } catch {
+      // ignore parse failures
+    }
+    throw new Error(
+      `Failed to refresh Blogger access token (${detail}). `
+      + 'Usually the GOOGLE_REFRESH_TOKEN is expired/revoked, or it does not match GOOGLE_CLIENT_ID/SECRET. '
+      + 'Re-run OAuth for the blog owner account and update GitHub Secrets — you can stay in Testing mode.'
+    );
   }
 
   const tokenData = await tokenResponse.json();
+  if (!tokenData.access_token) {
+    throw new Error('Failed to refresh Blogger access token (no access_token in response)');
+  }
   return tokenData.access_token;
 }
 

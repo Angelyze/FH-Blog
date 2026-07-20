@@ -44,16 +44,6 @@ jobs:
 
       - name: Commit pipeline state
         if: always()
-        run: |
-          npm run fallout:repair-history
-          if ! git diff --quiet -- data/story-history.json data/feed-health.json 2>/dev/null; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add data/story-history.json data/feed-health.json
-            git commit -m "chore(blog): update pipeline state"
-            git pull --rebase --autostash origin "${{ github.ref_name }}"
-            git push
-            echo "Pipeline state committed to repository."
-          else
-            echo "No pipeline data changes to commit."
-          fi
+        env:
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+        run: npm run fallout:commit-state

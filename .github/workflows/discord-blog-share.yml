@@ -36,11 +36,27 @@ jobs:
           if ! git diff --quiet -- data/discord-share-state.json 2>/dev/null; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            # Snapshot this run's state so concurrent main updates cannot leave a stuck rebase
+            cp data/discord-share-state.json /tmp/discord-share-state.json
             git add data/discord-share-state.json
             git commit -m "chore(discord): update blog share state"
-            git pull --rebase --autostash origin "${{ github.ref_name }}"
-            git push
-            echo "Discord share state committed to repository."
+            for attempt in 1 2 3 4 5; do
+              if git pull --rebase --autostash origin "${{ github.ref_name }}" \
+                && git push origin "HEAD:${{ github.ref_name }}"; then
+                echo "Discord share state committed to repository."
+                exit 0
+              fi
+              echo "Discord state push conflict (attempt ${attempt}); retrying on latest main..."
+              git rebase --abort 2>/dev/null || true
+              git fetch origin "${{ github.ref_name }}"
+              git reset --hard "origin/${{ github.ref_name }}"
+              cp /tmp/discord-share-state.json data/discord-share-state.json
+              git add data/discord-share-state.json
+              git commit -m "chore(discord): update blog share state" || true
+              sleep $((attempt * 2))
+            done
+            echo "Failed to commit Discord share state after retries."
+            exit 1
           else
             echo "No Discord share state changes to commit."
           fi
