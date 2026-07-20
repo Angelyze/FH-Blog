@@ -1,6 +1,33 @@
 {
   "entries": [
     {
+      "fingerprint": "dd6008f9235693ca",
+      "topicFingerprint": "d1f4e1fb979be41c",
+      "contentType": "news",
+      "title": "Maintenance Announcement - July 21, 2026",
+      "articleTitle": "Fallout 76 Maintenance Scheduled for July 21; Plus a Retro Mod Update",
+      "source": "Steam — Fallout 76",
+      "coveredAt": 1784575319083
+    },
+    {
+      "fingerprint": "2b97c791c9de5aef",
+      "topicFingerprint": "2161633717ce5d6d",
+      "contentType": "news",
+      "title": "The Fallout I’m Most Looking Forward To Isn&#8217;t A Remaster Or A Sequel",
+      "articleTitle": "Fallout 76 Maintenance Scheduled for July 21; Plus a Retro Mod Update",
+      "source": "Kotaku",
+      "coveredAt": 1784575319083
+    },
+    {
+      "fingerprint": "9881d866f6352bdd",
+      "topicFingerprint": "51d397815b00c7cc",
+      "contentType": "news",
+      "title": "Fallout 76 Maintenance Scheduled for July 21; Plus a Retro Mod Update",
+      "articleTitle": "Fallout 76 Maintenance Scheduled for July 21; Plus a Retro Mod Update",
+      "source": "Fallout Hub",
+      "coveredAt": 1784575319083
+    },
+    {
       "fingerprint": "00cbb6c9556ec247",
       "topicFingerprint": "001444fcda3fb5e5",
       "contentType": "community",
