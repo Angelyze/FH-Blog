@@ -892,6 +892,164 @@ export function getGenerationBatchLimit(contentType = 'news') {
   return GENERATION_BATCH_LIMITS[contentType] || 1;
 }
 
+/** Distinctive project / franchise hooks used for relatedness + research queries. */
+const RESEARCH_PROJECT_PATTERNS = [
+  /\bbakersfield\b/i,
+  /\braven rock\b/i,
+  /\bfallout 5\b|\bfallout5\b/i,
+  /\bnew vegas\b|\bfnv\b/i,
+  /\bfallout 76\b|\bfo76\b/i,
+  /\bfallout 4\b|\bfo4\b/i,
+  /\bfallout 3\b|\bfo3\b/i,
+  /\bfallout shelter\b/i,
+  /\bcreation club\b/i,
+  /\bobsidian\b/i,
+  /\bbethesda\b/i
+];
+
+/**
+ * Pull entities from a lead for relatedness checks and deep research queries.
+ */
+export function extractLeadEntities(item = {}) {
+  const title = String(item.title || '');
+  const description = String(item.description || '');
+  const haystack = `${title} ${description}`;
+  let redditAuthor = null;
+
+  const authorMatch = haystack.match(/\bu\/([A-Za-z0-9_-]{2,32})\b/i);
+  if (authorMatch) redditAuthor = authorMatch[1];
+
+  if (!redditAuthor && item.link) {
+    try {
+      const url = new URL(item.link);
+      const pathAuthor = url.pathname.match(/\/(?:user|u)\/([^/?#]+)/i);
+      if (pathAuthor) redditAuthor = decodeURIComponent(pathAuthor[1]);
+    } catch {
+      // ignore bad links
+    }
+  }
+
+  if (!redditAuthor && /reddit/i.test(item.source || '')) {
+    const fromSource = String(item.source).match(/\bu\/([A-Za-z0-9_-]+)/i);
+    if (fromSource) redditAuthor = fromSource[1];
+  }
+
+  const projectKeys = RESEARCH_PROJECT_PATTERNS
+    .filter((pattern) => pattern.test(haystack))
+    .map((pattern) => pattern.source.replace(/\\b/g, '').replace(/\|/g, ' ').slice(0, 40));
+
+  const properNames = [...haystack.matchAll(/\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,2})\b/g)]
+    .map((match) => match[1])
+    .filter((name) => !/^(Fallout|The|This|That|With|From|About)$/i.test(name))
+    .slice(0, 8);
+
+  return {
+    redditAuthor: redditAuthor || null,
+    projectKeys,
+    properNames,
+    contentType: item.contentType || 'news'
+  };
+}
+
+/** Single artist / single project leads deserve a feature, not a mixed roundup. */
+export function isSingleSubjectFeatureLead(item = {}) {
+  const entities = extractLeadEntities(item);
+  if (entities.redditAuthor) return true;
+  if (/\b(fan art|fanart|artwork|drawing|illustration|cosplay|\[oc\]|\boc\b)\b/i.test(item.title || '')) {
+    return true;
+  }
+  if (item.contentType === 'news' && entities.projectKeys.length >= 1) {
+    // One clear franchise project hook and thin multi-outlet package → feature candidate
+    return true;
+  }
+  return false;
+}
+
+/**
+ * True only when item is the same story (or same creator/project) as the lead.
+ * Prevents padding articles with unrelated same-type headlines.
+ */
+export function isStrictlyRelatedToLead(item = {}, mainStory = {}) {
+  if (!item?.title || !mainStory?.title) return false;
+  if (item.link && mainStory.link && item.link === mainStory.link) return true;
+  if (item.title === mainStory.title && item.source === mainStory.source) return true;
+
+  if (shareMegaEventPackage(item, mainStory)) return true;
+  if (shareFollowUpBeats(item, mainStory)) return true;
+  if (areTopicsSimilar(item.title, mainStory.title, { allowAnchorMatch: true })) return true;
+
+  const mainEntities = extractLeadEntities(mainStory);
+  const itemEntities = extractLeadEntities(item);
+
+  if (mainEntities.redditAuthor && itemEntities.redditAuthor
+    && mainEntities.redditAuthor.toLowerCase() === itemEntities.redditAuthor.toLowerCase()) {
+    return true;
+  }
+
+  if (mainEntities.projectKeys.length > 0 && itemEntities.projectKeys.length > 0) {
+    const sharedProject = mainEntities.projectKeys.some((key) => itemEntities.projectKeys.includes(key));
+    // Same distinctive project + overlapping title tokens is enough
+    if (sharedProject && areTopicsSimilar(item.title, mainStory.title, { allowAnchorMatch: false })) {
+      return true;
+    }
+    // Bakersfield + Bakersfield coverage from another outlet
+    if (sharedProject && mainEntities.projectKeys.some((key) => /bakersfield|raven rock|fallout 5|fallout5/i.test(key))) {
+      const keyNeedle = mainEntities.projectKeys.find((key) => /bakersfield|raven|fallout 5|fallout5/i.test(key));
+      if (keyNeedle && new RegExp(keyNeedle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i').test(`${item.title} ${item.description}`)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Intentional community multi-highlight day (several high-value posts), not a single-artist feature.
+ */
+export function shouldAllowCommunityMultiHighlight(mainStory = {}, candidates = []) {
+  if ((mainStory.contentType || 'news') !== 'community') return false;
+  if (isSingleSubjectFeatureLead(mainStory)) return false;
+
+  const highValue = candidates.filter((item) => (
+    item.contentType === 'community'
+    && hasHighValueCommunitySignals(item)
+    && item.title !== mainStory.title
+  ));
+
+  return highValue.length >= 2;
+}
+
+export function getBatchUsableTextLength(items = []) {
+  return items.reduce((sum, item) => sum + String(item.description || '').length, 0);
+}
+
+/**
+ * Thin feed batch → deep research a single topic instead of mixing unrelated stories.
+ */
+export function needsDeepResearch(batch = [], { minTextChars = 900 } = {}) {
+  if (!Array.isArray(batch) || batch.length === 0) return false;
+
+  const feedItems = batch.filter((item) => item.enrichmentRole !== 'research');
+  const lead = feedItems[0];
+  if (!lead) return false;
+
+  const secondaries = feedItems.slice(1).filter((item) => isStrictlyRelatedToLead(item, lead));
+  const textLen = getBatchUsableTextLength(feedItems);
+
+  // True multi-outlet same-story package — write as package brief, not a mixed digest
+  if (secondaries.length >= 2) return false;
+  // One strong related secondary with enough combined text
+  if (secondaries.length >= 1 && textLen >= minTextChars) return false;
+
+  // Intentional community multi-highlight with enough material
+  if (lead.contentType === 'community' && feedItems.length >= 3 && textLen >= Math.floor(minTextChars * 0.7)) {
+    return false;
+  }
+
+  return true;
+}
+
 export function pickFeaturedStory(candidates = [], historyEntries = []) {
   const eligible = selectStoriesForGeneration(candidates, historyEntries, { storyLimit: 20 });
   if (eligible.length === 0) return [];
@@ -913,6 +1071,7 @@ export function assembleGenerationItems(mainStory = {}, candidates = [], history
   const contentType = mainStory.contentType || 'news';
   const limit = Math.min(maxItems, getGenerationBatchLimit(contentType));
   const mainTopic = getStoryTopicKey(mainStory);
+  const allowCommunityRoundup = shouldAllowCommunityMultiHighlight(mainStory, candidates);
 
   const baseFilters = (item) => {
     if (item.contentType !== contentType) return false;
@@ -929,40 +1088,38 @@ export function assembleGenerationItems(mainStory = {}, candidates = [], history
   const pool = candidates
     .filter(baseFilters)
     .filter((item) => !isTopicCovered(item, historyEntries))
-    // Fan-first: related package angles + distinct follow-ups before unrelated filler
+    .filter((item) => {
+      if (isStrictlyRelatedToLead(item, mainStory)) return true;
+      // Intentional community multi-highlight only — never pad news/mods with unrelated filler
+      if (allowCommunityRoundup && hasHighValueCommunitySignals(item)) return true;
+      return false;
+    })
     .sort((a, b) => {
-      const relatedA = shareMegaEventPackage(mainStory, a) || shareFollowUpBeats(mainStory, a) ? 1 : 0;
-      const relatedB = shareMegaEventPackage(mainStory, b) || shareFollowUpBeats(mainStory, b) ? 1 : 0;
+      const relatedA = isStrictlyRelatedToLead(a, mainStory) ? 2 : 0;
+      const relatedB = isStrictlyRelatedToLead(b, mainStory) ? 2 : 0;
       if (relatedB !== relatedA) return relatedB - relatedA;
       return getAdjustedCandidateScore(b, historyEntries) - getAdjustedCandidateScore(a, historyEntries);
     });
 
-  // Weak theories / soft package chatter: enrich the lead even when they cannot lead alone
+  // Buzz only when it is still about the same story/package (never random filler)
   const buzzPool = candidates
     .filter(baseFilters)
     .filter((item) => isBuzzEnrichmentCandidate(item, mainStory, historyEntries))
+    .filter((item) => isStrictlyRelatedToLead(item, mainStory) || shareMegaEventPackage(item, mainStory))
     .sort((a, b) => getAdjustedCandidateScore(b, historyEntries) - getAdjustedCandidateScore(a, historyEntries));
 
   const selected = [mainStory];
   const usedTopics = new Set([mainTopic]);
 
-  const tryAdd = (item, { allowSimilarPackage = false } = {}) => {
+  const tryAdd = (item) => {
     if (selected.length >= limit) return false;
     const topicKey = getStoryTopicKey(item);
     if (usedTopics.has(topicKey)) return false;
     if (item.link === mainStory.link && item.title === mainStory.title) return false;
     if (selected.some((existing) => existing.link && item.link && existing.link === item.link)) return false;
 
-    if (selected.some((existing) => areTopicsSimilar(existing.title, item.title)
-      && !shareMegaEventPackage(existing, item)
-      && !shareFollowUpBeats(existing, item)
-      && !allowSimilarPackage)) {
-      return false;
-    }
-
     selected.push({
       ...item,
-      // Mark buzz so prompts can frame it as context, not the main claim
       enrichmentRole: isWeakPackageBuzz(item) ? 'buzz' : (item.enrichmentRole || 'source')
     });
     usedTopics.add(topicKey);
@@ -974,10 +1131,9 @@ export function assembleGenerationItems(mainStory = {}, candidates = [], history
     tryAdd(item);
   }
 
-  // Fill remaining slots with fan buzz that makes the main story more complete
   for (const item of buzzPool) {
     if (selected.length >= limit) break;
-    tryAdd(item, { allowSimilarPackage: true });
+    tryAdd(item);
   }
 
   return selected;
@@ -1850,18 +2006,21 @@ function getContentTypeLabel(contentType, trustLevel = 'confirmed') {
 }
 
 function buildPromptContext(newsItems = []) {
-  return newsItems.slice(0, 5)
+  return newsItems.slice(0, 8)
     .map((item, index) => {
       const ageLabel = item.publishedAt
         ? `${Math.max(1, Math.round((Date.now() - item.publishedAt) / (1000 * 60 * 60)))}h ago`
         : 'recent';
       const itemTrust = item.trustLevel || detectTrustLevel(item, { tier: item.sourceTier, category: item.contentType });
       const summary = buildStorySummaryForPrompt(item);
-      const role = item.enrichmentRole === 'buzz' || isWeakPackageBuzz(item)
-        ? 'Role: FAN BUZZ / SOFT CONTEXT only — mention briefly if useful; never treat as confirmed fact'
-        : index === 0
-          ? 'Role: MAIN STORY — lead the article with this'
-          : 'Role: SUPPORTING SOURCE — weave in where it strengthens the main story';
+      let role = 'Role: SUPPORTING SOURCE — weave in where it strengthens the main story';
+      if (item.enrichmentRole === 'research') {
+        role = 'Role: DEEP RESEARCH CONTEXT — same topic/creator/project only; use for background and depth, never for unrelated Fallout news';
+      } else if (item.enrichmentRole === 'buzz' || isWeakPackageBuzz(item)) {
+        role = 'Role: FAN BUZZ / SOFT CONTEXT only — mention briefly if useful; never treat as confirmed fact';
+      } else if (index === 0) {
+        role = 'Role: MAIN STORY — lead the article with this';
+      }
       return `${index + 1}. ${item.title}
    Source: ${item.source}
    Type: ${getContentTypeLabel(item.contentType || 'news', itemTrust)}
@@ -1936,28 +2095,69 @@ function buildSharedArticleRequirements(contentType, trustLevel, reportingOutlet
 Return valid JSON only with these fields: title, seoDescription, subtitle, intro, keyFacts, sections, conclusion, takeaway, cta, contentType, trustLevel, sources`;
 }
 
+function isFeatureGenerationMode(newsItems = []) {
+  if (!Array.isArray(newsItems) || newsItems.length === 0) return false;
+  if (newsItems[0]?.generationMode === 'feature') return true;
+  const researchCount = newsItems.filter((item) => item.enrichmentRole === 'research').length;
+  const feedCount = newsItems.filter((item) => item.enrichmentRole !== 'research' && item.enrichmentRole !== 'buzz').length;
+  return researchCount > 0 && feedCount <= 2;
+}
+
+function buildFeaturePrompt(newsItems, context) {
+  const mainStory = newsItems[0];
+  const contentType = mainStory.contentType || 'news';
+  const trustLevel = detectTrustLevelForBatch(newsItems);
+  const reportingOutlet = resolveStoryAttribution(newsItems, trustLevel);
+
+  return `You are ${AUTHOR_NAME}, writing a FULL FEATURE article for ${BRAND_NAME} — the kind of deep, satisfying post games media writes when one story is worth the whole page.
+
+Goal: a miracle-read for Fallout fans about ONE topic. Not a mixed news dump. Not filler.
+
+${getAuthorVoiceGuide(contentType)}
+
+${getContentTypeGuidance(contentType, trustLevel)}
+
+SINGLE-TOPIC FEATURE RULES:
+- Lead with the hook: ${mainStory.title}
+- Build the entire article around this subject (project, creator, mod, or announcement)
+- Use DEEP RESEARCH CONTEXT for background: creator portfolio, project history, studio context, related coverage of the SAME story
+- Do NOT drag in unrelated Fallout headlines just to add length
+- Structure like a real feature: what happened, who/what it is, why fans care, context, what is still unknown
+- If research is thin, say so honestly and still write the best possible focused piece from what you have
+- Credit every claim to sources in the material below
+
+${buildPromptTrustSection(trustLevel, reportingOutlet, { multiSource: newsItems.length > 1 })}
+
+SOURCE MATERIAL (one story + related research only):
+${context}
+
+MAIN SUBJECT: ${mainStory.title}
+
+${buildSharedArticleRequirements(contentType, trustLevel, reportingOutlet, { multiSource: false })}`;
+}
+
 function buildNewsPrompt(newsItems, context) {
   const mainStory = newsItems[0];
   const trustLevel = detectTrustLevelForBatch(newsItems);
   const reportingOutlet = resolveStoryAttribution(newsItems, trustLevel);
-  const isMultiAngle = newsItems.length > 1;
+  const isMultiAngle = newsItems.length > 1
+    && newsItems.filter((item) => item.enrichmentRole !== 'research').length > 1;
 
   const hasBuzz = newsItems.some((item) => item.enrichmentRole === 'buzz' || isWeakPackageBuzz(item));
   const buzzRule = hasBuzz
-    ? `- Items marked FAN BUZZ / SOFT CONTEXT are for color only (fan theories, date speculation, social buzz). Mention briefly so fans know the conversation; do NOT build the article around them or present them as confirmed`
+    ? `- Items marked FAN BUZZ / SOFT CONTEXT are for color only (fan theories, date speculation, social buzz). Mention briefly if useful; never treat as confirmed fact`
     : '';
   const followUpRule = hasDistinctFollowUpBeat(mainStory)
     ? `- This is a DISTINCT FOLLOW-UP beat (e.g. exclusivity, pricing, trailer), not a rehash of the original FO5/remaster confirmation. Lead with the new question fans care about`
     : '';
 
   const formatRules = isMultiAngle
-    ? `NEWS BRIEF RULES (${newsItems.length} sourced angles):
+    ? `NEWS BRIEF RULES (${newsItems.length} sourced angles — SAME STORY ONLY):
 - Lead with the strongest fan-relevant fact: ${mainStory.title}
-- Weave the other sourced items into one cohesive Fallout news post in your voice
-- When this package is an official studio confirmation covered by multiple outlets, treat it as ONE confirmed story — not separate rumors
-- Keep every section tied to material below; this is one briefing, not a random link dump
+- Weave ONLY related angles (same package / same announcement). Never pad with unrelated Fallout news
+- When this package is an official studio confirmation covered by multiple outlets, treat it as ONE confirmed story
 - Separate confirmed studio facts from still-unknown details (dates, exact scope)
-- Say why a player should care in practical terms (game, remaster, show, mods, platforms) with no empty hype
+- Say why a player should care in practical terms with no empty hype
 ${followUpRule}
 ${buzzRule}`
     : `NEWS WRITING RULES:
@@ -2079,23 +2279,27 @@ function buildPrompt(newsItems, { expansion = false, previousArticle = null, exp
 Previous draft title: ${previousArticle?.title || 'unknown'}
 Previous word count: ${previousWords} (MUST exceed ${MIN_ARTICLE_WORDS})
 Previous section count: ${previousSections} (need at least 4 sections; each body ≥ ~35 words)
-Rewrite as a substantially deeper article in ${AUTHOR_NAME}'s natural ${BRAND_NAME} voice.
+Grow the existing draft in ${AUTHOR_NAME}'s natural ${BRAND_NAME} voice — stay on the SAME topic; do not add unrelated Fallout news.
 Add more concrete detail from the source summaries below. Do not invent facts.
 Strip corporate/AI filler. Prefer longer, uneven section bodies over empty praise.
 ${expansionAttempt >= 2 ? 'Earlier expansions still failed — be more thorough and use more of the source material in every section.\n' : ''}\n`
     : '';
 
   let body;
-  switch (contentType) {
-    case 'mods':
-      body = buildModsPrompt(newsItems, contextText);
-      break;
-    case 'community':
-      body = buildCommunityPrompt(newsItems, contextText);
-      break;
-    default:
-      body = buildNewsPrompt(newsItems, contextText);
-      break;
+  if (isFeatureGenerationMode(newsItems)) {
+    body = buildFeaturePrompt(newsItems, contextText);
+  } else {
+    switch (contentType) {
+      case 'mods':
+        body = buildModsPrompt(newsItems, contextText);
+        break;
+      case 'community':
+        body = buildCommunityPrompt(newsItems, contextText);
+        break;
+      default:
+        body = buildNewsPrompt(newsItems, contextText);
+        break;
+    }
   }
 
   return `${expansionNote}${body}`;
@@ -2736,6 +2940,250 @@ export async function enrichStories(stories, { limit = stories.length } = {}) {
   }
 
   return [...enriched, ...stories.slice(targetStories.length)];
+}
+
+export function buildResearchQueryHints(lead = {}) {
+  const entities = extractLeadEntities(lead);
+  const hints = [
+    lead.title,
+    'Fallout'
+  ].filter(Boolean);
+
+  if (entities.redditAuthor) {
+    hints.push(`u/${entities.redditAuthor} Fallout`);
+    hints.push(`${entities.redditAuthor} Fallout artist`);
+  }
+  for (const key of entities.projectKeys.slice(0, 3)) {
+    hints.push(`Fallout ${key}`);
+  }
+  for (const name of entities.properNames.slice(0, 3)) {
+    hints.push(`${name} Fallout`);
+  }
+
+  return [...new Set(hints.map((hint) => String(hint).trim()).filter(Boolean))].slice(0, 8);
+}
+
+function researchHostAllowed(url = '') {
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, '').toLowerCase();
+    if (!host) return false;
+    // Block obvious junk / social login walls; allow major press + Reddit + wiki + studio
+    if (/doubleclick|googlesyndication|facebook\.com\/login|twitter\.com\/i\/flow/i.test(url)) return false;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function shapeResearchSourceItem(entry = {}, lead = {}) {
+  const title = cleanText(entry.title || entry.notes || 'Related Fallout coverage');
+  const link = String(entry.url || entry.link || '').trim();
+  if (!link || !researchHostAllowed(link)) return null;
+
+  return {
+    title: title.slice(0, 200),
+    link,
+    description: cleanText(entry.notes || entry.description || title).slice(0, MAX_STORY_BODY_CHARS),
+    source: entry.source || 'Web research',
+    sourceTier: entry.sourceTier || 'press',
+    sourceKind: 'research',
+    contentType: lead.contentType || 'news',
+    enrichmentRole: 'research',
+    relation: entry.relation || 'background',
+    publishedAt: Date.now(),
+    score: 1
+  };
+}
+
+/**
+ * Gemini + Google Search grounding to discover topic-related URLs (not unrelated Fallout filler).
+ */
+export async function discoverResearchLinksViaGemini(lead = {}, { maxLinks = 6 } = {}) {
+  const hints = buildResearchQueryHints(lead);
+  const prompt = `You are a research assistant for a Fallout fan website.
+Find useful web sources about THIS topic only, plus closely related context (same project, same creator/artist, same studio history for this story).
+
+DO NOT return unrelated Fallout headlines (other games, random mods, remaster packages, TV news) unless they are the same story.
+
+Lead title: ${lead.title}
+Lead summary: ${String(lead.description || '').slice(0, 800)}
+Search hints: ${hints.join(' | ')}
+
+Return JSON only:
+{"sources":[{"title":"...","url":"https://...","notes":"1-2 factual sentences","relation":"same-project|same-creator|background|coverage"}]}
+Maximum ${maxLinks} sources. Prefer official pages, serious press on this topic, creator portfolios/socials, and relevant wiki pages.`;
+
+  const apiKeys = getGeminiApiKeys();
+  const keyOffset = advanceGeminiKeyCursor(apiKeys.length);
+  const rotatedKeys = rotateApiKeys(apiKeys, keyOffset);
+  // Prefer models that commonly support search grounding
+  const models = rotateList([
+    'gemini-2.5-flash',
+    'gemini-flash-latest',
+    'gemini-2.0-flash',
+    ...getGeminiModelChain()
+  ], 0);
+  const seenModels = new Set();
+  const modelChain = models.filter((model) => {
+    if (seenModels.has(model)) return false;
+    seenModels.add(model);
+    return true;
+  });
+
+  for (const model of modelChain) {
+    for (const [keyIndex, apiKey] of rotatedKeys.entries()) {
+      const keyLabel = getGeminiKeyLabel((keyOffset + keyIndex) % apiKeys.length);
+      try {
+        const response = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }] }],
+              tools: [{ google_search: {} }],
+              generationConfig: {
+                temperature: 0.2
+              }
+            })
+          }
+        );
+
+        if (!response.ok) {
+          const text = await response.text();
+          if (shouldTryNextGeminiKey(response.status, text)) continue;
+          if (shouldTryNextGeminiModel(response.status, text)) break;
+          continue;
+        }
+
+        const data = await response.json();
+        const text = data?.candidates?.[0]?.content?.parts?.map((part) => part.text || '').join('\n') || '';
+        const groundingChunks = data?.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
+        const fromGrounding = groundingChunks
+          .map((chunk) => ({
+            title: chunk?.web?.title || chunk?.web?.domain || 'Related source',
+            url: chunk?.web?.uri || chunk?.web?.url || '',
+            notes: chunk?.web?.title || '',
+            relation: 'coverage'
+          }))
+          .filter((entry) => entry.url);
+
+        let fromJson = [];
+        if (text) {
+          try {
+            const parsed = JSON.parse(extractJsonText(text));
+            fromJson = Array.isArray(parsed?.sources) ? parsed.sources : [];
+          } catch {
+            // Grounding-only response is fine
+          }
+        }
+
+        const merged = [...fromJson, ...fromGrounding]
+          .map((entry) => shapeResearchSourceItem(entry, lead))
+          .filter(Boolean);
+
+        if (merged.length > 0) {
+          console.log(`Research discovery succeeded with ${keyLabel} on ${model} (${merged.length} link(s)).`);
+          return merged.slice(0, maxLinks);
+        }
+      } catch {
+        // try next key/model
+      }
+    }
+  }
+
+  return [];
+}
+
+async function fetchRedditAuthorRecentPosts(author = '', lead = {}, { limit = 5 } = {}) {
+  if (!author) return [];
+  const url = `https://www.reddit.com/user/${encodeURIComponent(author)}/submitted.json?limit=${limit}&raw_json=1`;
+  try {
+    const response = await fetch(url, {
+      headers: getRedditJsonRequestHeaders(null)
+    });
+    if (!response.ok) return [];
+    const payload = await response.json();
+    const children = payload?.data?.children || [];
+    return children
+      .map((child) => child?.data)
+      .filter((post) => post?.title && /fallout|fnv|fo76|fo4|wasteland|vault/i.test(`${post.title} ${post.selftext || ''}`))
+      .map((post) => shapeResearchSourceItem({
+        title: post.title,
+        url: post.permalink ? `https://www.reddit.com${post.permalink}` : post.url,
+        notes: cleanText(post.selftext || post.title).slice(0, 1200),
+        relation: 'same-creator',
+        source: `u/${author}`,
+        sourceTier: 'community'
+      }, lead))
+      .filter(Boolean)
+      .slice(0, limit);
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Discover + fetch related context for a thin lead (topic + same creator/project only).
+ */
+export async function researchTopicSources(lead = {}, { maxItems = 5 } = {}) {
+  if (!lead?.title) return [];
+  if (String(process.env.DEEP_RESEARCH_ENABLED || 'true').toLowerCase() === 'false') {
+    console.log('Deep research disabled via DEEP_RESEARCH_ENABLED=false.');
+    return [];
+  }
+
+  const entities = extractLeadEntities(lead);
+  const discovered = [];
+  const seenUrls = new Set([lead.link].filter(Boolean));
+
+  const geminiLinks = await discoverResearchLinksViaGemini(lead, { maxLinks: maxItems + 2 });
+  for (const item of geminiLinks) {
+    if (!item.link || seenUrls.has(item.link)) continue;
+    seenUrls.add(item.link);
+    discovered.push(item);
+  }
+
+  if (entities.redditAuthor) {
+    const authorPosts = await fetchRedditAuthorRecentPosts(entities.redditAuthor, lead, { limit: 4 });
+    for (const item of authorPosts) {
+      if (!item.link || seenUrls.has(item.link)) continue;
+      seenUrls.add(item.link);
+      discovered.push(item);
+    }
+  }
+
+  const enriched = [];
+  for (const item of discovered.slice(0, maxItems + 2)) {
+    // Skip if clearly off-topic vs lead after discovery
+    if (!isStrictlyRelatedToLead(item, lead)
+      && !shareMegaEventPackage(item, lead)
+      && !(entities.redditAuthor && new RegExp(entities.redditAuthor, 'i').test(`${item.title} ${item.source} ${item.description}`))
+      && !entities.projectKeys.some((key) => new RegExp(key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i').test(`${item.title} ${item.description}`))) {
+      // Allow research notes that mention the lead title tokens
+      if (!areTopicsSimilar(item.title, lead.title, { allowAnchorMatch: true })) {
+        continue;
+      }
+    }
+
+    let detail = item;
+    try {
+      detail = await enrichStoryDetail(item);
+    } catch {
+      detail = item;
+    }
+    detail = {
+      ...detail,
+      enrichmentRole: 'research',
+      sourceKind: detail.sourceKind || 'research'
+    };
+    enriched.push(detail);
+    if (enriched.length >= maxItems) break;
+    await sleep(300);
+  }
+
+  console.log(`Research kept ${enriched.length} source(s) for topic "${lead.title}".`);
+  return enriched;
 }
 
 function filterRetainedStoryHistoryEntries(entries = []) {
@@ -4057,34 +4505,72 @@ async function main() {
   }
 
   const editorialScore = getEditorialCandidateScore(mainStory, localHistory, getContentTypeCounts(localHistory));
-  const batchTrust = detectTrustLevelForBatch(generationBatch);
-  const batchMode = generationBatch.length > 1 ? 'multi-angle roundup' : 'single spotlight';
-  const buzzCount = generationBatch.filter((item) => item.enrichmentRole === 'buzz' || isWeakPackageBuzz(item)).length;
   const beatKeys = getFollowUpBeatKeys(mainStory);
   console.log(`Editorial pick: ${mainStory.contentType} (score ${editorialScore.toFixed(1)}) — "${mainStory.title}"`);
   if (beatKeys.length > 0) {
     console.log(`Follow-up beat(s) for fans: ${beatKeys.join(', ')}`);
   }
-  console.log(`Generation batch: ${generationBatch.length}/${batchLimit} ${mainStory.contentType} item(s) for ${batchMode} [${batchTrust}]${buzzCount ? ` (+${buzzCount} buzz context)` : ''}.`);
+  console.log(
+    `Related-only batch: ${generationBatch.length}/${batchLimit} ${mainStory.contentType} item(s) `
+    + `(no unrelated padding).`
+  );
 
   const enrichedItems = await enrichStories(generationBatch);
-  const qualityOk = (item) => meetsMinimumSourceQuality(item) && isEligibleForGeneration(item);
+  const qualityOk = (item) => {
+    if (item.enrichmentRole === 'research') {
+      return Boolean(item.title && (item.description || '').length >= 40);
+    }
+    return meetsMinimumSourceQuality(item) && isEligibleForGeneration(item);
+  };
   const leadKey = `${mainStory.link || ''}|${mainStory.title || ''}`;
   const enrichedLead = enrichedItems.find((item) => `${item.link || ''}|${item.title || ''}` === leadKey)
     || enrichedItems[0];
 
   if (!enrichedLead || !qualityOk(enrichedLead)) {
-    console.log('Only thin-source or off-topic stories available today; skipping generation.');
-    return;
+    // Lead may be thin RSS — still allow if we can deep-research
+    if (!enrichedLead?.title) {
+      console.log('Only thin-source or off-topic stories available today; skipping generation.');
+      return;
+    }
   }
 
   // Keep editorial lead first so exclusivity (etc.) is never replaced by a package rehash
-  const orderedSubstantive = [
+  let orderedSubstantive = [
     enrichedLead,
     ...prioritizeGenerationBatch(
       enrichedItems.filter((item) => item !== enrichedLead && qualityOk(item))
     )
-  ];
+  ].filter(Boolean);
+
+  // Thin lead / few related sources → research that topic and write a single-topic feature
+  if (needsDeepResearch(orderedSubstantive)) {
+    console.log(`Deep research mode: thin related batch for "${enrichedLead.title}" — gathering topic context (not unrelated news).`);
+    const researchItems = await researchTopicSources(enrichedLead, { maxItems: 5 });
+    orderedSubstantive = [
+      {
+        ...enrichedLead,
+        generationMode: 'feature'
+      },
+      ...researchItems,
+      ...orderedSubstantive.slice(1).filter((item) => isStrictlyRelatedToLead(item, enrichedLead))
+    ];
+    // Dedupe by link
+    const seen = new Set();
+    orderedSubstantive = orderedSubstantive.filter((item) => {
+      const key = item.link || item.title;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+    console.log(
+      `Feature batch: 1 lead + ${researchItems.length} research source(s) `
+      + `(${orderedSubstantive.length} total, related-only).`
+    );
+  } else {
+    const batchTrust = detectTrustLevelForBatch(orderedSubstantive);
+    const batchMode = orderedSubstantive.length > 1 ? 'multi-angle same-story package' : 'single spotlight';
+    console.log(`Generation batch: ${orderedSubstantive.length} item(s) for ${batchMode} [${batchTrust}].`);
+  }
 
   console.log(`Trust for fans: ${detectTrustLevelForBatch(orderedSubstantive)} — attribution: ${resolveStoryAttribution(orderedSubstantive, detectTrustLevelForBatch(orderedSubstantive))}`);
 

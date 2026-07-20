@@ -72,6 +72,12 @@ Secondary goals:
 └────────────────────────────┬────────────────────────────────────┘
                              ▼
 ┌─────────────────────────────────────────────────────────────────┐
+│ 4b. DEEP RESEARCH (when lead is thin / few related sources)      │
+│    Google Search grounding + fetch related pages (same topic)    │
+│    → single-topic FEATURE mode (not unrelated news padding)      │
+└────────────────────────────┬────────────────────────────────────┘
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
 │ 5. TRUST + ATTRIBUTION                                           │
 │    official | confirmed | press-report | community-highlight     │
 └────────────────────────────┬────────────────────────────────────┘
@@ -403,9 +409,23 @@ Rough score stack:
 ### 7.3 Assemble generation batch
 
 - Same `contentType` only (never mix news + mods in one article)  
-- Prefer items related to lead (mega-package, same follow-up beat)  
+- **Strict relatedness only** — secondary items must be the same story (mega-package, follow-up beat, topic similarity, same creator/project). Never pad with unrelated same-type headlines.  
 - Cap at type limit (e.g. 5)  
-- **Buzz enrichment:** weak theories / covered package rehashes may join as `enrichmentRole: 'buzz'` for context only  
+- **Buzz enrichment:** only when still same package/story (`enrichmentRole: 'buzz'`)  
+- **Community multi-highlight:** allowed only when intentional (several high-value community posts) and the lead is not a single-artist feature  
+
+### 7.3b Deep single-topic research (thin leads)
+
+When the related-only batch is still thin (one feed item, or little body text):
+
+1. Run **deep research** on that topic (Gemini Google Search grounding + optional Reddit author posts)  
+2. Fetch related pages for background (same project, same creator, same studio history)  
+3. Attach as `enrichmentRole: 'research'` sources  
+4. Write in **feature mode** — one full article like games media, not a mixed digest  
+
+Disable with `DEEP_RESEARCH_ENABLED=false`.  
+
+Do **not** deep-research when 2+ strictly related multi-outlet package sources already exist.  
 
 ### 7.4 Dedup & mega-events
 

@@ -9,6 +9,12 @@ import {
   getFollowUpBeatKeys,
   isBuzzEnrichmentCandidate,
   assembleGenerationItems,
+  isStrictlyRelatedToLead,
+  needsDeepResearch,
+  extractLeadEntities,
+  shapeResearchSourceItem,
+  shouldAllowCommunityMultiHighlight,
+  buildResearchQueryHints,
   buildArticleHtml,
   buildStorySummaryForPrompt,
   extractArticleBodyText,
@@ -153,49 +159,117 @@ test('assembleGenerationItems never mixes content types in one generation batch'
   ];
 
   const batch = assembleGenerationItems(mainStory, candidates, [], { maxItems: 5 });
-  assert.equal(batch.length, 2);
-  assert.ok(batch.every((item) => item.contentType === 'news'));
+  // Unrelated Obsidian DNA news must not pad an Emmy story
+  assert.equal(batch.length, 1);
   assert.equal(batch[0].title, mainStory.title);
+  assert.ok(batch.every((item) => item.contentType === 'news'));
 });
 
-test('assembleGenerationItems builds a mod roundup from same-type candidates only', () => {
+test('assembleGenerationItems keeps same-story package angles and drops unrelated mods', () => {
   const mainStory = {
-    source: 'r/FalloutMods',
-    title: 'New Vegas assassin faction mod released',
-    link: 'https://example.com/mod-1',
-    contentType: 'mods',
-    description: 'A New Vegas mod adds a Dark Brotherhood-style assassin faction with new quests and contracts.'
+    source: 'GameSpot',
+    title: 'Fallout 5 Is Really Happening, Along With Fallout 3 And Fallout: New Vegas Remasters',
+    link: 'https://example.com/fo5',
+    contentType: 'news',
+    description: 'Bethesda confirmed Fallout 5 pre-production and remasters for Fallout 3 and New Vegas in a studio note.'
   };
 
   const candidates = [
     mainStory,
     {
-      source: 'r/fo4',
-      title: 'Fallout 4 settlement overhaul mod',
-      link: 'https://example.com/mod-2',
-      contentType: 'mods',
-      description: 'A settlement overhaul mod for Fallout 4 adds new build pieces, lighting presets, and clutter packs.'
-    },
-    {
-      source: 'IGN',
-      title: 'Xbox portfolio reset continues',
-      link: 'https://example.com/news',
+      source: 'Kotaku',
+      title: 'Fallout 5 Is In Preproduction And Fallout 3 And New Vegas Remasters Are On The Way',
+      link: 'https://example.com/fo5-kotaku',
       contentType: 'news',
-      description: 'Industry coverage of Xbox portfolio changes across first-party studios.'
+      description: 'Kotaku covers the same official studio confirmation about Fallout 5 and remasters.'
     },
     {
       source: 'r/FalloutMods',
-      title: 'FNV weapon pack expansion',
-      link: 'https://example.com/mod-3',
+      title: 'Fallout 4 settlement overhaul mod',
+      link: 'https://example.com/mod-2',
       contentType: 'mods',
-      description: 'A weapon pack expansion for Fallout New Vegas adds lore-friendly firearms and custom animations.'
+      description: 'A settlement overhaul mod for Fallout 4 adds new build pieces, lighting presets, and clutter packs for builders.'
     }
   ];
 
   const batch = assembleGenerationItems(mainStory, candidates, [], { maxItems: 5 });
-  assert.equal(batch.length, 3);
+  assert.equal(batch.length, 2);
   assert.equal(batch[0].title, mainStory.title);
-  assert.ok(batch.every((item) => item.contentType === 'mods'));
+  assert.ok(batch.every((item) => item.contentType === 'news'));
+  assert.ok(batch.some((item) => /Kotaku|Preproduction/i.test(item.title) || item.source === 'Kotaku'));
+});
+
+test('isStrictlyRelatedToLead and needsDeepResearch support feature mode', () => {
+  const bakersfield = {
+    title: 'Fallout Bakersfield project details surface online',
+    description: 'A short blurb about the Fallout Bakersfield project with almost no body text yet.',
+    contentType: 'news',
+    source: 'The Gamer',
+    link: 'https://example.com/bakersfield'
+  };
+  const other = {
+    title: 'Fallout 76 season rewards refresh this week',
+    description: 'Season track notes for Fallout 76 with daily challenges and scoreboard details for Appalachia players.',
+    contentType: 'news',
+    source: 'Eurogamer',
+    link: 'https://example.com/76'
+  };
+  assert.equal(isStrictlyRelatedToLead(other, bakersfield), false);
+  assert.equal(needsDeepResearch([bakersfield]), true);
+  assert.ok(extractLeadEntities(bakersfield).projectKeys.length >= 1);
+  assert.ok(buildResearchQueryHints(bakersfield).some((hint) => /bakersfield/i.test(hint)));
+
+  const packageBatch = [
+    {
+      title: 'Fallout 5 Is Really Happening, Along With Fallout 3 And Fallout: New Vegas Remasters',
+      description: 'Bethesda confirmed Fallout 5 pre-production and remasters with a long studio note covering Obsidian, Raven Rock, and more franchise plans for fans.',
+      contentType: 'news',
+      source: 'GameSpot',
+      link: 'https://example.com/a'
+    },
+    {
+      title: 'Fallout 5 Is In Preproduction And Fallout 3 And New Vegas Remasters Are On The Way',
+      description: 'Kotaku reports the same official confirmation with additional quotes and context about pre-production, remasters, and what Bethesda said in the studio note for players.',
+      contentType: 'news',
+      source: 'Kotaku',
+      link: 'https://example.com/b'
+    },
+    {
+      title: 'Fallout 3 Prequel Raven Rock Coming To Fallout 76',
+      description: 'Insider Gaming covers Raven Rock as part of the same Bethesda package with Fallout 5 pre-production and remaster confirmations for the franchise roadmap.',
+      contentType: 'news',
+      source: 'Insider Gaming',
+      link: 'https://example.com/c'
+    }
+  ];
+  assert.equal(isStrictlyRelatedToLead(packageBatch[1], packageBatch[0]), true);
+  assert.equal(needsDeepResearch(packageBatch), false);
+});
+
+test('shapeResearchSourceItem rejects empty urls and tags research role', () => {
+  assert.equal(shapeResearchSourceItem({ title: 'x' }, { contentType: 'news' }), null);
+  const item = shapeResearchSourceItem({
+    title: 'Bakersfield wiki page',
+    url: 'https://fallout.fandom.com/wiki/Bakersfield',
+    notes: 'Background on the location and lore.',
+    relation: 'background'
+  }, { contentType: 'news', title: 'Fallout Bakersfield' });
+  assert.equal(item.enrichmentRole, 'research');
+  assert.match(item.link, /fandom\.com/);
+});
+
+test('shouldAllowCommunityMultiHighlight blocks single-artist feature leads', () => {
+  const artLead = {
+    title: 'u/Nero_arts shared New Vegas fan art',
+    description: 'Stunning FNV key art tribute posted on r/fnv after the remaster news.',
+    contentType: 'community',
+    source: 'Reddit — Custom Fallout Feed'
+  };
+  const others = [
+    { title: 'Cosplay at con', contentType: 'community', description: 'Vault suit cosplay photos from a fan convention floor with lots of detail.' },
+    { title: 'Camp build showcase', contentType: 'community', description: 'A huge FO76 camp build with screenshots and a full layout write-up for builders.' }
+  ];
+  assert.equal(shouldAllowCommunityMultiHighlight(artLead, [artLead, ...others]), false);
 });
 
 test('pickFeaturedStory prefers the strongest candidate even if that type was posted recently', () => {
