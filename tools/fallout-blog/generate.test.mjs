@@ -61,6 +61,10 @@ import {
   getCollectedItemPoolLimit,
   getGeminiApiKeys,
   getGeminiModelChain,
+  getSubstantiveGenerationAttempts,
+  diagnoseArticleThinness,
+  mergeExpandedArticle,
+  rotateList,
   getRedditCustomFeedItemLimit,
   getRedditCustomFeedMaxRank,
   getSourceDiversityAdjustment,
@@ -1754,4 +1758,71 @@ test('getGeminiModelChain defaults to all non-pro Flash models best to worst', (
     if (value === undefined) delete process.env[name];
     else process.env[name] = value;
   }
+});
+
+test('rotateList matches rotateApiKeys for model chain offsets', () => {
+  assert.deepEqual(rotateList(['m1', 'm2', 'm3'], 2), ['m3', 'm1', 'm2']);
+});
+
+test('getSubstantiveGenerationAttempts defaults high enough for multi-pass expansion', () => {
+  const previous = process.env.GEMINI_SUBSTANTIVE_ATTEMPTS;
+  delete process.env.GEMINI_SUBSTANTIVE_ATTEMPTS;
+  assert.ok(getSubstantiveGenerationAttempts() >= 5);
+
+  process.env.GEMINI_SUBSTANTIVE_ATTEMPTS = '3';
+  assert.equal(getSubstantiveGenerationAttempts(), 3);
+
+  process.env.GEMINI_SUBSTANTIVE_ATTEMPTS = '99';
+  assert.equal(getSubstantiveGenerationAttempts(), 12);
+
+  if (previous === undefined) delete process.env.GEMINI_SUBSTANTIVE_ATTEMPTS;
+  else process.env.GEMINI_SUBSTANTIVE_ATTEMPTS = previous;
+});
+
+test('diagnoseArticleThinness flags short sections and word deficits', () => {
+  const diagnosis = diagnoseArticleThinness({
+    intro: 'Short intro.',
+    sections: [
+      { heading: 'A', body: 'Too short.' },
+      { heading: 'B', body: 'Also too short here.' }
+    ],
+    conclusion: 'Done.'
+  });
+  assert.equal(diagnosis.needsMoreWords, true);
+  assert.equal(diagnosis.needsMoreSections, true);
+  assert.equal(diagnosis.shortSections.length, 2);
+});
+
+test('mergeExpandedArticle keeps longer previous section bodies when expansion is thinner', () => {
+  const previous = {
+    title: 'Solid Fallout New Vegas Fan Art Spotlight',
+    intro: 'A full intro that already has enough detail about the piece and the subreddit reaction for readers.',
+    sections: [
+      {
+        heading: 'The art',
+        body: 'This body is already long enough that we should not replace it with a shorter rewrite from a bad expansion pass that drops concrete detail fans care about in the original draft text here.'
+      }
+    ],
+    takeaway: 'Keep good copy.',
+    conclusion: 'Wrap with care for the wasteland readers who follow Fallout Hub regularly each week.'
+  };
+  const expanded = {
+    title: 'Solid Fallout New Vegas Fan Art Spotlight',
+    intro: 'Shorter intro.',
+    sections: [
+      { heading: 'The art', body: 'Tiny body.' },
+      {
+        heading: 'Extra angle',
+        body: 'A brand new section with enough words to count as real expansion material about the same fan art post and why New Vegas still inspires people to draw the Courier and Mojave skyline today for the community.'
+      }
+    ],
+    takeaway: 'Keep good copy and grow.',
+    conclusion: 'Longer conclusion that adds a bit more for the word count while staying on topic for Fallout fans reading along at home.'
+  };
+
+  const merged = mergeExpandedArticle(previous, expanded);
+  assert.match(merged.sections[0].body, /already long enough/);
+  assert.equal(merged.sections.length, 2);
+  assert.match(merged.sections[1].heading, /Extra angle/);
+  assert.ok(countWords(merged.intro) >= countWords(previous.intro));
 });

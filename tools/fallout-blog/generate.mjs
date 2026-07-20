@@ -2067,16 +2067,22 @@ MAIN COMMUNITY STORY TO LEAD WITH: ${mainStory.title}
 ${buildSharedArticleRequirements('community', trustLevel, reportingOutlet)}`;
 }
 
-function buildPrompt(newsItems, { expansion = false, previousArticle = null } = {}) {
+function buildPrompt(newsItems, { expansion = false, previousArticle = null, expansionAttempt = 0 } = {}) {
   const mainStory = newsItems[0];
   const contentType = mainStory.contentType || 'news';
   const contextText = buildPromptContext(newsItems);
+  const previousWords = getArticleWordCount(previousArticle || {});
+  const previousSections = Array.isArray(previousArticle?.sections) ? previousArticle.sections.length : 0;
 
   const expansionNote = expansion
-    ? `IMPORTANT: The previous draft was too short, too generic, or too bot-like. Rewrite it as a deeper article in ${AUTHOR_NAME}'s natural ${BRAND_NAME} voice.
+    ? `IMPORTANT: Expansion rewrite #${expansionAttempt || 1}. The previous draft failed the ${BRAND_NAME} substance gate (too short / thin sections / bot-like).
 Previous draft title: ${previousArticle?.title || 'unknown'}
-Previous word count: ${getArticleWordCount(previousArticle || {})}
-You must exceed ${MIN_ARTICLE_WORDS} words, add more concrete detail from the summaries below, and strip corporate/AI filler phrasing.\n\n`
+Previous word count: ${previousWords} (MUST exceed ${MIN_ARTICLE_WORDS})
+Previous section count: ${previousSections} (need at least 4 sections; each body ≥ ~35 words)
+Rewrite as a substantially deeper article in ${AUTHOR_NAME}'s natural ${BRAND_NAME} voice.
+Add more concrete detail from the source summaries below. Do not invent facts.
+Strip corporate/AI filler. Prefer longer, uneven section bodies over empty praise.
+${expansionAttempt >= 2 ? 'Earlier expansions still failed — be more thorough and use more of the source material in every section.\n' : ''}\n`
     : '';
 
   let body;
@@ -2305,6 +2311,203 @@ export function rotateApiKeys(keys = [], offset = 0) {
   if (!Array.isArray(keys) || keys.length === 0) return [];
   const normalizedOffset = ((offset % keys.length) + keys.length) % keys.length;
   return [...keys.slice(normalizedOffset), ...keys.slice(0, normalizedOffset)];
+}
+
+/** Same rotation helper for model chains (and any list). */
+export function rotateList(items = [], offset = 0) {
+  return rotateApiKeys(items, offset);
+}
+
+/**
+ * How many full generation passes to run until the article is substantive.
+ * Each pass can walk models × keys. Override with GEMINI_SUBSTANTIVE_ATTEMPTS (1–12).
+ */
+export function getSubstantiveGenerationAttempts() {
+  const fromEnv = Number.parseInt(process.env.GEMINI_SUBSTANTIVE_ATTEMPTS || '', 10);
+  if (Number.isFinite(fromEnv) && fromEnv >= 1) {
+    return Math.min(12, Math.max(1, fromEnv));
+  }
+
+  try {
+    const keyCount = getGeminiApiKeys().length;
+    // Enough passes to cycle keys and re-try expansion with different models
+    return Math.min(8, Math.max(5, keyCount * 2 + 1));
+  } catch {
+    return 5;
+  }
+}
+
+function scoreArticleSubstance(article = {}) {
+  const words = getArticleWordCount(article);
+  const sections = Array.isArray(article.sections) ? article.sections.length : 0;
+  const shortSections = Array.isArray(article.sections)
+    ? article.sections.filter((section) => (section.body || '').split(/\s+/).filter(Boolean).length < 35).length
+    : 0;
+  return words + sections * 40 - shortSections * 25;
+}
+
+/** What failed the substance gate — used for targeted expansion, not full rewrites. */
+export function diagnoseArticleThinness(article = {}, { minWords = MIN_ARTICLE_WORDS, minSections = 4 } = {}) {
+  const words = getArticleWordCount(article);
+  const sections = Array.isArray(article.sections) ? article.sections : [];
+  const shortSectionIndexes = sections
+    .map((section, index) => ({
+      index,
+      heading: section.heading || `Section ${index + 1}`,
+      words: (section.body || '').split(/\s+/).filter(Boolean).length
+    }))
+    .filter((entry) => entry.words < 35);
+
+  return {
+    words,
+    wordDeficit: Math.max(0, minWords - words),
+    sectionCount: sections.length,
+    sectionsNeeded: Math.max(0, minSections - sections.length),
+    shortSections: shortSectionIndexes,
+    needsMoreWords: words < minWords,
+    needsMoreSections: sections.length < minSections,
+    needsLongerSections: shortSectionIndexes.length > 0
+  };
+}
+
+/**
+ * Grow a thin draft without starting over: keep solid copy, only flesh out weak spots.
+ * Returns a full article object; mergeExpandedArticle() then protects good previous content.
+ */
+export function mergeExpandedArticle(previous = null, expanded = null) {
+  if (!expanded && previous) return previous;
+  if (!previous) return expanded;
+  if (!expanded) return previous;
+
+  const prevSections = Array.isArray(previous.sections) ? previous.sections : [];
+  const nextSections = Array.isArray(expanded.sections) ? expanded.sections : [];
+  const maxLen = Math.max(prevSections.length, nextSections.length);
+  const mergedSections = [];
+
+  for (let i = 0; i < maxLen; i += 1) {
+    const prev = prevSections[i];
+    const next = nextSections[i];
+    if (!prev && next) {
+      mergedSections.push(next);
+      continue;
+    }
+    if (prev && !next) {
+      mergedSections.push(prev);
+      continue;
+    }
+    const prevWords = (prev.body || '').split(/\s+/).filter(Boolean).length;
+    const nextWords = (next.body || '').split(/\s+/).filter(Boolean).length;
+    // Prefer the longer body; keep the better heading if one is empty
+    mergedSections.push({
+      heading: (next.heading && next.heading.trim()) || prev.heading,
+      body: nextWords >= prevWords ? (next.body || prev.body) : (prev.body || next.body)
+    });
+  }
+
+  // If expansion added extra sections beyond previous, already included via maxLen.
+  // If we still have fewer than 4, keep whatever we have (expansion should have added).
+
+  const pickLonger = (a, b) => {
+    const aw = countWords(a || '');
+    const bw = countWords(b || '');
+    return bw > aw ? b : a;
+  };
+
+  const merged = {
+    ...previous,
+    title: expanded.title && countChars(expanded.title) >= MIN_TITLE_CHARS ? expanded.title : previous.title,
+    seoDescription: pickLonger(previous.seoDescription, expanded.seoDescription),
+    subtitle: pickLonger(previous.subtitle, expanded.subtitle),
+    intro: pickLonger(previous.intro, expanded.intro),
+    keyFacts: Array.isArray(expanded.keyFacts) && expanded.keyFacts.length >= (previous.keyFacts?.length || 0)
+      ? expanded.keyFacts
+      : (previous.keyFacts || expanded.keyFacts),
+    sections: mergedSections,
+    takeaway: pickLonger(previous.takeaway, expanded.takeaway),
+    conclusion: pickLonger(previous.conclusion, expanded.conclusion),
+    cta: expanded.cta || previous.cta,
+    contentType: expanded.contentType || previous.contentType,
+    trustLevel: expanded.trustLevel || previous.trustLevel,
+    sources: Array.isArray(expanded.sources) && expanded.sources.length > 0
+      ? expanded.sources
+      : previous.sources
+  };
+
+  // Never accept an expansion that got worse overall
+  if (scoreArticleSubstance(merged) < scoreArticleSubstance(previous)) {
+    return previous;
+  }
+  return merged;
+}
+
+function buildTargetedExpansionPrompt(newsItems, previousArticle, { expansionAttempt = 1 } = {}) {
+  const contentType = newsItems[0]?.contentType || previousArticle?.contentType || 'news';
+  const trustLevel = detectTrustLevelForBatch(newsItems);
+  const diagnosis = diagnoseArticleThinness(previousArticle);
+  const sourceContext = buildPromptContext(newsItems);
+  const shortList = diagnosis.shortSections.length > 0
+    ? diagnosis.shortSections.map((s) => `  - "${s.heading}" (~${s.words} words — grow to 50–100+ words using source detail)`).join('\n')
+    : '  - (no short sections; deepen existing bodies and intro/conclusion instead)';
+
+  const tasks = [];
+  if (diagnosis.needsMoreWords) {
+    tasks.push(`- Raise total article length from ~${diagnosis.words} to OVER ${MIN_ARTICLE_WORDS} words (deficit ~${diagnosis.wordDeficit}+ words)`);
+  }
+  if (diagnosis.needsMoreSections) {
+    tasks.push(`- Add ${diagnosis.sectionsNeeded} more section(s) so there are at least 4 total (new headings must use source material only)`);
+  }
+  if (diagnosis.needsLongerSections) {
+    tasks.push('- Expand the short section bodies listed below — do not replace solid long sections with shorter text');
+  }
+  if (tasks.length === 0) {
+    tasks.push(`- Deepen the draft past ${MIN_ARTICLE_WORDS} words while keeping the same structure and voice`);
+  }
+
+  return `You are ${AUTHOR_NAME} editing an existing ${BRAND_NAME} draft. This is TARGETED EXPANSION pass #${expansionAttempt} — NOT a rewrite from scratch.
+
+${getAuthorVoiceGuide(contentType)}
+
+GOAL: Keep what already works. Only grow the thin parts until the article is publishable.
+
+HARD RULES:
+- Do NOT throw away the draft and start over
+- Keep the same title unless it is vague or broken; small polish only
+- Keep the same trustLevel, contentType, and source URLs (you may only drop clearly wrong sources)
+- Preserve strong section bodies that are already long enough — expand them only if you can add real source detail
+- Do NOT invent facts, quotes, dates, or creators not in SOURCE MATERIAL
+- Stay in a natural human voice (no corporate AI filler)
+
+CURRENT DRAFT JSON:
+${JSON.stringify({
+    title: previousArticle.title,
+    seoDescription: previousArticle.seoDescription,
+    subtitle: previousArticle.subtitle,
+    intro: previousArticle.intro,
+    keyFacts: previousArticle.keyFacts,
+    sections: previousArticle.sections,
+    takeaway: previousArticle.takeaway,
+    conclusion: previousArticle.conclusion,
+    cta: previousArticle.cta,
+    contentType: previousArticle.contentType || contentType,
+    trustLevel: previousArticle.trustLevel || trustLevel,
+    sources: previousArticle.sources
+  }, null, 2)}
+
+THINNESS DIAGNOSIS:
+- Word count: ${diagnosis.words} (need ≥ ${MIN_ARTICLE_WORDS})
+- Sections: ${diagnosis.sectionCount} (need ≥ 4)
+- Short sections to expand:
+${shortList}
+
+TASKS FOR THIS PASS:
+${tasks.join('\n')}
+
+SOURCE MATERIAL (only facts you may add):
+${sourceContext}
+
+Return the FULL updated article as valid JSON with the same fields:
+title, seoDescription, subtitle, intro, keyFacts, sections, conclusion, takeaway, cta, contentType, trustLevel, sources
+contentType must be "${contentType}" and trustLevel must be "${previousArticle.trustLevel || trustLevel}".`;
 }
 
 function advanceGeminiKeyCursor(keyCount = 1) {
@@ -3016,33 +3219,96 @@ async function generateArticle(newsItems) {
   const contentType = newsItems[0]?.contentType || 'news';
   const apiKeys = getGeminiApiKeys();
   const models = getGeminiModelChain();
+  const maxAttempts = getSubstantiveGenerationAttempts();
   console.log(`Gemini key pool: ${apiKeys.length} configured key(s), ${apiKeys.length > 1 ? 'using round-robin across generation calls' : 'single-key mode'}.`);
   console.log(`Gemini model chain (${models.length}): ${models.join(' → ')}`);
+  console.log(`Substantive generation budget: 1 draft + up to ${maxAttempts - 1} targeted expansion(s) (models × keys each call).`);
 
-  const prompt = buildPrompt(newsItems);
-  let article = normalizeArticle(await callGemini(prompt, { contentType }), newsItems);
+  let bestArticle = null;
+  let bestScore = -1;
 
-  if (!isArticleSubstantive(article)) {
-    console.warn(`Article too thin (${getArticleWordCount(article)} words). Requesting expanded version...`);
-    const expansionPrompt = buildPrompt(newsItems, { expansion: true, previousArticle: article });
-    article = normalizeArticle(await callGemini(expansionPrompt, { contentType }), newsItems);
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    const isExpansion = attempt > 1 && bestArticle;
+    // Pass 1 = full draft. Later passes = grow the best draft in place (not rewrite from scratch).
+    const prompt = isExpansion
+      ? buildTargetedExpansionPrompt(newsItems, bestArticle, { expansionAttempt: attempt - 1 })
+      : buildPrompt(newsItems);
+
+    const modelOffset = (attempt - 1) % Math.max(models.length, 1);
+    const keyOffset = advanceGeminiKeyCursor(apiKeys.length);
+
+    console.log(
+      `Generation pass ${attempt}/${maxAttempts}`
+      + ` (start model #${modelOffset + 1}/${models.length}, key offset ${keyOffset}`
+      + `${isExpansion ? ', targeted expansion' : ', initial draft'})...`
+    );
+
+    let article;
+    try {
+      const raw = await callGemini(prompt, { contentType, modelOffset, keyOffset });
+      article = normalizeArticle(raw, newsItems);
+      if (isExpansion) {
+        article = normalizeArticle(mergeExpandedArticle(bestArticle, article), newsItems);
+      }
+    } catch (error) {
+      console.warn(`Generation pass ${attempt}/${maxAttempts} failed: ${error.message}`);
+      if (bestArticle) continue;
+      throw error;
+    }
+
+    const words = getArticleWordCount(article);
+    const score = scoreArticleSubstance(article);
+    const sections = Array.isArray(article.sections) ? article.sections.length : 0;
+    const diagnosis = diagnoseArticleThinness(article);
+    console.log(`Pass ${attempt} result: ${words} words, ${sections} section(s), substance score ${score}.`);
+
+    if (score > bestScore) {
+      bestArticle = article;
+      bestScore = score;
+    }
+
+    if (isArticleSubstantive(article)) {
+      console.log(`Article is substantive on pass ${attempt}/${maxAttempts} (${words} words).`);
+      return article;
+    }
+
+    if (attempt < maxAttempts) {
+      console.warn(
+        `Still thin after pass ${attempt}/${maxAttempts} `
+        + `(${words} words, need ≥${MIN_ARTICLE_WORDS}; `
+        + `${diagnosis.shortSections.length} short section(s), `
+        + `${diagnosis.sectionsNeeded} section(s) to add). `
+        + 'Expanding weak parts with next model/key — not rewriting from scratch...'
+      );
+    }
   }
 
-  return article;
+  if (bestArticle) {
+    console.warn(
+      `All ${maxAttempts} generation pass(es) finished; best draft is still thin `
+      + `(${getArticleWordCount(bestArticle)} words). Returning best attempt for publish gate.`
+    );
+    return bestArticle;
+  }
+
+  throw new Error('Gemini produced no usable article after all generation passes.');
 }
 
-async function callGemini(prompt, { contentType = 'news' } = {}) {
+/**
+ * Call Gemini walking models first, then every key for that model, then the next model.
+ * That way a strong model can succeed on a fallback key before we drop to weaker models.
+ */
+async function callGemini(prompt, { contentType = 'news', modelOffset = 0, keyOffset = null } = {}) {
   const apiKeys = getGeminiApiKeys();
-  const keyOffset = advanceGeminiKeyCursor(apiKeys.length);
-  const rotatedKeys = rotateApiKeys(apiKeys, keyOffset);
-
-  const models = getGeminiModelChain();
+  const resolvedKeyOffset = keyOffset == null ? advanceGeminiKeyCursor(apiKeys.length) : keyOffset;
+  const rotatedKeys = rotateApiKeys(apiKeys, resolvedKeyOffset);
+  const models = rotateList(getGeminiModelChain(), modelOffset);
   const errors = [];
 
-  for (const [keyIndex, apiKey] of rotatedKeys.entries()) {
-    const keyLabel = getGeminiKeyLabel((keyOffset + keyIndex) % apiKeys.length);
+  for (const model of models) {
+    for (const [keyIndex, apiKey] of rotatedKeys.entries()) {
+      const keyLabel = getGeminiKeyLabel((resolvedKeyOffset + keyIndex) % apiKeys.length);
 
-    for (const model of models) {
       try {
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
           method: 'POST',
@@ -3060,8 +3326,12 @@ async function callGemini(prompt, { contentType = 'news' } = {}) {
           const text = await response.text();
           const message = `Gemini API error ${response.status}: ${text}`;
           errors.push(`${keyLabel}/${model}: ${message}`);
-          if (shouldTryNextGeminiModel(response.status, text)) continue;
-          break;
+          // Quota/rate on this key → try next key for same model
+          if (shouldTryNextGeminiKey(response.status, text)) continue;
+          // Model broken/unavailable → skip remaining keys for this model
+          if (shouldTryNextGeminiModel(response.status, text)) break;
+          // Hard client error on this key — still try other keys/models
+          continue;
         }
 
         const data = await response.json();
