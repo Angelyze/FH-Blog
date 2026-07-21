@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "ca2b8d68b1a63560",
+      "topicFingerprint": "e91d701911e3f86b",
+      "contentType": "news",
+      "title": "Fallout 76 Update Notes - July 21, 2026",
+      "articleTitle": "Fallout 76 July 21 Update: Next-Gen Status and a Massive Bug Sweep",
+      "source": "Steam — Fallout 76",
+      "coveredAt": 1784657823917
+    },
+    {
+      "fingerprint": "c5913a813855692d",
+      "topicFingerprint": "753acbd9332bae4e",
+      "contentType": "news",
+      "title": "Fallout 76 July 21 Update: Next-Gen Status and a Massive Bug Sweep",
+      "articleTitle": "Fallout 76 July 21 Update: Next-Gen Status and a Massive Bug Sweep",
+      "source": "Fallout Hub",
+      "coveredAt": 1784657823917
+    },
+    {
       "fingerprint": "5fc92d523da8d538",
       "topicFingerprint": "92bde025ea81075e",
       "contentType": "community",
