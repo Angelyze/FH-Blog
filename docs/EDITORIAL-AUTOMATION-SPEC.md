@@ -462,13 +462,24 @@ Only after **successful publish adapter** call:
 Priority sketch:
 
 1. `tier === official` → `official`  
-2. mods/community → `community-highlight`  
+2. mods/community/**any Reddit community source** → `community-highlight` (never confirmed from wording alone)  
 3. Weak package buzz → force `press-report` (never “confirmed studio news”)  
-4. Official confirmation signals in text → `confirmed`  
+4. Official confirmation signals in **press** text → `confirmed`  
 5. Rumor / “– Report” framing → `press-report`  
 6. Confirmed press signals (patch notes, now live) → `confirmed`  
 7. Platform exclusivity follow-ups → usually `press-report`  
 8. Default press → `press-report`  
+
+### 8.0 Satire / fake announcement filter
+
+Skip (not eligible) when posts look like meme “news”:
+
+- Joke years (2077+) with confirm/announce framing  
+- Impossible hardware (e.g. Xbox Palantir)  
+- Community-only “Fallout 6 confirmed” style headlines  
+- Uncorroborated “Todd/Bethesda confirms…” from Reddit alone  
+
+If deep research returns **no** press/official backup for a studio-claim community post → **skip draft** (`uncorroborated-studio-claim`), do not write as fact.
 
 ### 8.2 Per batch
 

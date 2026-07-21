@@ -15,6 +15,10 @@ import {
   shapeResearchSourceItem,
   shouldAllowCommunityMultiHighlight,
   buildResearchQueryHints,
+  isObviousSatireOrFakeAnnouncement,
+  isUncorroboratedStudioClaim,
+  isCommunitySourcedItem,
+  batchHasReliableCorroboration,
   buildArticleHtml,
   buildStorySummaryForPrompt,
   extractArticleBodyText,
@@ -270,6 +274,57 @@ test('shouldAllowCommunityMultiHighlight blocks single-artist feature leads', ()
     { title: 'Camp build showcase', contentType: 'community', description: 'A huge FO76 camp build with screenshots and a full layout write-up for builders.' }
   ];
   assert.equal(shouldAllowCommunityMultiHighlight(artLead, [artLead, ...others]), false);
+});
+
+test('isObviousSatireOrFakeAnnouncement catches Palantir 2077 Todd meme posts', () => {
+  const meme = {
+    title: "Todd Howard officially confirms that ‘FALLOUT 6’ will release exclusively for the XBOX PALANTIR 2 for Fallout Day on Ocotober 23, 2077.",
+    description: 'lol',
+    contentType: 'community',
+    sourceKind: 'reddit',
+    sourceTier: 'community',
+    source: 'Reddit — Custom Fallout Feed'
+  };
+  assert.equal(isObviousSatireOrFakeAnnouncement(meme), true);
+  assert.equal(isUncorroboratedStudioClaim(meme), true);
+  assert.equal(isEligibleForGeneration(meme), false);
+  assert.equal(
+    detectTrustLevel(meme, { tier: 'community', category: 'community' }),
+    'community-highlight'
+  );
+  assert.equal(
+    detectTrustLevelForBatch([meme]),
+    'community-highlight'
+  );
+});
+
+test('community confirmation wording never upgrades batch trust without press/official', () => {
+  const redditClaim = {
+    title: 'Todd Howard confirms Fallout 5 is in pre-production exclusively on Reddit trust me',
+    description: 'Someone on reddit says Todd confirmed something about Fallout 5 remasters and exclusives.',
+    contentType: 'community',
+    sourceKind: 'reddit',
+    sourceTier: 'community',
+    source: 'Reddit — Custom Fallout Feed'
+  };
+  // May or may not be pure satire, but must not become "confirmed" alone
+  assert.equal(isCommunitySourcedItem(redditClaim), true);
+  assert.equal(batchHasReliableCorroboration([redditClaim]), false);
+  assert.equal(detectTrustLevelForBatch([redditClaim]), 'community-highlight');
+
+  const withSteam = [
+    {
+      title: 'Fallout 76 Update Notes - July 21, 2026',
+      description: 'Official patch notes and next-gen status from Bethesda via Steam.',
+      contentType: 'news',
+      sourceTier: 'official',
+      source: 'Steam — Fallout 76',
+      link: 'https://store.steampowered.com/news/app/1151340'
+    },
+    redditClaim
+  ];
+  assert.equal(batchHasReliableCorroboration(withSteam), true);
+  assert.equal(detectTrustLevelForBatch(withSteam), 'official');
 });
 
 test('pickFeaturedStory prefers the strongest candidate even if that type was posted recently', () => {

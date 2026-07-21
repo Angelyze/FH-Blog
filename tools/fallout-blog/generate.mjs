@@ -1307,7 +1307,88 @@ function isDedicatedFalloutSource(source = {}) {
   return source.dedicatedFallout === true || source.kind === 'reddit';
 }
 
+/**
+ * Meme / shitpost "announcements" that must never become news features.
+ * Example: "Todd confirms Fallout 6 on Xbox Palantir 2 for October 23, 2077".
+ */
+export function isObviousSatireOrFakeAnnouncement(item = {}) {
+  const title = String(item.title || '');
+  const haystack = `${title} ${item.description || ''}`;
+
+  // Far-future or in-universe joke years with announcement framing
+  if (/\b(2077|208\d|209\d|21\d{2})\b/.test(haystack)
+    && /\b(confirm|announc|release|exclusive|fallout day|launch)\b/i.test(haystack)) {
+    return true;
+  }
+
+  // Impossible / meme hardware and products
+  if (/\bpalantir\b|\bxbox\s+palantir|\bsteam\s*deck\s*3\b|\bps6\s+pro\b|\bnintendo\s+switch\s*3\s+fallout\b/i.test(haystack)) {
+    return true;
+  }
+
+  // Common meme typos with announcement framing
+  if (/\bocotober\b|\boctober\s+32\b|\bjanurary\b/i.test(haystack)
+    && /\b(confirm|announc|release|exclusive)\b/i.test(haystack)) {
+    return true;
+  }
+
+  // "Fallout 6/7/69" confirmation from community-only sources
+  const fromCommunity = isCommunitySourcedItem(item);
+  if (fromCommunity
+    && /\b(confirm|confirms|confirmed|officially|announces|announced)\b/i.test(title)
+    && /\bfallout\s*(6|7|8|9|69|420)\b/i.test(title)) {
+    return true;
+  }
+
+  return false;
+}
+
+/** Community-only "Todd/Bethesda confirms…" with no press/official source in the item itself. */
+export function isUncorroboratedStudioClaim(item = {}) {
+  if (!isCommunitySourcedItem(item)) return false;
+  if (isObviousSatireOrFakeAnnouncement(item)) return true;
+
+  const title = String(item.title || '');
+  const haystack = `${title} ${item.description || ''}`;
+
+  const hasStudioActor = /\b(todd howard|bethesda|obsidian|microsoft|xbox wire|zenimax)\b/i.test(haystack);
+  const hasConfirmVerb = /\b(confirm|confirms|confirmed|officially|announces|announced|reveal|reveals|revealed)\b/i.test(haystack);
+  const hasBigClaim = /\b(fallout\s*[5-9]|fallout\s*6|remaster|exclusive|release date|xbox exclusive|ps5 exclusive)\b/i.test(haystack);
+
+  return hasStudioActor && hasConfirmVerb && hasBigClaim;
+}
+
+export function isCommunitySourcedItem(item = {}) {
+  if (!item) return false;
+  if (item.enrichmentRole === 'research') {
+    return item.sourceTier === 'community'
+      || item.sourceKind === 'reddit'
+      || /reddit/i.test(item.source || '');
+  }
+  return item.sourceTier === 'community'
+    || item.contentType === 'community'
+    || item.sourceKind === 'reddit'
+    || /reddit/i.test(item.source || '');
+}
+
+/** True when the batch includes real press or official (not community-only Reddit). */
+export function batchHasReliableCorroboration(newsItems = []) {
+  if (!Array.isArray(newsItems)) return false;
+  return newsItems.some((item) => {
+    if (!item || item.enrichmentRole === 'buzz') return false;
+    if (item.sourceTier === 'official') return true;
+    if (item.sourceTier === 'press' && item.sourceKind !== 'reddit') return true;
+    if (item.enrichmentRole === 'research' && item.sourceTier === 'press') return true;
+    if (item.enrichmentRole === 'research' && resolveOutletFromLink(item.link)) return true;
+    return false;
+  });
+}
+
 export function isEligibleForGeneration(item = {}) {
+  if (isObviousSatireOrFakeAnnouncement(item)) return false;
+  // Community "studio confirms X" without being a known joke still must not lead alone
+  if (isUncorroboratedStudioClaim(item)) return false;
+
   if (item.sourceKind === 'reddit') return true;
   if (/wiki|mutants allowed|duck and cover|steam community|steam —/i.test(item.source || '')) return true;
   if (!hasFalloutFocus(item)) return false;
@@ -1423,8 +1504,11 @@ function scoreItem(item, source) {
   if (isNicheCommunityPost(item)) score -= 3.5;
   if (NOISE_TERMS.some((term) => haystack.includes(term))) score -= 4;
   if (hasCompetingFranchiseInTitle(item.title || '') && !/\bfallout\b/i.test(item.title || '')) score -= 8;
-  // Prefer press that is covering an official studio confirmation over rumor-framed packages
-  if (hasOfficialConfirmationSignals(item)) score += 4.5;
+  if (isObviousSatireOrFakeAnnouncement(item) || isUncorroboratedStudioClaim(item)) score -= 25;
+  // Prefer press/official confirmation coverage — not community meme "Todd confirms" posts
+  if (hasOfficialConfirmationSignals(item) && !isCommunitySourcedItem({ ...item, sourceTier: source.tier || item.sourceTier, contentType })) {
+    score += 4.5;
+  }
 
   return score;
 }
@@ -1539,9 +1623,17 @@ export function resolveReportingOutletFromSources(sources = [], newsItems = []) 
 export function detectTrustLevel(item = {}, source = {}) {
   const tier = source.tier || item.sourceTier;
   const category = source.category || item.contentType;
+  const normalized = {
+    ...item,
+    sourceTier: tier,
+    contentType: category || item.contentType
+  };
 
   if (tier === 'official') return 'official';
-  if (category === 'mods' || category === 'community') return 'community-highlight';
+  // Community / Reddit never becomes confirmed from "officially confirms" wording alone
+  if (category === 'mods' || category === 'community' || isCommunitySourcedItem(normalized)) {
+    return 'community-highlight';
+  }
 
   // Fan theories / soft buzz must never inherit "confirmed studio news" framing
   if (isWeakPackageBuzz(item) || item.enrichmentRole === 'buzz') {
@@ -1593,9 +1685,19 @@ export function detectTrustLevelForBatch(newsItems = []) {
     category: lead.contentType
   });
 
+  // Pure community batches stay community — never upgrade via "confirms" wording
+  if (!batchHasReliableCorroboration(newsItems)) {
+    if (newsItems.every((item) => isCommunitySourcedItem(item) || item.enrichmentRole === 'buzz')) {
+      return 'community-highlight';
+    }
+  }
+
   // Lead is a distinct follow-up or weak buzz → trust follows the lead, not package rehash support
   if (lead && (hasDistinctFollowUpBeat(lead) || isWeakPackageBuzz(lead) || lead.enrichmentRole === 'buzz')) {
-    if (leadLevel === 'official') return 'official';
+    if (leadLevel === 'official' && batchHasReliableCorroboration(newsItems)) return 'official';
+    if (leadLevel === 'confirmed' && !batchHasReliableCorroboration(newsItems)) {
+      return isCommunitySourcedItem(lead) ? 'community-highlight' : 'press-report';
+    }
     return leadLevel;
   }
 
@@ -1603,15 +1705,17 @@ export function detectTrustLevelForBatch(newsItems = []) {
     item.trustLevel || detectTrustLevel(item, { tier: item.sourceTier, category: item.contentType })
   ));
 
-  if (levels.includes('official')) return 'official';
+  if (levels.includes('official') && batchHasReliableCorroboration(newsItems)) return 'official';
 
+  // Only non-community sources can push the batch to "confirmed"
   const confirmedLike = newsItems.filter((item) => (
-    hasOfficialConfirmationSignals(item) && !isWeakPackageBuzz(item) && item.enrichmentRole !== 'buzz'
+    !isCommunitySourcedItem(item)
+    && hasOfficialConfirmationSignals(item)
+    && !isWeakPackageBuzz(item)
+    && item.enrichmentRole !== 'buzz'
   )).length;
   if (confirmedLike > 0) return 'confirmed';
-  if (levels.includes('confirmed')) return 'confirmed';
-
-  if (newsItems.length >= 2 && confirmedLike >= 1) return 'confirmed';
+  if (levels.includes('confirmed') && batchHasReliableCorroboration(newsItems)) return 'confirmed';
 
   if (levels.includes('press-report')) return 'press-report';
   if (levels.includes('community-highlight')) return 'community-highlight';
@@ -4546,6 +4650,33 @@ async function main() {
   if (needsDeepResearch(orderedSubstantive)) {
     console.log(`Deep research mode: thin related batch for "${enrichedLead.title}" — gathering topic context (not unrelated news).`);
     const researchItems = await researchTopicSources(enrichedLead, { maxItems: 5 });
+
+    // "Todd/Bethesda confirms…" from Reddit with zero real corroboration → do not write as news
+    const studioClaim = isUncorroboratedStudioClaim(enrichedLead)
+      || isObviousSatireOrFakeAnnouncement(enrichedLead)
+      || (
+        isCommunitySourcedItem(enrichedLead)
+        && hasOfficialConfirmationSignals(enrichedLead)
+      );
+    const researchedBatch = [enrichedLead, ...researchItems];
+    if (studioClaim && !batchHasReliableCorroboration(researchedBatch)) {
+      console.warn(
+        `Blogger draft skipped: uncorroborated-studio-claim `
+        + `(community/meme "confirmation" with ${researchItems.length} research source(s) and no press/official backup). `
+        + `"${enrichedLead.title}"`
+      );
+      await fs.writeFile(OUTPUT_FILE, JSON.stringify({
+        generatedAt: new Date().toISOString(),
+        brand: BRAND_NAME,
+        publishable: false,
+        publishSkippedReason: 'uncorroborated-studio-claim',
+        selectedNews: researchedBatch,
+        article: null
+      }, null, 2));
+      console.log(`Draft output saved to ${OUTPUT_FILE}`);
+      return;
+    }
+
     orderedSubstantive = [
       {
         ...enrichedLead,
@@ -4572,7 +4703,9 @@ async function main() {
     console.log(`Generation batch: ${orderedSubstantive.length} item(s) for ${batchMode} [${batchTrust}].`);
   }
 
-  console.log(`Trust for fans: ${detectTrustLevelForBatch(orderedSubstantive)} — attribution: ${resolveStoryAttribution(orderedSubstantive, detectTrustLevelForBatch(orderedSubstantive))}`);
+  // Final safety: never treat pure community batches as official/confirmed news
+  const batchTrust = detectTrustLevelForBatch(orderedSubstantive);
+  console.log(`Trust for fans: ${batchTrust} — attribution: ${resolveStoryAttribution(orderedSubstantive, batchTrust)}`);
 
   let article;
   let generationError = null;
