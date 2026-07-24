@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "91ab3203c5c01855",
+      "topicFingerprint": "313a904d39c7d669",
+      "contentType": "news",
+      "title": "Fallout Fan Gets New Vegas Running In Morrowind",
+      "articleTitle": "A Modder Is Porting Fallout: New Vegas Into Morrowind's Engine",
+      "source": "The Gamer",
+      "coveredAt": 1784880637633
+    },
+    {
+      "fingerprint": "e37136836b860ebd",
+      "topicFingerprint": "e6e8faac64e4eea1",
+      "contentType": "news",
+      "title": "A Modder Is Porting Fallout: New Vegas Into Morrowind's Engine",
+      "articleTitle": "A Modder Is Porting Fallout: New Vegas Into Morrowind's Engine",
+      "source": "Fallout Hub",
+      "coveredAt": 1784880637633
+    },
+    {
       "fingerprint": "da1741b0f8cf04cc",
       "topicFingerprint": "2edd4b03d0d59e6e",
       "contentType": "community",
