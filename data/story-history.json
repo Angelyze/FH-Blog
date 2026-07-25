@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "4ee30ff1ceaf44a3",
+      "topicFingerprint": "47a96ae7d598258a",
+      "contentType": "news",
+      "title": "Sony’s PlayStation Disc Shutdown Draws Ubisoft’s Verdict, as CFO Bets Cheaper Digital Machines Beat the Used-Game Fallout",
+      "articleTitle": "Sony’s Reported Disc Shutdown Has Ubisoft Betting Against Physical",
+      "source": "Wccftech",
+      "coveredAt": 1784965959524
+    },
+    {
+      "fingerprint": "cc8124d771a6296f",
+      "topicFingerprint": "df102aefb37d60d3",
+      "contentType": "news",
+      "title": "Sony’s Reported Disc Shutdown Has Ubisoft Betting Against Physical",
+      "articleTitle": "Sony’s Reported Disc Shutdown Has Ubisoft Betting Against Physical",
+      "source": "Fallout Hub",
+      "coveredAt": 1784965959524
+    },
+    {
       "fingerprint": "91ab3203c5c01855",
       "topicFingerprint": "313a904d39c7d669",
       "contentType": "news",
