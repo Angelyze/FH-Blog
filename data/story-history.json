@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "feeca8b293e7da68",
+      "topicFingerprint": "cabecd3e8f108a5c",
+      "contentType": "news",
+      "title": "Dragon's Dogma 2 is getting a Fallout-inspired homesteading mod with fully customisable houses, and its creator has tons of big ideas for it",
+      "articleTitle": "Dragon's Dogma 2 Is Getting a Fallout-Style Homesteading Mod",
+      "source": "Eurogamer",
+      "coveredAt": 1785257948784
+    },
+    {
+      "fingerprint": "6f7ef24682690878",
+      "topicFingerprint": "f8e71a4d60057802",
+      "contentType": "news",
+      "title": "Dragon's Dogma 2 Is Getting a Fallout-Style Homesteading Mod",
+      "articleTitle": "Dragon's Dogma 2 Is Getting a Fallout-Style Homesteading Mod",
+      "source": "Fallout Hub",
+      "coveredAt": 1785257948784
+    },
+    {
       "fingerprint": "638ddeebbecbc138",
       "topicFingerprint": "ab2c3d5533eade88",
       "contentType": "community",
