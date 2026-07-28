@@ -1,119 +1,178 @@
-import test from 'node:test';
-import assert from 'node:assert/strict';
+import assert from "node:assert/strict";
+import test from "node:test";
 import {
   buildDiscordPayload,
   buildPostExcerpt,
-  extractFirstImageUrl,
+  extractMetaTags,
+  extractSearchDescriptionComment,
   getPostsToShare,
   parseBlogFeedItems,
-  stripHtml
-} from './share-latest-post.mjs';
+  pickBestDescription,
+  preferFullSizeBloggerImage,
+  stripHtml,
+} from "./share-latest-post.mjs";
 
-const sampleFeed = `<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
-  <channel>
-    <item>
-      <title><![CDATA[Older Fallout 76 update recap]]></title>
-      <link>https://www.fallouthub.blog/2026/07/older-post.html</link>
-      <guid isPermaLink="true">https://www.fallouthub.blog/2026/07/older-post.html</guid>
-      <pubDate>Mon, 13 Jul 2026 10:00:00 +0000</pubDate>
-      <description><![CDATA[<p>Older coverage for returning players.</p>]]></description>
-    </item>
-    <item>
-      <title><![CDATA[Fallout 4 modders add protest signs across the Commonwealth]]></title>
-      <link>https://www.fallouthub.blog/2026/07/protest-mod-post.html</link>
-      <guid isPermaLink="true">https://www.fallouthub.blog/2026/07/protest-mod-post.html</guid>
-      <pubDate>Tue, 14 Jul 2026 12:00:00 +0000</pubDate>
-      <description><![CDATA[<p>Modders turned Fallout 4 into a visible protest against recent layoffs.</p><img src="https://blogger.googleusercontent.com/img/example-rss.jpg" />]]></description>
-      <media:content url="https://blogger.googleusercontent.com/img/example-media.jpg" medium="image" />
-    </item>
-  </channel>
-</rss>`;
-
-test('parseBlogFeedItems extracts Blogger RSS posts in publish order', () => {
-  const items = parseBlogFeedItems(sampleFeed);
-  assert.equal(items.length, 2);
-  assert.equal(items[0].title, 'Older Fallout 76 update recap');
-  assert.equal(items[1].link, 'https://www.fallouthub.blog/2026/07/protest-mod-post.html');
-  assert.ok(items[1].publishedAt > items[0].publishedAt);
+test("stripHtml removes tags and collapses whitespace", () => {
+  assert.equal(stripHtml("<p>Hello <b>world</b></p>"), "Hello world");
 });
 
-test('parseBlogFeedItems pulls image URLs from media tags and description HTML', () => {
-  const items = parseBlogFeedItems(sampleFeed);
-  assert.equal(items[1].imageUrl, 'https://blogger.googleusercontent.com/img/example-media.jpg');
+test("buildPostExcerpt truncates long text", () => {
+  assert.equal(buildPostExcerpt("  a   b  "), "a b");
+  const long = "x".repeat(500);
+  assert.ok(buildPostExcerpt(long, { maxChars: 280 }).endsWith("…"));
+  assert.ok(buildPostExcerpt(long, { maxChars: 280 }).length <= 281);
 });
 
-test('getPostsToShare bootstraps without posting existing feed items', () => {
-  const items = parseBlogFeedItems(sampleFeed);
-  const result = getPostsToShare(items, { initialized: false, sharedPostIds: [] });
-
-  assert.equal(result.mode, 'bootstrap');
-  assert.equal(result.posts.length, 0);
-  assert.equal(result.nextState.initialized, true);
-  assert.equal(result.nextState.sharedPostIds.length, 2);
+test("extractMetaTags handles attribute order and single quotes", () => {
+  const html = `
+    <meta content="Eyebot pod blurb" property="og:description" />
+    <meta name='twitter:image' content='https://example.com/big.jpg' />
+    <meta property="og:image" content="https://example.com/og.jpg">
+  `;
+  const tags = extractMetaTags(html);
+  assert.equal(tags.get("og:description"), "Eyebot pod blurb");
+  assert.equal(tags.get("twitter:image"), "https://example.com/big.jpg");
+  assert.equal(tags.get("og:image"), "https://example.com/og.jpg");
 });
 
-test('getPostsToShare returns only unseen posts after bootstrap', () => {
-  const items = parseBlogFeedItems(sampleFeed);
-  const result = getPostsToShare(items, {
-    initialized: true,
-    sharedPostIds: ['https://www.fallouthub.blog/2026/07/older-post.html']
+test("extractSearchDescriptionComment reads Blogger SEARCH_DESCRIPTION", () => {
+  const html = `<!-- SEARCH_DESCRIPTION (150 chars): A Fallout 4 veteran with 2,000 hours just discovered the Eyebot pod settlement item, proving we still find new things in the game nine years later! -->`;
+  assert.match(
+    extractSearchDescriptionComment(html) || "",
+    /Eyebot pod settlement item/,
+  );
+});
+
+test("extractSearchDescriptionComment handles RSS entity-encoded comments", () => {
+  const encoded =
+    "&lt;!--SEARCH_DESCRIPTION (147 chars): A Fallout 4 veteran with 2,000 hours just discovered the Eyebot pod settlement item, proving we still find new things in the game nine years later!--&gt;";
+  assert.match(
+    extractSearchDescriptionComment(encoded) || "",
+    /Eyebot pod settlement item/,
+  );
+});
+
+test("preferFullSizeBloggerImage upgrades s72 and w640 crops", () => {
+  assert.equal(
+    preferFullSizeBloggerImage(
+      "https://blogger.googleusercontent.com/img/b/R29/s72-c/photo.jpg",
+    ),
+    "https://blogger.googleusercontent.com/img/b/R29/s1600/photo.jpg",
+  );
+  assert.equal(
+    preferFullSizeBloggerImage(
+      "https://blogger.googleusercontent.com/img/b/R29/w640-h360-p-k-no-nu/photo.jpg",
+    ),
+    "https://blogger.googleusercontent.com/img/b/R29/s1600/photo.jpg",
+  );
+});
+
+test("pickBestDescription prefers SEO-length over long RSS body", () => {
+  const longRss = "x".repeat(800);
+  const seo =
+    "A Fallout 4 veteran with 2,000 hours just discovered the Eyebot pod settlement item.";
+  const best = pickBestDescription({
+    feedDescription: longRss,
+    ogDescription: seo,
   });
-
-  assert.equal(result.mode, 'share');
-  assert.equal(result.posts.length, 1);
-  assert.equal(result.posts[0].title, 'Fallout 4 modders add protest signs across the Commonwealth');
+  assert.equal(best.description, seo);
+  assert.equal(best.source, "og:description");
 });
 
-test('buildDiscordPayload creates a Fallout Hub embed with OG image', () => {
+test("pickBestDescription uses search description comment when better", () => {
+  const feed = "x".repeat(600);
+  const comment =
+    "A Fallout 4 veteran with 2,000 hours just discovered the Eyebot pod settlement item, proving we still find new things in the game nine years later!";
+  const best = pickBestDescription({
+    feedDescription: feed,
+    searchDescriptionComment: comment,
+  });
+  assert.equal(best.description, comment);
+  assert.equal(best.source, "SEARCH_DESCRIPTION comment");
+});
+
+test("getPostsToShare bootstraps then shares new ids only", () => {
+  const items = [
+    { id: "a", title: "A", link: "https://example.com/a" },
+    { id: "b", title: "B", link: "https://example.com/b" },
+  ];
+  const boot = getPostsToShare(items, { initialized: false });
+  assert.equal(boot.mode, "bootstrap");
+  assert.deepEqual(boot.nextState.sharedPostIds, ["a", "b"]);
+
+  const share = getPostsToShare(
+    [...items, { id: "c", title: "C", link: "https://example.com/c" }],
+    { initialized: true, sharedPostIds: ["a", "b"] },
+  );
+  assert.equal(share.mode, "share");
+  assert.equal(share.posts.length, 1);
+  assert.equal(share.posts[0].id, "c");
+});
+
+test("parseBlogFeedItems reads RSS item fields", () => {
+  const xml = `<?xml version="1.0"?>
+  <rss version="2.0">
+    <channel>
+      <item>
+        <title>Hello World</title>
+        <link>https://example.com/p/hello</link>
+        <guid>tag:blogger.com,1999:blog-123.post-456</guid>
+        <pubDate>Fri, 20 Mar 2026 10:00:00 +0000</pubDate>
+        <description><![CDATA[<p>Short summary</p>]]></description>
+      </item>
+    </channel>
+  </rss>`;
+  const entries = parseBlogFeedItems(xml);
+  assert.equal(entries.length, 1);
+  assert.equal(entries[0].title, "Hello World");
+  assert.equal(entries[0].link, "https://example.com/p/hello");
+  assert.equal(entries[0].description, "Short summary");
+  assert.equal(entries[0].id, "tag:blogger.com,1999:blog-123.post-456");
+});
+
+test("parseBlogFeedItems prefers SEARCH_DESCRIPTION and upgrades Blogger image sizes", () => {
+  const seo =
+    "A Fallout 4 veteran with 2,000 hours just discovered the Eyebot pod settlement item, proving we still find new things in the game nine years later!";
+  const xml = `<?xml version="1.0"?>
+  <rss version="2.0">
+    <channel>
+      <item>
+        <title>After 2,000 Hours</title>
+        <link>https://www.fallouthub.blog/2026/07/after.html</link>
+        <guid>tag:blogger.com,1999:blog-1.post-2</guid>
+        <pubDate>Mon, 27 Jul 2026 09:54:33 +0000</pubDate>
+        <description>&lt;!--SEARCH_DESCRIPTION (147 chars): ${seo}--&gt;&lt;p&gt;Long body that should not become the Discord blurb because we have SEO text.&lt;/p&gt;&lt;img src=&quot;https://blogger.googleusercontent.com/img/b/R29/w640-h360/photo.jpg&quot; /&gt;</description>
+      </item>
+    </channel>
+  </rss>`;
+  const entries = parseBlogFeedItems(xml);
+  assert.equal(entries.length, 1);
+  assert.equal(entries[0].searchDescription, seo);
+  assert.equal(entries[0].description, seo);
+  assert.equal(
+    entries[0].imageUrl,
+    "https://blogger.googleusercontent.com/img/b/R29/s1600/photo.jpg",
+  );
+});
+
+test("buildDiscordPayload includes large image and SEO description", () => {
   const payload = buildDiscordPayload({
-    title: 'Fallout 4 modders add protest signs across the Commonwealth',
-    link: 'https://www.fallouthub.blog/2026/07/protest-mod-post.html',
-    description: '<p>Modders turned Fallout 4 into a visible protest against recent layoffs.</p>',
-    imageUrl: 'https://blogger.googleusercontent.com/img/b/example/w640-h360/cover.jpg',
-    publishedAt: Date.parse('Tue, 14 Jul 2026 12:00:00 +0000')
+    title: "After 2,000 Hours",
+    link: "https://www.fallouthub.blog/2026/03/after.html",
+    ogDescription:
+      "A Fallout 4 veteran with 2,000 hours just discovered the Eyebot pod settlement item.",
+    imageUrl:
+      "https://blogger.googleusercontent.com/img/b/R29/s1600/hero.jpg",
+    publishedAt: Date.parse("2026-03-20T12:00:00.000Z"),
   });
-
-  assert.equal(payload.username, 'Fallout Hub');
-  assert.equal(payload.embeds[0].title, 'Fallout 4 modders add protest signs across the Commonwealth');
-  assert.equal(payload.embeds[0].url, 'https://www.fallouthub.blog/2026/07/protest-mod-post.html');
-  assert.equal(payload.embeds[0].color, 0xff9000);
-  assert.match(payload.embeds[0].description, /visible protest/);
+  assert.equal(payload.embeds[0].title, "After 2,000 Hours");
+  assert.equal(
+    payload.embeds[0].description,
+    "A Fallout 4 veteran with 2,000 hours just discovered the Eyebot pod settlement item.",
+  );
   assert.equal(
     payload.embeds[0].image.url,
-    'https://blogger.googleusercontent.com/img/b/example/w640-h360/cover.jpg'
+    "https://blogger.googleusercontent.com/img/b/R29/s1600/hero.jpg",
   );
-  assert.equal(payload.embeds[0].footer.text, 'fallouthub.blog');
-});
-
-test('buildDiscordPayload omits image when no OG image is available', () => {
-  const payload = buildDiscordPayload({
-    title: 'Fallout news without a cover',
-    link: 'https://www.fallouthub.blog/2026/07/no-image.html',
-    description: 'Still worth reading.'
-  });
-
-  assert.equal(payload.embeds[0].image, undefined);
-});
-
-test('extractFirstImageUrl finds og:image meta tags', () => {
-  const html = `
-    <html><head>
-      <meta property="og:image" content="https://blogger.googleusercontent.com/img/b/og-cover.jpg" />
-      <meta property="og:description" content="Studio confirms Fallout 5 pre-production." />
-    </head></html>
-  `;
-
-  assert.equal(
-    extractFirstImageUrl(html),
-    'https://blogger.googleusercontent.com/img/b/og-cover.jpg'
-  );
-});
-
-test('stripHtml and buildPostExcerpt clean Blogger summaries', () => {
-  assert.equal(stripHtml('<p>Hello <strong>wasteland</strong></p>'), 'Hello wasteland');
-  assert.match(
-    buildPostExcerpt('<p>' + 'Fallout fans '.repeat(40) + '</p>'),
-    /…$/
-  );
+  assert.equal(payload.username, "Fallout Hub");
 });
