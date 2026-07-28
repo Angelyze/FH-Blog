@@ -1,6 +1,168 @@
 {
   "entries": [
     {
+      "fingerprint": "feeca8b293e7da68",
+      "topicFingerprint": "cabecd3e8f108a5c",
+      "contentType": "news",
+      "title": "Dragon's Dogma 2 is getting a Fallout-inspired homesteading mod with fully customisable houses, and its creator has tons of big ideas for it",
+      "articleTitle": "Dragon's Dogma 2 Is Getting a Fallout-Style Homesteading Mod",
+      "source": "Eurogamer",
+      "coveredAt": 1785257948784
+    },
+    {
+      "fingerprint": "6f7ef24682690878",
+      "topicFingerprint": "f8e71a4d60057802",
+      "contentType": "news",
+      "title": "Dragon's Dogma 2 Is Getting a Fallout-Style Homesteading Mod",
+      "articleTitle": "Dragon's Dogma 2 Is Getting a Fallout-Style Homesteading Mod",
+      "source": "Fallout Hub",
+      "coveredAt": 1785257948784
+    },
+    {
+      "fingerprint": "638ddeebbecbc138",
+      "topicFingerprint": "ab2c3d5533eade88",
+      "contentType": "community",
+      "title": "Hot Take, Fallout,s 4 art Style is great, but the color pallete is terrible",
+      "articleTitle": "Is Fallout 4 Too Colorful? The Debate Over the Commonwealth's Palette",
+      "source": "Reddit — Custom Fallout Feed",
+      "coveredAt": 1785146291359
+    },
+    {
+      "fingerprint": "2548ac730856796d",
+      "topicFingerprint": "3e84c678ec403b1a",
+      "contentType": "community",
+      "title": "Is Fallout 4 Too Colorful? The Debate Over the Commonwealth's Palette",
+      "articleTitle": "Is Fallout 4 Too Colorful? The Debate Over the Commonwealth's Palette",
+      "source": "Fallout Hub",
+      "coveredAt": 1785146291359
+    },
+    {
+      "fingerprint": "aad164bfe8bc50a9",
+      "topicFingerprint": "d75a8411fc158a6a",
+      "contentType": "community",
+      "title": "There should be a fallout game where you establish trade routes between the east and west coasts and they make it clear the NCR views Appalachians the way the Romans viewed the Chinese.",
+      "articleTitle": "This Fan Pitch Connects the NCR to Appalachia Like Rome to China",
+      "source": "Reddit — Custom Fallout Feed",
+      "coveredAt": 1785144890715
+    },
+    {
+      "fingerprint": "2f9818938b7afb5e",
+      "topicFingerprint": "0e4b6ce044b3ded3",
+      "contentType": "community",
+      "title": "This Fan Pitch Connects the NCR to Appalachia Like Rome to China",
+      "articleTitle": "This Fan Pitch Connects the NCR to Appalachia Like Rome to China",
+      "source": "Fallout Hub",
+      "coveredAt": 1785144890715
+    },
+    {
+      "fingerprint": "3ccd3bd52e99b9d1",
+      "topicFingerprint": "5bea65bbcd21fbb3",
+      "contentType": "community",
+      "title": "I think I finally realised why I like the older Fallouts designs more than the new, despite both being Retrofuturistic, and thats that the new ones lack that brutalistic Mad Max aspect.",
+      "articleTitle": "Is Modern Fallout Missing That Brutal 'Mad Max' Edge?",
+      "source": "Reddit — Custom Fallout Feed",
+      "coveredAt": 1785053457793
+    },
+    {
+      "fingerprint": "5fe9c044c88a235f",
+      "topicFingerprint": "88698ee8a83809f5",
+      "contentType": "community",
+      "title": "Is Modern Fallout Missing That Brutal 'Mad Max' Edge?",
+      "articleTitle": "Is Modern Fallout Missing That Brutal 'Mad Max' Edge?",
+      "source": "Fallout Hub",
+      "coveredAt": 1785053457793
+    },
+    {
+      "fingerprint": "4ee30ff1ceaf44a3",
+      "topicFingerprint": "47a96ae7d598258a",
+      "contentType": "news",
+      "title": "Sony’s PlayStation Disc Shutdown Draws Ubisoft’s Verdict, as CFO Bets Cheaper Digital Machines Beat the Used-Game Fallout",
+      "articleTitle": "Sony’s Reported Disc Shutdown Has Ubisoft Betting Against Physical",
+      "source": "Wccftech",
+      "coveredAt": 1784965959524
+    },
+    {
+      "fingerprint": "cc8124d771a6296f",
+      "topicFingerprint": "df102aefb37d60d3",
+      "contentType": "news",
+      "title": "Sony’s Reported Disc Shutdown Has Ubisoft Betting Against Physical",
+      "articleTitle": "Sony’s Reported Disc Shutdown Has Ubisoft Betting Against Physical",
+      "source": "Fallout Hub",
+      "coveredAt": 1784965959524
+    },
+    {
+      "fingerprint": "91ab3203c5c01855",
+      "topicFingerprint": "313a904d39c7d669",
+      "contentType": "news",
+      "title": "Fallout Fan Gets New Vegas Running In Morrowind",
+      "articleTitle": "A Modder Is Porting Fallout: New Vegas Into Morrowind's Engine",
+      "source": "The Gamer",
+      "coveredAt": 1784880637633
+    },
+    {
+      "fingerprint": "e37136836b860ebd",
+      "topicFingerprint": "e6e8faac64e4eea1",
+      "contentType": "news",
+      "title": "A Modder Is Porting Fallout: New Vegas Into Morrowind's Engine",
+      "articleTitle": "A Modder Is Porting Fallout: New Vegas Into Morrowind's Engine",
+      "source": "Fallout Hub",
+      "coveredAt": 1784880637633
+    },
+    {
+      "fingerprint": "da1741b0f8cf04cc",
+      "topicFingerprint": "2edd4b03d0d59e6e",
+      "contentType": "community",
+      "title": "Fallout 1 weird file image",
+      "articleTitle": "Who Is This Guy? A Bizarre Fallout 1 File Discovery",
+      "source": "Reddit — Custom Fallout Feed",
+      "coveredAt": 1784794464734
+    },
+    {
+      "fingerprint": "669801e4da8ffff1",
+      "topicFingerprint": "8e94b900026e0da0",
+      "contentType": "community",
+      "title": "Who Is This Guy? A Bizarre Fallout 1 File Discovery",
+      "articleTitle": "Who Is This Guy? A Bizarre Fallout 1 File Discovery",
+      "source": "Fallout Hub",
+      "coveredAt": 1784794464734
+    },
+    {
+      "fingerprint": "9e12343f10ca73d9",
+      "topicFingerprint": "7d879adde18032d2",
+      "contentType": "community",
+      "title": "What the fuck is this shit",
+      "articleTitle": "After 2,000 Hours in Fallout 4, a Veteran Just Discovered This Feature",
+      "source": "Reddit — Custom Fallout Feed",
+      "coveredAt": 1784707865143
+    },
+    {
+      "fingerprint": "813e6a2707ef0c4a",
+      "topicFingerprint": "b3066732d4677dbe",
+      "contentType": "community",
+      "title": "After 2,000 Hours in Fallout 4, a Veteran Just Discovered This Feature",
+      "articleTitle": "After 2,000 Hours in Fallout 4, a Veteran Just Discovered This Feature",
+      "source": "Fallout Hub",
+      "coveredAt": 1784707865143
+    },
+    {
+      "fingerprint": "fafc1da3d2aa6d09",
+      "topicFingerprint": "db3dbcf89a8c55f6",
+      "contentType": "community",
+      "title": "Fallout 3 Chinese PLA soldier cosplay",
+      "articleTitle": "This Fallout 3 Chinese PLA Soldier Cosplay Is Anchorage-Ready",
+      "source": "Reddit — Custom Fallout Feed",
+      "coveredAt": 1784659305901
+    },
+    {
+      "fingerprint": "330277165be47e59",
+      "topicFingerprint": "a663bfc66f0f29b6",
+      "contentType": "community",
+      "title": "This Fallout 3 Chinese PLA Soldier Cosplay Is Anchorage-Ready",
+      "articleTitle": "This Fallout 3 Chinese PLA Soldier Cosplay Is Anchorage-Ready",
+      "source": "Fallout Hub",
+      "coveredAt": 1784659305901
+    },
+    {
       "fingerprint": "7a88d053e34ed9f9",
       "topicFingerprint": "ed11838a7a128d05",
       "contentType": "community",
