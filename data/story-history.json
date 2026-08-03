@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "17eeb1b50a74d080",
+      "topicFingerprint": "ba2f7570dc17b75c",
+      "contentType": "news",
+      "title": "Reported lead of Obsidian's new Fallout game wants you to feel a \"sense of agony\" when playing an RPG, rather than being an all-powerful god-splatterer",
+      "articleTitle": "Josh Sawyer Wants His Reported New Fallout Game to Hurt a Little",
+      "source": "Rock Paper Shotgun",
+      "coveredAt": 1785749136647
+    },
+    {
+      "fingerprint": "449fa31343349b9c",
+      "topicFingerprint": "194445aae4726076",
+      "contentType": "news",
+      "title": "Josh Sawyer Wants His Reported New Fallout Game to Hurt a Little",
+      "articleTitle": "Josh Sawyer Wants His Reported New Fallout Game to Hurt a Little",
+      "source": "Fallout Hub",
+      "coveredAt": 1785749136647
+    },
+    {
       "fingerprint": "7dbd17f992e328d0",
       "topicFingerprint": "b181e8a431fb0d71",
       "contentType": "news",
@@ -494,15 +512,6 @@
       "articleTitle": "Bethesda Confirms Fallout 5, Plus Fallout 3 & New Vegas Remasters",
       "source": "Fallout Hub",
       "coveredAt": 1784370516661
-    },
-    {
-      "fingerprint": "ab0274d0ff131564",
-      "topicFingerprint": "b11e0fb46e265e20",
-      "contentType": "news",
-      "title": "New Fallout Game Is New Focus For New Vegas Developer Obsidian Entertainment &#8211; Report",
-      "articleTitle": "Obsidian Reportedly Shifting Focus to New Fallout Game",
-      "source": "GameSpot",
-      "coveredAt": 1783871250237
     }
   ]
 }
