@@ -7,6 +7,14 @@ import { pathToFileURL } from 'node:url';
 const ROOT = process.cwd();
 const OUTPUT_DIR = path.join(ROOT, 'artifacts');
 const OUTPUT_FILE = path.join(OUTPUT_DIR, 'latest-draft.json');
+const POSTS_DIR = process.env.POSTS_DIR
+  ? path.resolve(process.env.POSTS_DIR)
+  : path.join(ROOT, 'posts');
+/** First post number when posts/ is empty (user requested No.01). */
+const POSTS_START_NUMBER = Math.max(
+  1,
+  Number.parseInt(process.env.POSTS_START_NUMBER || '1', 10) || 1
+);
 const HISTORY_FILE = path.join(ROOT, 'data', 'story-history.json');
 const FEED_HEALTH_FILE = path.join(ROOT, 'data', 'feed-health.json');
 const MANUAL_SEEDS_FILE = path.join(ROOT, 'data', 'manual-seeds.json');
@@ -2543,9 +2551,106 @@ export function buildArticleHtml(article) {
   return `<article>${seoHtml}${disclaimerHtml}${subtitleHtml}${introHtml}${keyFactsHtml}${sectionsHtml}${takeawayHtml}${conclusionHtml}${ctaHtml}${sourcesHtml}${editorialHtml}</article>`;
 }
 
-export function getBloggerInsertUrl(blogId, { asDraft = true } = {}) {
-  const base = `https://www.googleapis.com/blogger/v3/blogs/${blogId}/posts`;
-  return asDraft ? `${base}?isDraft=true` : base;
+/**
+ * Display form for post numbers: 01, 02, … 99, then 100+ without forced width.
+ */
+export function formatPostNumber(n = 1) {
+  const num = Math.max(1, Math.floor(Number(n) || 1));
+  return num < 100 ? String(num).padStart(2, '0') : String(num);
+}
+
+export function parsePostNumberFromFilename(name = '') {
+  const match = String(name).match(/^No\.(\d+)\s*-/i);
+  if (!match) return null;
+  const n = Number.parseInt(match[1], 10);
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+
+export async function nextPostNumber(postsDir = POSTS_DIR, { startNumber = POSTS_START_NUMBER } = {}) {
+  let max = startNumber - 1;
+  try {
+    const entries = await fs.readdir(postsDir, { withFileTypes: true });
+    for (const entry of entries) {
+      if (!entry.isFile()) continue;
+      const n = parsePostNumberFromFilename(entry.name);
+      if (n != null && n > max) max = n;
+    }
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+  }
+  return max + 1;
+}
+
+/** Strip characters that are invalid or awkward in Windows filenames. */
+export function sanitizePostFilenameTitle(title = '', { maxLength = 80 } = {}) {
+  const cleaned = String(title || 'Untitled')
+    .replace(/[<>:"/\\|?*\u0000-\u001f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/[. ]+$/g, '');
+  const base = cleaned || 'Untitled';
+  if (base.length <= maxLength) return base;
+  const trimmed = base.slice(0, maxLength);
+  const lastSpace = trimmed.lastIndexOf(' ');
+  return (lastSpace > 40 ? trimmed.slice(0, lastSpace) : trimmed).trim() || 'Untitled';
+}
+
+export function buildPostFilename(postNumber, title = '') {
+  const num = formatPostNumber(postNumber);
+  const safeTitle = sanitizePostFilenameTitle(title);
+  return `No.${num} - ${safeTitle}.html`;
+}
+
+/**
+ * Full post file: copy-paste meta (title, SEO, tags) + same article HTML as former Blogger drafts.
+ */
+export function buildPostFileHtml(article = {}, {
+  postNumber = 1,
+  labels = null,
+  generatedAt = new Date().toISOString()
+} = {}) {
+  const tags = Array.isArray(labels) ? labels : getBloggerLabels(article);
+  const seoDescription = ensureSeoDescription(article);
+  const seoCharCount = countChars(seoDescription);
+  const title = String(article.title || 'Untitled').trim();
+  const meta = [
+    `  POST No.${formatPostNumber(postNumber)}`,
+    `  TITLE: ${title}`,
+    `  SEARCH DESCRIPTION (${seoCharCount} chars): ${seoDescription}`,
+    `  TAGS: ${tags.join(', ') || '(none)'}`,
+    `  TRUST: ${article.trustLevel || 'confirmed'}`,
+    `  CONTENT TYPE: ${article.contentType || 'news'}`,
+    `  GENERATED: ${generatedAt}`
+  ].join('\n');
+
+  return `<!--\n${meta}\n-->\n${buildArticleHtml(article)}\n`;
+}
+
+export async function writePostFile(article = {}, {
+  postsDir = POSTS_DIR,
+  postNumber = null,
+  labels = null,
+  generatedAt = new Date().toISOString()
+} = {}) {
+  await fs.mkdir(postsDir, { recursive: true });
+  const number = postNumber ?? await nextPostNumber(postsDir);
+  const tagList = Array.isArray(labels) ? labels : getBloggerLabels(article);
+  const filename = buildPostFilename(number, article.title);
+  const filePath = path.join(postsDir, filename);
+  const html = buildPostFileHtml(article, {
+    postNumber: number,
+    labels: tagList,
+    generatedAt
+  });
+  await fs.writeFile(filePath, html, 'utf8');
+  return {
+    postNumber: number,
+    postNumberLabel: formatPostNumber(number),
+    filename,
+    filePath,
+    relativePath: path.relative(ROOT, filePath).split(path.sep).join('/'),
+    labels: tagList
+  };
 }
 
 function extractJsonText(text) {
@@ -3716,51 +3821,6 @@ async function saveStoryHistory(existingEntries, selectedStories, article = {}) 
   console.log(`Story history saved: ${entries.length} entr${entries.length === 1 ? 'y' : 'ies'}.`);
 }
 
-async function getBloggerAccessToken() {
-  const clientId = process.env.GOOGLE_CLIENT_ID;
-  const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-  const refreshToken = process.env.GOOGLE_REFRESH_TOKEN;
-
-  if (!clientId || !clientSecret || !refreshToken) {
-    throw new Error('Missing Blogger credentials');
-  }
-
-  const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      client_id: clientId,
-      client_secret: clientSecret,
-      refresh_token: refreshToken,
-      grant_type: 'refresh_token'
-    })
-  });
-
-  if (!tokenResponse.ok) {
-    let detail = `HTTP ${tokenResponse.status}`;
-    try {
-      const errBody = await tokenResponse.json();
-      // Google returns error + error_description (no secrets) — helps diagnose expired/revoked tokens
-      const code = errBody.error || 'unknown_error';
-      const description = errBody.error_description || errBody.error_uri || '';
-      detail = description ? `${code}: ${description}` : code;
-    } catch {
-      // ignore parse failures
-    }
-    throw new Error(
-      `Failed to refresh Blogger access token (${detail}). `
-      + 'Usually the GOOGLE_REFRESH_TOKEN is expired/revoked, or it does not match GOOGLE_CLIENT_ID/SECRET. '
-      + 'Re-run OAuth for the blog owner account and update GitHub Secrets — you can stay in Testing mode.'
-    );
-  }
-
-  const tokenData = await tokenResponse.json();
-  if (!tokenData.access_token) {
-    throw new Error('Failed to refresh Blogger access token (no access_token in response)');
-  }
-  return tokenData.access_token;
-}
-
 function getGeminiTemperature(contentType = 'news') {
   if (contentType === 'community') return 0.65;
   if (contentType === 'mods') return 0.55;
@@ -4518,6 +4578,7 @@ async function fetchContentItems() {
   };
 }
 
+/** Blogger label suggestions for manual paste (TAGS line in post HTML). */
 export function getBloggerLabels(article = {}) {
   const labels = new Set();
   const trustLevel = article.trustLevel || 'confirmed';
@@ -4544,39 +4605,6 @@ export function getBloggerLabels(article = {}) {
   if (/\btv\b|\bprime\b|\bemmy/.test(haystack)) labels.add('Fallout TV Show');
 
   return [...labels].slice(0, 15);
-}
-
-async function createBloggerDraft(article) {
-  const blogId = process.env.BLOGGER_BLOG_ID;
-
-  if (!blogId || !process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET || !process.env.GOOGLE_REFRESH_TOKEN) {
-    throw new Error('Missing Blogger credentials');
-  }
-
-  const accessToken = await getBloggerAccessToken();
-
-  const postBody = {
-    kind: 'blogger#post',
-    title: article.title,
-    content: buildArticleHtml(article),
-    labels: getBloggerLabels(article)
-  };
-
-  const response = await fetch(getBloggerInsertUrl(blogId, { asDraft: true }), {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(postBody)
-  });
-
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`Blogger API error ${response.status}: ${text}`);
-  }
-
-  return response.json();
 }
 
 async function main() {
@@ -4661,7 +4689,7 @@ async function main() {
     const researchedBatch = [enrichedLead, ...researchItems];
     if (studioClaim && !batchHasReliableCorroboration(researchedBatch)) {
       console.warn(
-        `Blogger draft skipped: uncorroborated-studio-claim `
+        `Post package skipped: uncorroborated-studio-claim `
         + `(community/meme "confirmation" with ${researchItems.length} research source(s) and no press/official backup). `
         + `"${enrichedLead.title}"`
       );
@@ -4723,8 +4751,8 @@ async function main() {
   }
 
   const publishable = isPublishableArticle(article, { mode, historyEntries: localHistory });
-  let bloggerPost = null;
-  let bloggerError = null;
+  let postFile = null;
+  let postFileError = null;
   let publishSkippedReason = null;
 
   if (!publishable) {
@@ -4738,32 +4766,29 @@ async function main() {
     const titleDetail = ['title-length', 'vague-title', 'duplicate-title', 'empty-title'].includes(publishSkippedReason)
       ? ` (${countChars(article.title)} chars: "${article.title}")`
       : '';
-    console.warn(`Blogger draft skipped: ${publishSkippedReason}${titleDetail}`);
+    console.warn(`Post package skipped: ${publishSkippedReason}${titleDetail}`);
   } else if (isTopicCovered(mainStory, localHistory) || isDuplicateArticleTitle(article.title, localHistory)) {
     publishSkippedReason = 'already-covered';
-    console.warn(`Blogger draft skipped: "${article.title}" matches a recently covered story.`);
+    console.warn(`Post package skipped: "${article.title}" matches a recently covered story.`);
   } else {
     try {
-      bloggerPost = await createBloggerDraft(article);
-      if (bloggerPost) {
-        console.log('Blogger draft created successfully.');
-        // Mark lead + supporting angles. Buzz is marked too so it cannot re-lead later,
-        // but distinct follow-up beats remain open until written as a lead.
-        const historyStories = [
-          ...orderedSubstantive,
-          {
-            title: article.title,
-            description: orderedSubstantive.map((item) => item.title).join(' · '),
-            source: BRAND_NAME,
-            contentType: orderedSubstantive[0]?.contentType || 'news',
-            link: orderedSubstantive[0]?.link || ''
-          }
-        ];
-        await saveStoryHistory(localHistory, historyStories, article);
-      }
+      postFile = await writePostFile(article, { postsDir: POSTS_DIR });
+      console.log(`Post package written: ${postFile.relativePath}`);
+      // Mark lead + supporting angles so we do not regenerate the same story next run.
+      const historyStories = [
+        ...orderedSubstantive,
+        {
+          title: article.title,
+          description: orderedSubstantive.map((item) => item.title).join(' · '),
+          source: BRAND_NAME,
+          contentType: orderedSubstantive[0]?.contentType || 'news',
+          link: orderedSubstantive[0]?.link || ''
+        }
+      ];
+      await saveStoryHistory(localHistory, historyStories, article);
     } catch (error) {
-      bloggerError = error;
-      console.warn(`Blogger draft skipped: ${error.message}`);
+      postFileError = error;
+      console.warn(`Post package skipped: ${error.message}`);
     }
   }
 
@@ -4790,9 +4815,11 @@ async function main() {
       unhealthyFeeds
     },
     storyHistoryCount: localHistory.length,
-    bloggerPost,
+    postNumber: postFile?.postNumber ?? null,
+    postFilePath: postFile?.relativePath ?? null,
+    postFileLabels: postFile?.labels ?? null,
     generationError: generationError ? generationError.message : null,
-    bloggerError: bloggerError ? bloggerError.message : null,
+    postFileError: postFileError ? postFileError.message : null,
     mode
   };
 

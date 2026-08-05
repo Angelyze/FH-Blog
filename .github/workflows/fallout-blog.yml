@@ -20,13 +20,10 @@ jobs:
       GEMINI_API_KEY_FALLBACK: ${{ secrets.GEMINI_API_KEY_FALLBACK }}
       GEMINI_API_KEY_FALLBACK_2: ${{ secrets.GEMINI_API_KEY_FALLBACK_2 }}
       GEMINI_MODEL_CHAIN: ${{ vars.GEMINI_MODEL_CHAIN || '' }}
-      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-      GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
-      BLOGGER_BLOG_ID: ${{ secrets.BLOGGER_BLOG_ID }}
       REDDIT_CUSTOM_FEED_URL: ${{ secrets.REDDIT_CUSTOM_FEED_URL }}
       REDDIT_FETCH_DELAY_MS: 6000
       REDDIT_RATE_LIMIT_BACKOFF_MS: 8000
+      # Manual Blogger: HTML packages land in posts/No.NN - Title.html (no API)
     steps:
       - name: Check out repository
         uses: actions/checkout@v4

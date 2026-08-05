@@ -1,6 +1,6 @@
 {
   "name": "pause",
-  "description": "Pause or resume a task schedule (by `schedule_id` from `task_list`). Use this when the user asks to pause, unpause, resume, stop, or cancel a task.",
+  "description": "Pause or resume an automation's schedule (by `schedule_id` from `automation_list`). Use this when the user asks to pause, unpause, resume, stop, or cancel an automation or task.",
   "inputSchema": {
     "type": "object",
     "properties": {

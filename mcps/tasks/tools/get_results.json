@@ -1,12 +1,12 @@
 {
   "name": "get_results",
-  "description": "Get recent execution results for a task (by `task_id` from `task_create` / `task_list`). Use this when the user asks about task results, what a task found, or wants to check task output.",
+  "description": "Get recent execution results for an automation (by `task_id` from `automation_create` / `automation_list`). Use this when the user asks about automation or task results, what a task found, or wants to check its output.",
   "inputSchema": {
     "type": "object",
     "properties": {
       "task_id": {
         "type": "string",
-        "description": "The ID of the task to get results for"
+        "description": "The ID of the automation to get results for"
       },
       "limit": {
         "type": "integer",

@@ -1,5 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
 import {
   areTopicsSimilar,
   shareMegaEventPackage,
@@ -20,6 +23,8 @@ import {
   isCommunitySourcedItem,
   batchHasReliableCorroboration,
   buildArticleHtml,
+  buildPostFileHtml,
+  buildPostFilename,
   buildStorySummaryForPrompt,
   extractArticleBodyText,
   countChars,
@@ -29,12 +34,15 @@ import {
   detectTrustLevelForBatch,
   ensureSeoDescription,
   ensureTrustKeyFacts,
+  formatPostNumber,
   hasOfficialConfirmationSignals,
   extractFeedItems,
   freshnessBonus,
   getArticleWordCount,
-  getBloggerInsertUrl,
   getBloggerLabels,
+  nextPostNumber,
+  parsePostNumberFromFilename,
+  sanitizePostFilenameTitle,
   getStoryFingerprint,
   getStoryTopicFingerprint,
   getStoryTopicKey,
@@ -1691,11 +1699,76 @@ test('ensureTrustKeyFacts matches cited sources rather than an unused lead outle
   assert.doesNotMatch(facts[0], /IGN/);
 });
 
-test('getBloggerInsertUrl requests draft creation via query parameter', () => {
+test('formatPostNumber zero-pads through 99', () => {
+  assert.equal(formatPostNumber(1), '01');
+  assert.equal(formatPostNumber(9), '09');
+  assert.equal(formatPostNumber(93), '93');
+  assert.equal(formatPostNumber(100), '100');
+});
+
+test('parsePostNumberFromFilename reads No.NN prefix', () => {
+  assert.equal(parsePostNumberFromFilename('No.01 - Hello.html'), 1);
+  assert.equal(parsePostNumberFromFilename('No.93 - Title.html'), 93);
+  assert.equal(parsePostNumberFromFilename('readme.md'), null);
+});
+
+test('sanitizePostFilenameTitle strips illegal path characters', () => {
   assert.equal(
-    getBloggerInsertUrl('123456789'),
-    'https://www.googleapis.com/blogger/v3/blogs/123456789/posts?isDraft=true'
+    sanitizePostFilenameTitle('A/B: "Fallout?" <test>'),
+    'AB Fallout test'
   );
+});
+
+test('buildPostFilename uses No.01 style numbering', () => {
+  assert.equal(
+    buildPostFilename(1, 'After 2,000 Hours in Fallout 4'),
+    'No.01 - After 2,000 Hours in Fallout 4.html'
+  );
+});
+
+test('nextPostNumber starts at 1 when posts folder is empty', async () => {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'fh-posts-'));
+  try {
+    assert.equal(await nextPostNumber(dir, { startNumber: 1 }), 1);
+    await fs.writeFile(path.join(dir, 'No.01 - First.html'), '<article></article>');
+    assert.equal(await nextPostNumber(dir, { startNumber: 1 }), 2);
+    await fs.writeFile(path.join(dir, 'No.09 - Ninth.html'), '<article></article>');
+    assert.equal(await nextPostNumber(dir, { startNumber: 1 }), 10);
+  } finally {
+    await fs.rm(dir, { recursive: true, force: true });
+  }
+});
+
+test('buildPostFileHtml includes meta TAGS/TITLE and article body', () => {
+  const html = buildPostFileHtml({
+    title: 'Bethesda Confirms Fallout 5 Plans',
+    subtitle: 'What fans should know.',
+    intro: 'Bethesda confirmed more Fallout work is underway.',
+    keyFacts: ['Official confirmation from Bethesda'],
+    sections: [
+      { heading: 'What we know', body: 'Bethesda confirmed Fallout 5 remains in pre-production with more detail still to come for fans watching the pipeline.' },
+      { heading: 'Why it matters', body: 'Confirmed studio news is rare, so fans want clear attribution and a calm read on what is actually locked in.' },
+      { heading: 'What is still open', body: 'Release windows and platform details remain unannounced, which is normal this early in a long Fallout cycle.' },
+      { heading: 'Community angle', body: 'Players are already debating remasters versus a full next numbered entry and what that means for mods.' }
+    ],
+    takeaway: 'Confirmed news beats rumor cycles.',
+    conclusion: 'I will keep watching official channels.',
+    cta: 'What do you want from Fallout 5?',
+    contentType: 'news',
+    trustLevel: 'confirmed',
+    seoDescription: 'Bethesda confirms Fallout 5 remains in the works — here is what is locked in and what fans should still treat as TBA for now.',
+    sources: [{ title: 'Bethesda', url: 'https://example.com/bethesda', type: 'official' }]
+  }, { postNumber: 1, generatedAt: '2026-07-28T12:00:00.000Z' });
+
+  assert.match(html, /POST No\.01/);
+  assert.match(html, /TITLE: Bethesda Confirms Fallout 5 Plans/);
+  assert.match(html, /SEARCH DESCRIPTION \(\d+ chars\):/);
+  assert.match(html, /TAGS:.*News/);
+  assert.match(html, /TAGS:.*Fallout 5/);
+  assert.match(html, /TAGS:.*Official/);
+  assert.match(html, /<article>/);
+  assert.match(html, /Search description — copy into Blogger/);
+  assert.match(html, /GENERATED: 2026-07-28T12:00:00\.000Z/);
 });
 
 test('getBloggerLabels tags official news for fans and search', () => {

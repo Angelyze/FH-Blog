@@ -1,12 +1,12 @@
 {
   "name": "create",
-  "description": "Create a new scheduled task. Grok will execute the prompt on the specified schedule and optionally notify the user. Use this when the user asks to create a reminder, scheduled task, or recurring check.",
+  "description": "Create a new automation (also called a scheduled task): Grok runs the prompt on the schedule you set and optionally notifies the user. Use this when the user asks to create an automation, reminder, scheduled task, or recurring check — or asks for something every morning, daily, weekly, or at a specific future time.",
   "inputSchema": {
     "type": "object",
     "properties": {
       "name": {
         "type": "string",
-        "description": "Short name for the task (e.g. 'bitcoin-price-check')"
+        "description": "Short name for the automation (e.g. 'bitcoin-price-check')"
       },
       "prompt": {
         "type": "string",
@@ -14,11 +14,11 @@
       },
       "cadence": {
         "type": "string",
-        "description": "RFC 5545 RRULE describing how often the task runs (e.g. \"RRULE:FREQ=DAILY\", \"RRULE:FREQ=WEEKLY;BYDAY=MO\", \"RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR\" for weekdays, \"RRULE:FREQ=MONTHLY;BYMONTHDAY=15\", \"RRULE:FREQ=YEARLY\"). Omit / empty to run only once. Do not include DTSTART/DTEND — use time_of_day + timezone instead."
+        "description": "RFC 5545 RRULE describing how often the automation runs (e.g. \"RRULE:FREQ=DAILY\", \"RRULE:FREQ=WEEKLY;BYDAY=MO\", \"RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR\" for weekdays, \"RRULE:FREQ=MONTHLY;BYMONTHDAY=15\", \"RRULE:FREQ=YEARLY\"). Omit / empty to run only once. Do not include DTSTART/DTEND — use time_of_day + timezone instead."
       },
       "scheduled_date": {
         "type": "string",
-        "description": "ISO 8601 date for one-time tasks (e.g. '2026-05-25'). Required when cadence is omitted (run-once). Defaults to today if not provided."
+        "description": "ISO 8601 date for one-time automations (e.g. '2026-05-25'). Required when cadence is omitted (run-once). Defaults to today if not provided."
       },
       "time_of_day": {
         "type": "string",

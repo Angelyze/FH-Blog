@@ -10,21 +10,20 @@ Daily editorial automation for the **Fallout Hub Blog** — a trusted Fallout fa
 - Ranks stories by relevance, freshness, and source quality
 - Enriches top stories with additional page context when available
 - Uses Gemini to write substantive, shareable articles with key facts and sourced trust markers
-- Creates a Blogger **draft** for manual review before publishing
+- Saves each publishable article as a numbered HTML file under **`posts/`** for manual paste into Blogger (no Blogger API)
 - Tracks a 21-day story history to avoid repeats
 
 ## Local setup
 1. Copy `.env.example` to `.env` and fill in your values.
 2. Add `REDDIT_CUSTOM_FEED_URL` with your private Fallout multireddit/custom feed `.rss` URL.
 3. Run `npm run fallout:generate`.
-4. Review the output in `artifacts/latest-draft.json`.
+4. Open the new file in `posts/` (e.g. `No.01 - Your Title.html`):
+   - Copy **TITLE**, **SEARCH DESCRIPTION**, and **TAGS** from the HTML comment at the top into Blogger’s fields
+   - Copy the `<article>…</article>` block into Blogger’s HTML compose view
+5. Debug JSON (gitignored) is also written to `artifacts/latest-draft.json`.
 
 ## Required secrets for GitHub Actions
 - `GEMINI_API_KEY`
-- `GOOGLE_CLIENT_ID`
-- `GOOGLE_CLIENT_SECRET`
-- `GOOGLE_REFRESH_TOKEN`
-- `BLOGGER_BLOG_ID`
 - `REDDIT_CUSTOM_FEED_URL`
 - `DISCORD_WEBHOOK_URL` (for the daily Discord blog share workflow)
 

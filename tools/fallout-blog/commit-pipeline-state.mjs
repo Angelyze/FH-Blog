@@ -1,5 +1,5 @@
 /**
- * Commit feed-health + story-history after a CI generate run.
+ * Commit feed-health, story-history, and posts/ after a CI generate run.
  * Retries rebase/push races so concurrent main updates do not fail the job.
  */
 import { spawnSync } from 'node:child_process';
@@ -8,9 +8,11 @@ import path from 'node:path';
 import process from 'node:process';
 
 const ROOT = process.cwd();
-const FILES = [
+/** Paths relative to repo root (files or directories). */
+const PATHS = [
   'data/story-history.json',
-  'data/feed-health.json'
+  'data/feed-health.json',
+  'posts'
 ];
 const BRANCH = process.env.GITHUB_REF_NAME || process.env.PIPELINE_STATE_BRANCH || 'main';
 const MAX_ATTEMPTS = 6;
@@ -32,26 +34,45 @@ function run(command, args, { allowFail = false } = {}) {
 }
 
 function hasLocalChanges() {
-  const result = run('git', ['status', '--porcelain', ...FILES], { allowFail: true });
+  const result = run('git', ['status', '--porcelain', '--', ...PATHS], { allowFail: true });
   return Boolean((result.stdout || '').trim());
 }
 
-function snapshotFiles(dir) {
-  fs.mkdirSync(dir, { recursive: true });
-  for (const file of FILES) {
-    const src = path.join(ROOT, file);
-    if (fs.existsSync(src)) {
-      fs.copyFileSync(src, path.join(dir, path.basename(file)));
+function copyPathRecursive(src, dest) {
+  if (!fs.existsSync(src)) return;
+  const stat = fs.statSync(src);
+  if (stat.isDirectory()) {
+    fs.mkdirSync(dest, { recursive: true });
+    for (const name of fs.readdirSync(src)) {
+      copyPathRecursive(path.join(src, name), path.join(dest, name));
     }
+    return;
+  }
+  fs.mkdirSync(path.dirname(dest), { recursive: true });
+  fs.copyFileSync(src, dest);
+}
+
+function removePathRecursive(target) {
+  if (!fs.existsSync(target)) return;
+  fs.rmSync(target, { recursive: true, force: true });
+}
+
+function snapshotPaths(dir) {
+  fs.mkdirSync(dir, { recursive: true });
+  for (const rel of PATHS) {
+    const src = path.join(ROOT, rel);
+    const dest = path.join(dir, rel);
+    removePathRecursive(dest);
+    copyPathRecursive(src, dest);
   }
 }
 
 function restoreSnapshot(dir) {
-  for (const file of FILES) {
-    const snap = path.join(dir, path.basename(file));
-    if (fs.existsSync(snap)) {
-      fs.copyFileSync(snap, path.join(ROOT, file));
-    }
+  for (const rel of PATHS) {
+    const snap = path.join(dir, rel);
+    const dest = path.join(ROOT, rel);
+    removePathRecursive(dest);
+    copyPathRecursive(snap, dest);
   }
 }
 
@@ -61,7 +82,7 @@ function configureGit() {
 }
 
 function commitIfNeeded(message) {
-  run('git', ['add', ...FILES], { allowFail: true });
+  run('git', ['add', '--', ...PATHS], { allowFail: true });
   const staged = run('git', ['diff', '--cached', '--name-only'], { allowFail: true });
   if (!(staged.stdout || '').trim()) {
     return false;
@@ -106,7 +127,7 @@ function main() {
   }
 
   const snapDir = path.join(ROOT, '.pipeline-state-snapshot');
-  snapshotFiles(snapDir);
+  snapshotPaths(snapDir);
   configureGit();
 
   if (!commitIfNeeded('chore(blog): update pipeline state')) {
