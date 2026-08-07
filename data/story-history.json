@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "1cf14d8f0f2e38a5",
+      "topicFingerprint": "602e6364b88f7557",
+      "contentType": "news",
+      "title": "Massive Fallout: New Vegas mod Fallout: New California hits GOG, offering another way to get some \"proper, story-driven Fallout\" in your belly",
+      "articleTitle": "Fallout: New California Hits GOG for an Easier Trip to Vault 18",
+      "source": "Rock Paper Shotgun",
+      "coveredAt": 1786086143352
+    },
+    {
+      "fingerprint": "d2368b257cfca6cc",
+      "topicFingerprint": "7060b8c86b2929db",
+      "contentType": "news",
+      "title": "Fallout: New California Hits GOG for an Easier Trip to Vault 18",
+      "articleTitle": "Fallout: New California Hits GOG for an Easier Trip to Vault 18",
+      "source": "Fallout Hub",
+      "coveredAt": 1786086143352
+    },
+    {
       "fingerprint": "0290cb9717589543",
       "topicFingerprint": "71db4dd224a85166",
       "contentType": "community",
