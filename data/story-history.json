@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "4485ac7953254a85",
+      "topicFingerprint": "0059bfb361e25db3",
+      "contentType": "news",
+      "title": "Fallout 76 Creative Director Promises &#8216;Dark Content&#8217; Coming Soon",
+      "articleTitle": "Fallout 76 Creative Director Teases 'Dark Content' Coming Very Soon",
+      "source": "Insider Gaming",
+      "coveredAt": 1786346013978
+    },
+    {
+      "fingerprint": "b48a0bebac4ec4c4",
+      "topicFingerprint": "9bbc8b528b9cfcc0",
+      "contentType": "news",
+      "title": "Fallout 76 Creative Director Teases 'Dark Content' Coming Very Soon",
+      "articleTitle": "Fallout 76 Creative Director Teases 'Dark Content' Coming Very Soon",
+      "source": "Fallout Hub",
+      "coveredAt": 1786346013978
+    },
+    {
       "fingerprint": "2df1718f78a0be0b",
       "topicFingerprint": "2c2cb1adc2871cd8",
       "contentType": "community",
