@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "f24311a633cb48c6",
+      "topicFingerprint": "75bc8c269e36d2ff",
+      "contentType": "community",
+      "title": "Nuclear Sunset Modpack",
+      "articleTitle": "Why Fans Are Eyeing the \"Nuclear Sunset\" Modpack for FO3 and New Vegas",
+      "source": "Reddit — Custom Fallout Feed",
+      "coveredAt": 1786431093238
+    },
+    {
+      "fingerprint": "74e229215c8b8d96",
+      "topicFingerprint": "24837fcc265cd8e1",
+      "contentType": "community",
+      "title": "Why Fans Are Eyeing the \"Nuclear Sunset\" Modpack for FO3 and New Vegas",
+      "articleTitle": "Why Fans Are Eyeing the \"Nuclear Sunset\" Modpack for FO3 and New Vegas",
+      "source": "Fallout Hub",
+      "coveredAt": 1786431093238
+    },
+    {
       "fingerprint": "4485ac7953254a85",
       "topicFingerprint": "0059bfb361e25db3",
       "contentType": "news",
@@ -413,105 +431,6 @@
       "articleTitle": "Fallout 76 July 21 Update: Next-Gen Status and a Massive Bug Sweep",
       "source": "Fallout Hub",
       "coveredAt": 1784657823917
-    },
-    {
-      "fingerprint": "5fc92d523da8d538",
-      "topicFingerprint": "92bde025ea81075e",
-      "contentType": "community",
-      "title": "something i would like to discuss",
-      "articleTitle": "Passing the Pip-Boy: A Young Fan’s Tribute to a Fallout Dad",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1784577050162
-    },
-    {
-      "fingerprint": "d1ee12c36577e22a",
-      "topicFingerprint": "329cce59c1adddbd",
-      "contentType": "community",
-      "title": "Passing the Pip-Boy: A Young Fan’s Tribute to a Fallout Dad",
-      "articleTitle": "Passing the Pip-Boy: A Young Fan’s Tribute to a Fallout Dad",
-      "source": "Fallout Hub",
-      "coveredAt": 1784577050162
-    },
-    {
-      "fingerprint": "dd6008f9235693ca",
-      "topicFingerprint": "d1f4e1fb979be41c",
-      "contentType": "news",
-      "title": "Maintenance Announcement - July 21, 2026",
-      "articleTitle": "Fallout 76 Maintenance Scheduled for July 21; Plus a Retro Mod Update",
-      "source": "Steam — Fallout 76",
-      "coveredAt": 1784575319083
-    },
-    {
-      "fingerprint": "2b97c791c9de5aef",
-      "topicFingerprint": "2161633717ce5d6d",
-      "contentType": "news",
-      "title": "The Fallout I’m Most Looking Forward To Isn&#8217;t A Remaster Or A Sequel",
-      "articleTitle": "Fallout 76 Maintenance Scheduled for July 21; Plus a Retro Mod Update",
-      "source": "Kotaku",
-      "coveredAt": 1784575319083
-    },
-    {
-      "fingerprint": "9881d866f6352bdd",
-      "topicFingerprint": "51d397815b00c7cc",
-      "contentType": "news",
-      "title": "Fallout 76 Maintenance Scheduled for July 21; Plus a Retro Mod Update",
-      "articleTitle": "Fallout 76 Maintenance Scheduled for July 21; Plus a Retro Mod Update",
-      "source": "Fallout Hub",
-      "coveredAt": 1784575319083
-    },
-    {
-      "fingerprint": "00cbb6c9556ec247",
-      "topicFingerprint": "001444fcda3fb5e5",
-      "contentType": "community",
-      "title": "they should bring back real guns.",
-      "articleTitle": "Why the Fight Over Fallout’s 'Toy' Guns Still Matters",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1784570119451
-    },
-    {
-      "fingerprint": "33f32fe803e87f5d",
-      "topicFingerprint": "c3d6f7ba8a0a83c2",
-      "contentType": "community",
-      "title": "The Malpais Legate @Deimos_art",
-      "articleTitle": "Why the Fight Over Fallout’s 'Toy' Guns Still Matters",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1784570119451
-    },
-    {
-      "fingerprint": "c587ca5a61eb9ef8",
-      "topicFingerprint": "2058bb8be54c1499",
-      "contentType": "community",
-      "title": "3D Printed and hand painted Death Claw skull",
-      "articleTitle": "Why the Fight Over Fallout’s 'Toy' Guns Still Matters",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1784570119451
-    },
-    {
-      "fingerprint": "ef4b60766efbd8d6",
-      "topicFingerprint": "e25f004c42cfc44f",
-      "contentType": "community",
-      "title": "i think i've seen more people complaining about that one fo4 gun than i've ever seen it ACTUALLY IN GAME. anyway did you know fallout was actually popular because of it's totally logical and functional guns (literally none of NVs AR platform rifles would work)",
-      "articleTitle": "Why the Fight Over Fallout’s 'Toy' Guns Still Matters",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1784570119451
-    },
-    {
-      "fingerprint": "ea565d53abe609e8",
-      "topicFingerprint": "196bf44c000748d4",
-      "contentType": "community",
-      "title": "New Engine- New Adventure - New Vegas in OpenMW Coming Soon™",
-      "articleTitle": "Why the Fight Over Fallout’s 'Toy' Guns Still Matters",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1784570119451
-    },
-    {
-      "fingerprint": "5aef5a9ce1ef6b98",
-      "topicFingerprint": "93dc19d28f313f03",
-      "contentType": "community",
-      "title": "Why the Fight Over Fallout’s 'Toy' Guns Still Matters",
-      "articleTitle": "Why the Fight Over Fallout’s 'Toy' Guns Still Matters",
-      "source": "Fallout Hub",
-      "coveredAt": 1784570119451
     }
   ]
 }
