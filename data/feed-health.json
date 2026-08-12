@@ -1,218 +1,218 @@
 {
-  "updatedAt": "2026-08-11T06:50:57.885Z",
+  "updatedAt": "2026-08-12T07:10:08.718Z",
   "sources": {
     "Reddit — Custom Fallout Feed": {
-      "successStreak": 4,
+      "successStreak": 5,
       "failureStreak": 0,
-      "lastSuccessAt": 1786431056632,
+      "lastSuccessAt": 1786518607145,
       "lastErrorAt": 1786086070570,
       "lastError": null,
-      "lastItemCount": 19
+      "lastItemCount": 17
     },
     "IGN": {
-      "successStreak": 45,
+      "successStreak": 46,
       "failureStreak": 0,
-      "lastSuccessAt": 1786431057884,
+      "lastSuccessAt": 1786518608718,
       "lastErrorAt": null,
       "lastError": null,
       "lastItemCount": 0
     },
     "VGC": {
-      "successStreak": 45,
+      "successStreak": 46,
       "failureStreak": 0,
-      "lastSuccessAt": 1786431057884,
+      "lastSuccessAt": 1786518608718,
       "lastErrorAt": null,
       "lastError": null,
       "lastItemCount": 0
     },
     "GamesRadar": {
-      "successStreak": 45,
+      "successStreak": 46,
       "failureStreak": 0,
-      "lastSuccessAt": 1786431057884,
+      "lastSuccessAt": 1786518608718,
       "lastErrorAt": null,
       "lastError": null,
       "lastItemCount": 0
     },
     "Eurogamer": {
-      "successStreak": 45,
+      "successStreak": 46,
       "failureStreak": 0,
-      "lastSuccessAt": 1786431057884,
+      "lastSuccessAt": 1786518608718,
       "lastErrorAt": null,
       "lastError": null,
       "lastItemCount": 0
     },
     "GameSpot": {
-      "successStreak": 45,
+      "successStreak": 46,
       "failureStreak": 0,
-      "lastSuccessAt": 1786431057884,
+      "lastSuccessAt": 1786518608718,
       "lastErrorAt": null,
       "lastError": null,
       "lastItemCount": 0
     },
     "Polygon": {
-      "successStreak": 45,
+      "successStreak": 46,
       "failureStreak": 0,
-      "lastSuccessAt": 1786431057884,
+      "lastSuccessAt": 1786518608718,
       "lastErrorAt": null,
       "lastError": null,
       "lastItemCount": 0
     },
     "The Verge": {
-      "successStreak": 45,
+      "successStreak": 46,
       "failureStreak": 0,
-      "lastSuccessAt": 1786431057884,
+      "lastSuccessAt": 1786518608718,
       "lastErrorAt": null,
       "lastError": null,
       "lastItemCount": 0
     },
     "Steam — Fallout 76": {
-      "successStreak": 45,
+      "successStreak": 46,
       "failureStreak": 0,
-      "lastSuccessAt": 1786431057884,
+      "lastSuccessAt": 1786518608718,
       "lastErrorAt": null,
       "lastError": null,
       "lastItemCount": 4
     },
     "Steam — Fallout 4": {
-      "successStreak": 45,
+      "successStreak": 46,
       "failureStreak": 0,
-      "lastSuccessAt": 1786431057884,
+      "lastSuccessAt": 1786518608718,
       "lastErrorAt": null,
       "lastError": null,
       "lastItemCount": 4
     },
     "Steam — New Vegas": {
-      "successStreak": 45,
+      "successStreak": 46,
       "failureStreak": 0,
-      "lastSuccessAt": 1786431057884,
+      "lastSuccessAt": 1786518608718,
       "lastErrorAt": null,
       "lastError": null,
       "lastItemCount": 4
     },
     "Xbox Wire": {
-      "successStreak": 45,
+      "successStreak": 46,
       "failureStreak": 0,
-      "lastSuccessAt": 1786431057884,
+      "lastSuccessAt": 1786518608718,
       "lastErrorAt": null,
       "lastError": null,
       "lastItemCount": 0
     },
     "Bethesda — YouTube": {
-      "successStreak": 0,
-      "failureStreak": 1,
-      "lastSuccessAt": 1786345981629,
+      "successStreak": 1,
+      "failureStreak": 0,
+      "lastSuccessAt": 1786518608718,
       "lastErrorAt": 1786431057884,
-      "lastError": "Feed request failed (404)",
+      "lastError": null,
       "lastItemCount": 0
     },
     "Amazon Newsroom": {
-      "successStreak": 45,
+      "successStreak": 46,
       "failureStreak": 0,
-      "lastSuccessAt": 1786431057884,
+      "lastSuccessAt": 1786518608718,
       "lastErrorAt": null,
       "lastError": null,
       "lastItemCount": 0
     },
     "Kotaku": {
-      "successStreak": 45,
+      "successStreak": 46,
       "failureStreak": 0,
-      "lastSuccessAt": 1786431057884,
+      "lastSuccessAt": 1786518608718,
       "lastErrorAt": null,
       "lastError": null,
       "lastItemCount": 0
     },
     "Rock Paper Shotgun": {
-      "successStreak": 45,
+      "successStreak": 46,
       "failureStreak": 0,
-      "lastSuccessAt": 1786431057884,
+      "lastSuccessAt": 1786518608718,
       "lastErrorAt": null,
       "lastError": null,
       "lastItemCount": 1
     },
     "PC Gamer": {
-      "successStreak": 45,
+      "successStreak": 46,
       "failureStreak": 0,
-      "lastSuccessAt": 1786431057884,
+      "lastSuccessAt": 1786518608718,
       "lastErrorAt": null,
       "lastError": null,
       "lastItemCount": 0
     },
     "PCGamesN": {
-      "successStreak": 45,
+      "successStreak": 46,
       "failureStreak": 0,
-      "lastSuccessAt": 1786431057884,
+      "lastSuccessAt": 1786518608718,
       "lastErrorAt": null,
       "lastError": null,
       "lastItemCount": 0
     },
     "Shacknews": {
-      "successStreak": 45,
+      "successStreak": 46,
       "failureStreak": 0,
-      "lastSuccessAt": 1786431057884,
+      "lastSuccessAt": 1786518608718,
       "lastErrorAt": null,
       "lastError": null,
       "lastItemCount": 0
     },
     "DualShockers": {
-      "successStreak": 45,
+      "successStreak": 46,
       "failureStreak": 0,
-      "lastSuccessAt": 1786431057884,
+      "lastSuccessAt": 1786518608718,
       "lastErrorAt": null,
       "lastError": null,
       "lastItemCount": 0
     },
     "PlayStation Blog": {
-      "successStreak": 40,
+      "successStreak": 41,
       "failureStreak": 0,
-      "lastSuccessAt": 1786431057884,
+      "lastSuccessAt": 1786518608718,
       "lastErrorAt": 1784188679148,
       "lastError": null,
       "lastItemCount": 0
     },
     "Aftermath": {
-      "successStreak": 45,
+      "successStreak": 46,
       "failureStreak": 0,
-      "lastSuccessAt": 1786431057884,
+      "lastSuccessAt": 1786518608718,
       "lastErrorAt": null,
       "lastError": null,
       "lastItemCount": 0
     },
     "GamesIndustry": {
-      "successStreak": 45,
+      "successStreak": 46,
       "failureStreak": 0,
-      "lastSuccessAt": 1786431057884,
+      "lastSuccessAt": 1786518608718,
       "lastErrorAt": null,
       "lastError": null,
       "lastItemCount": 0
     },
     "The Gamer": {
-      "successStreak": 45,
+      "successStreak": 46,
       "failureStreak": 0,
-      "lastSuccessAt": 1786431057884,
+      "lastSuccessAt": 1786518608718,
       "lastErrorAt": null,
       "lastError": null,
       "lastItemCount": 0
     },
     "Insider Gaming": {
-      "successStreak": 45,
+      "successStreak": 46,
       "failureStreak": 0,
-      "lastSuccessAt": 1786431057884,
+      "lastSuccessAt": 1786518608718,
       "lastErrorAt": null,
       "lastError": null,
       "lastItemCount": 0
     },
     "Wccftech": {
-      "successStreak": 45,
+      "successStreak": 46,
       "failureStreak": 0,
-      "lastSuccessAt": 1786431057884,
+      "lastSuccessAt": 1786518608718,
       "lastErrorAt": null,
       "lastError": null,
       "lastItemCount": 0
     },
     "Siliconera": {
-      "successStreak": 45,
+      "successStreak": 46,
       "failureStreak": 0,
-      "lastSuccessAt": 1786431057885,
+      "lastSuccessAt": 1786518608718,
       "lastErrorAt": null,
       "lastError": null,
       "lastItemCount": 0
@@ -226,25 +226,25 @@
       "lastItemCount": 0
     },
     "Steam Community — Fallout 76": {
-      "successStreak": 45,
+      "successStreak": 46,
       "failureStreak": 0,
-      "lastSuccessAt": 1786431057885,
+      "lastSuccessAt": 1786518608718,
       "lastErrorAt": null,
       "lastError": null,
       "lastItemCount": 4
     },
     "Steam Community — Fallout 4": {
-      "successStreak": 45,
+      "successStreak": 46,
       "failureStreak": 0,
-      "lastSuccessAt": 1786431057885,
+      "lastSuccessAt": 1786518608718,
       "lastErrorAt": null,
       "lastError": null,
       "lastItemCount": 4
     },
     "Steam Community — New Vegas": {
-      "successStreak": 45,
+      "successStreak": 46,
       "failureStreak": 0,
-      "lastSuccessAt": 1786431057885,
+      "lastSuccessAt": 1786518608718,
       "lastErrorAt": null,
       "lastError": null,
       "lastItemCount": 0

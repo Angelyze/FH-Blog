@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "da2679a3be2201ec",
+      "topicFingerprint": "66073f137d620416",
+      "contentType": "community",
+      "title": "(Opinion) Fallout 76 is \"decent\" now, but Fallout fans still deserve a better multiplayer game. A lot of it's reputation from it's terrible launch is still unsalvageable 7 years later.",
+      "articleTitle": "Fallout 76 Is Decent Now, But Fans Still Deserve Better",
+      "source": "Reddit — Custom Fallout Feed",
+      "coveredAt": 1786518631301
+    },
+    {
+      "fingerprint": "4e6798f6c0321312",
+      "topicFingerprint": "ea58576210b7cc14",
+      "contentType": "community",
+      "title": "Fallout 76 Is Decent Now, But Fans Still Deserve Better",
+      "articleTitle": "Fallout 76 Is Decent Now, But Fans Still Deserve Better",
+      "source": "Fallout Hub",
+      "coveredAt": 1786518631301
+    },
+    {
       "fingerprint": "f24311a633cb48c6",
       "topicFingerprint": "75bc8c269e36d2ff",
       "contentType": "community",
@@ -377,60 +395,6 @@
       "articleTitle": "After 2,000 Hours in Fallout 4, a Veteran Just Discovered This Feature",
       "source": "Fallout Hub",
       "coveredAt": 1784707865143
-    },
-    {
-      "fingerprint": "fafc1da3d2aa6d09",
-      "topicFingerprint": "db3dbcf89a8c55f6",
-      "contentType": "community",
-      "title": "Fallout 3 Chinese PLA soldier cosplay",
-      "articleTitle": "This Fallout 3 Chinese PLA Soldier Cosplay Is Anchorage-Ready",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1784659305901
-    },
-    {
-      "fingerprint": "330277165be47e59",
-      "topicFingerprint": "a663bfc66f0f29b6",
-      "contentType": "community",
-      "title": "This Fallout 3 Chinese PLA Soldier Cosplay Is Anchorage-Ready",
-      "articleTitle": "This Fallout 3 Chinese PLA Soldier Cosplay Is Anchorage-Ready",
-      "source": "Fallout Hub",
-      "coveredAt": 1784659305901
-    },
-    {
-      "fingerprint": "7a88d053e34ed9f9",
-      "topicFingerprint": "ed11838a7a128d05",
-      "contentType": "community",
-      "title": "Todd Howard officially confirms that ‘FALLOUT 6’ will release exclusively for the XBOX PALANTIR 2 for Fallout Day on Ocotober 23, 2077.",
-      "articleTitle": "Todd Howard Confirms Fallout 6 for Xbox Palantir 2 in 2077",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1784658386475
-    },
-    {
-      "fingerprint": "39bfb78129a30914",
-      "topicFingerprint": "539b5a4a99da24b5",
-      "contentType": "community",
-      "title": "Todd Howard Confirms Fallout 6 for Xbox Palantir 2 in 2077",
-      "articleTitle": "Todd Howard Confirms Fallout 6 for Xbox Palantir 2 in 2077",
-      "source": "Fallout Hub",
-      "coveredAt": 1784658386475
-    },
-    {
-      "fingerprint": "ca2b8d68b1a63560",
-      "topicFingerprint": "e91d701911e3f86b",
-      "contentType": "news",
-      "title": "Fallout 76 Update Notes - July 21, 2026",
-      "articleTitle": "Fallout 76 July 21 Update: Next-Gen Status and a Massive Bug Sweep",
-      "source": "Steam — Fallout 76",
-      "coveredAt": 1784657823917
-    },
-    {
-      "fingerprint": "c5913a813855692d",
-      "topicFingerprint": "753acbd9332bae4e",
-      "contentType": "news",
-      "title": "Fallout 76 July 21 Update: Next-Gen Status and a Massive Bug Sweep",
-      "articleTitle": "Fallout 76 July 21 Update: Next-Gen Status and a Massive Bug Sweep",
-      "source": "Fallout Hub",
-      "coveredAt": 1784657823917
     }
   ]
 }
