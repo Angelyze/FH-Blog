@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "3cc0cbc08fdabe77",
+      "topicFingerprint": "57f85ae2e30810da",
+      "contentType": "community",
+      "title": "This Game Literally Saved My Life.",
+      "articleTitle": "How Fallout: New Vegas Helped One Fan Survive Their Darkest Days",
+      "source": "Reddit — Custom Fallout Feed",
+      "coveredAt": 1786605281134
+    },
+    {
+      "fingerprint": "c0f50605dbc0b563",
+      "topicFingerprint": "2fc4dcb612cafd7a",
+      "contentType": "community",
+      "title": "How Fallout: New Vegas Helped One Fan Survive Their Darkest Days",
+      "articleTitle": "How Fallout: New Vegas Helped One Fan Survive Their Darkest Days",
+      "source": "Fallout Hub",
+      "coveredAt": 1786605281134
+    },
+    {
       "fingerprint": "da2679a3be2201ec",
       "topicFingerprint": "66073f137d620416",
       "contentType": "community",
@@ -377,24 +395,6 @@
       "articleTitle": "Who Is This Guy? A Bizarre Fallout 1 File Discovery",
       "source": "Fallout Hub",
       "coveredAt": 1784794464734
-    },
-    {
-      "fingerprint": "9e12343f10ca73d9",
-      "topicFingerprint": "7d879adde18032d2",
-      "contentType": "community",
-      "title": "What the fuck is this shit",
-      "articleTitle": "After 2,000 Hours in Fallout 4, a Veteran Just Discovered This Feature",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1784707865143
-    },
-    {
-      "fingerprint": "813e6a2707ef0c4a",
-      "topicFingerprint": "b3066732d4677dbe",
-      "contentType": "community",
-      "title": "After 2,000 Hours in Fallout 4, a Veteran Just Discovered This Feature",
-      "articleTitle": "After 2,000 Hours in Fallout 4, a Veteran Just Discovered This Feature",
-      "source": "Fallout Hub",
-      "coveredAt": 1784707865143
     }
   ]
 }
