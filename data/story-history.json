@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "acf4b1dfb377676a",
+      "topicFingerprint": "cebb1bf3cc3c5fe1",
+      "contentType": "community",
+      "title": "Cosplay NCR Ranger with abandoned factory in Can Tho ,Viet Nam",
+      "articleTitle": "This NCR Ranger Cosplay Set in an Abandoned Factory Hits Just Right",
+      "source": "Reddit — Custom Fallout Feed",
+      "coveredAt": 1786691485326
+    },
+    {
+      "fingerprint": "a96b22a935678950",
+      "topicFingerprint": "be97548c9b8e6e25",
+      "contentType": "community",
+      "title": "This NCR Ranger Cosplay Set in an Abandoned Factory Hits Just Right",
+      "articleTitle": "This NCR Ranger Cosplay Set in an Abandoned Factory Hits Just Right",
+      "source": "Fallout Hub",
+      "coveredAt": 1786691485326
+    },
+    {
       "fingerprint": "3cc0cbc08fdabe77",
       "topicFingerprint": "57f85ae2e30810da",
       "contentType": "community",
@@ -377,24 +395,6 @@
       "articleTitle": "A Modder Is Porting Fallout: New Vegas Into Morrowind's Engine",
       "source": "Fallout Hub",
       "coveredAt": 1784880637633
-    },
-    {
-      "fingerprint": "da1741b0f8cf04cc",
-      "topicFingerprint": "2edd4b03d0d59e6e",
-      "contentType": "community",
-      "title": "Fallout 1 weird file image",
-      "articleTitle": "Who Is This Guy? A Bizarre Fallout 1 File Discovery",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1784794464734
-    },
-    {
-      "fingerprint": "669801e4da8ffff1",
-      "topicFingerprint": "8e94b900026e0da0",
-      "contentType": "community",
-      "title": "Who Is This Guy? A Bizarre Fallout 1 File Discovery",
-      "articleTitle": "Who Is This Guy? A Bizarre Fallout 1 File Discovery",
-      "source": "Fallout Hub",
-      "coveredAt": 1784794464734
     }
   ]
 }
