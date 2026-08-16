@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "16eaf5f65bf4132e",
+      "topicFingerprint": "e2d90b5343838095",
+      "contentType": "community",
+      "title": "Fallout 3 with classic Fallout's trimetric perspective",
+      "articleTitle": "What Fallout 3 Looks Like in the Classic Isometric Style",
+      "source": "Reddit — Custom Fallout Feed",
+      "coveredAt": 1786861534390
+    },
+    {
+      "fingerprint": "19f118361a2825d4",
+      "topicFingerprint": "f1c9b8e866cad40f",
+      "contentType": "community",
+      "title": "What Fallout 3 Looks Like in the Classic Isometric Style",
+      "articleTitle": "What Fallout 3 Looks Like in the Classic Isometric Style",
+      "source": "Fallout Hub",
+      "coveredAt": 1786861534390
+    },
+    {
       "fingerprint": "e8d9a12f1136c7a2",
       "topicFingerprint": "c37d9ed76e82a759",
       "contentType": "community",
@@ -377,24 +395,6 @@
       "articleTitle": "Is Modern Fallout Missing That Brutal 'Mad Max' Edge?",
       "source": "Fallout Hub",
       "coveredAt": 1785053457793
-    },
-    {
-      "fingerprint": "4ee30ff1ceaf44a3",
-      "topicFingerprint": "47a96ae7d598258a",
-      "contentType": "news",
-      "title": "Sony’s PlayStation Disc Shutdown Draws Ubisoft’s Verdict, as CFO Bets Cheaper Digital Machines Beat the Used-Game Fallout",
-      "articleTitle": "Sony’s Reported Disc Shutdown Has Ubisoft Betting Against Physical",
-      "source": "Wccftech",
-      "coveredAt": 1784965959524
-    },
-    {
-      "fingerprint": "cc8124d771a6296f",
-      "topicFingerprint": "df102aefb37d60d3",
-      "contentType": "news",
-      "title": "Sony’s Reported Disc Shutdown Has Ubisoft Betting Against Physical",
-      "articleTitle": "Sony’s Reported Disc Shutdown Has Ubisoft Betting Against Physical",
-      "source": "Fallout Hub",
-      "coveredAt": 1784965959524
     }
   ]
 }
