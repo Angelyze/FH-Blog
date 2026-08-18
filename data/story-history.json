@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "98566fa437d062da",
+      "topicFingerprint": "0cd5b7aaab4c2a78",
+      "contentType": "news",
+      "title": "Bethesda Warns Skyrim & Fallout 4 Players of Mod-breaking Update",
+      "articleTitle": "Heads Up: Upcoming Bethesda Updates Are About to Break Your Mods",
+      "source": "Polygon",
+      "coveredAt": 1787034496266
+    },
+    {
+      "fingerprint": "a81bde8c80a6229c",
+      "topicFingerprint": "616142288cdb7327",
+      "contentType": "news",
+      "title": "Heads Up: Upcoming Bethesda Updates Are About to Break Your Mods",
+      "articleTitle": "Heads Up: Upcoming Bethesda Updates Are About to Break Your Mods",
+      "source": "Fallout Hub",
+      "coveredAt": 1787034496266
+    },
+    {
       "fingerprint": "d395af83f4a9561a",
       "topicFingerprint": "c0633d8fe4621083",
       "contentType": "community",
@@ -368,42 +386,6 @@
       "articleTitle": "Dragon's Dogma 2 Is Getting a Fallout-Style Homesteading Mod",
       "source": "Fallout Hub",
       "coveredAt": 1785257948784
-    },
-    {
-      "fingerprint": "638ddeebbecbc138",
-      "topicFingerprint": "ab2c3d5533eade88",
-      "contentType": "community",
-      "title": "Hot Take, Fallout,s 4 art Style is great, but the color pallete is terrible",
-      "articleTitle": "Is Fallout 4 Too Colorful? The Debate Over the Commonwealth's Palette",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1785146291359
-    },
-    {
-      "fingerprint": "2548ac730856796d",
-      "topicFingerprint": "3e84c678ec403b1a",
-      "contentType": "community",
-      "title": "Is Fallout 4 Too Colorful? The Debate Over the Commonwealth's Palette",
-      "articleTitle": "Is Fallout 4 Too Colorful? The Debate Over the Commonwealth's Palette",
-      "source": "Fallout Hub",
-      "coveredAt": 1785146291359
-    },
-    {
-      "fingerprint": "aad164bfe8bc50a9",
-      "topicFingerprint": "d75a8411fc158a6a",
-      "contentType": "community",
-      "title": "There should be a fallout game where you establish trade routes between the east and west coasts and they make it clear the NCR views Appalachians the way the Romans viewed the Chinese.",
-      "articleTitle": "This Fan Pitch Connects the NCR to Appalachia Like Rome to China",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1785144890715
-    },
-    {
-      "fingerprint": "2f9818938b7afb5e",
-      "topicFingerprint": "0e4b6ce044b3ded3",
-      "contentType": "community",
-      "title": "This Fan Pitch Connects the NCR to Appalachia Like Rome to China",
-      "articleTitle": "This Fan Pitch Connects the NCR to Appalachia Like Rome to China",
-      "source": "Fallout Hub",
-      "coveredAt": 1785144890715
     }
   ]
 }
