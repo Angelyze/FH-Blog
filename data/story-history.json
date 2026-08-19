@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "5177490cf218e4d3",
+      "topicFingerprint": "070f41c5f06437f6",
+      "contentType": "mods",
+      "title": "Fallout 4 Update - August 18th",
+      "articleTitle": "Fallout 4's Surprise August Update is a Massive Win for Modders",
+      "source": "Steam Community — Fallout 4",
+      "coveredAt": 1787121001751
+    },
+    {
+      "fingerprint": "28a9224b519ff709",
+      "topicFingerprint": "7715b2123440aa1a",
+      "contentType": "mods",
+      "title": "Fallout 4's Surprise August Update is a Massive Win for Modders",
+      "articleTitle": "Fallout 4's Surprise August Update is a Massive Win for Modders",
+      "source": "Fallout Hub",
+      "coveredAt": 1787121001751
+    },
+    {
       "fingerprint": "98566fa437d062da",
       "topicFingerprint": "0cd5b7aaab4c2a78",
       "contentType": "news",
@@ -368,24 +386,6 @@
       "articleTitle": "Forget the Lore: Caesar’s Legion Just Has Terrible Fashion Sense",
       "source": "Fallout Hub",
       "coveredAt": 1785313444466
-    },
-    {
-      "fingerprint": "feeca8b293e7da68",
-      "topicFingerprint": "cabecd3e8f108a5c",
-      "contentType": "news",
-      "title": "Dragon's Dogma 2 is getting a Fallout-inspired homesteading mod with fully customisable houses, and its creator has tons of big ideas for it",
-      "articleTitle": "Dragon's Dogma 2 Is Getting a Fallout-Style Homesteading Mod",
-      "source": "Eurogamer",
-      "coveredAt": 1785257948784
-    },
-    {
-      "fingerprint": "6f7ef24682690878",
-      "topicFingerprint": "f8e71a4d60057802",
-      "contentType": "news",
-      "title": "Dragon's Dogma 2 Is Getting a Fallout-Style Homesteading Mod",
-      "articleTitle": "Dragon's Dogma 2 Is Getting a Fallout-Style Homesteading Mod",
-      "source": "Fallout Hub",
-      "coveredAt": 1785257948784
     }
   ]
 }
