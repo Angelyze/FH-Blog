@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "98fccfd4e9b8cb4f",
+      "topicFingerprint": "7a15ae634ad42dac",
+      "contentType": "news",
+      "title": "“The Slasher” Cuts In on September 15",
+      "articleTitle": "The Pint-Sized Slasher Returns to Fallout 76 This September",
+      "source": "Steam — Fallout 76",
+      "coveredAt": 1787207402750
+    },
+    {
+      "fingerprint": "3fc21934c5c58093",
+      "topicFingerprint": "37ce80ec483d9538",
+      "contentType": "news",
+      "title": "The Pint-Sized Slasher Returns to Fallout 76 This September",
+      "articleTitle": "The Pint-Sized Slasher Returns to Fallout 76 This September",
+      "source": "Fallout Hub",
+      "coveredAt": 1787207402750
+    },
+    {
       "fingerprint": "5177490cf218e4d3",
       "topicFingerprint": "070f41c5f06437f6",
       "contentType": "mods",
@@ -368,24 +386,6 @@
       "articleTitle": "Has the 'Teal, Red, and Green' Era Ruined Fallout’s Art Style?",
       "source": "Fallout Hub",
       "coveredAt": 1785398977327
-    },
-    {
-      "fingerprint": "747d420f31e11310",
-      "topicFingerprint": "d60055acbe57f555",
-      "contentType": "community",
-      "title": "Your reason for not siding with the Legion? For me it’s that they look goofy af",
-      "articleTitle": "Forget the Lore: Caesar’s Legion Just Has Terrible Fashion Sense",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1785313444466
-    },
-    {
-      "fingerprint": "0b258cb4e6b51504",
-      "topicFingerprint": "2cd4aebbf410f09b",
-      "contentType": "community",
-      "title": "Forget the Lore: Caesar’s Legion Just Has Terrible Fashion Sense",
-      "articleTitle": "Forget the Lore: Caesar’s Legion Just Has Terrible Fashion Sense",
-      "source": "Fallout Hub",
-      "coveredAt": 1785313444466
     }
   ]
 }
