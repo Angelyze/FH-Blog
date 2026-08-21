@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "75c63135953a481f",
+      "topicFingerprint": "bff1b8df2ac298bd",
+      "contentType": "news",
+      "title": "Fallout 76&#039;s new Slasher update is \"a first of its kind\"",
+      "articleTitle": "Fallout 76’s Rumored 'Slasher' Update is a New Kind of Horror Event",
+      "source": "PCGamesN",
+      "coveredAt": 1787293871826
+    },
+    {
+      "fingerprint": "7b12993371b6347a",
+      "topicFingerprint": "6a31e743dc7fce73",
+      "contentType": "news",
+      "title": "Fallout 76’s Rumored 'Slasher' Update is a New Kind of Horror Event",
+      "articleTitle": "Fallout 76’s Rumored 'Slasher' Update is a New Kind of Horror Event",
+      "source": "Fallout Hub",
+      "coveredAt": 1787293871826
+    },
+    {
       "fingerprint": "98fccfd4e9b8cb4f",
       "topicFingerprint": "7a15ae634ad42dac",
       "contentType": "news",
@@ -368,24 +386,6 @@
       "articleTitle": "A Fallout Fan Just Scored a Mini Nuke USB Hub for Twenty Bucks",
       "source": "Fallout Hub",
       "coveredAt": 1785487036777
-    },
-    {
-      "fingerprint": "e84bfc0164749a27",
-      "topicFingerprint": "736f17c4bd211411",
-      "contentType": "community",
-      "title": "I don't have a problem with Fallout having color in some places. But I think the \"official Fallout Art Style\" being redefined by Fallout 4 having those washed out \"Teal, Red, and Green\" accents on everything has always looked really terrible, compared to the old art style.",
-      "articleTitle": "Has the 'Teal, Red, and Green' Era Ruined Fallout’s Art Style?",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1785398977327
-    },
-    {
-      "fingerprint": "9372995ebbd92c6d",
-      "topicFingerprint": "708d8bbe061aa15a",
-      "contentType": "community",
-      "title": "Has the 'Teal, Red, and Green' Era Ruined Fallout’s Art Style?",
-      "articleTitle": "Has the 'Teal, Red, and Green' Era Ruined Fallout’s Art Style?",
-      "source": "Fallout Hub",
-      "coveredAt": 1785398977327
     }
   ]
 }
