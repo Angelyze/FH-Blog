@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "6bb37e60e729e93d",
+      "topicFingerprint": "975ead0230151756",
+      "contentType": "news",
+      "title": "Be warned: Fallout 4's next update may break your mods - and there's a similar one for Skyrim in the works, too",
+      "articleTitle": "Heads Up: Fallout 4's New Update Is Here, and Your Mods Might Break",
+      "source": "Eurogamer",
+      "coveredAt": 1787379868597
+    },
+    {
+      "fingerprint": "2faf07063f8bdb85",
+      "topicFingerprint": "54d6eabf7003ab5e",
+      "contentType": "news",
+      "title": "Heads Up: Fallout 4's New Update Is Here, and Your Mods Might Break",
+      "articleTitle": "Heads Up: Fallout 4's New Update Is Here, and Your Mods Might Break",
+      "source": "Fallout Hub",
+      "coveredAt": 1787379868597
+    },
+    {
       "fingerprint": "75c63135953a481f",
       "topicFingerprint": "bff1b8df2ac298bd",
       "contentType": "news",
@@ -368,24 +386,6 @@
       "articleTitle": "Fallout 76 Infestation Bosses Just Got Nerfed, With Big QOL Coming",
       "source": "Fallout Hub",
       "coveredAt": 1785571566303
-    },
-    {
-      "fingerprint": "5aa3ccadae162d03",
-      "topicFingerprint": "5112acc2449cd50c",
-      "contentType": "community",
-      "title": "Found this cool Fallout Mini Nuke multi USB thing at a game store yesterday!!",
-      "articleTitle": "A Fallout Fan Just Scored a Mini Nuke USB Hub for Twenty Bucks",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1785487036777
-    },
-    {
-      "fingerprint": "5fe6c61e5ee66643",
-      "topicFingerprint": "435b8e2c72d86872",
-      "contentType": "community",
-      "title": "A Fallout Fan Just Scored a Mini Nuke USB Hub for Twenty Bucks",
-      "articleTitle": "A Fallout Fan Just Scored a Mini Nuke USB Hub for Twenty Bucks",
-      "source": "Fallout Hub",
-      "coveredAt": 1785487036777
     }
   ]
 }
