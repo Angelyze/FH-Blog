@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "766a23aa8b7fb979",
+      "topicFingerprint": "2a5e923da1817026",
+      "contentType": "community",
+      "title": "Beatrix Russell FNV",
+      "articleTitle": "This Beatrix Russell Cosplay Proves SFX Makeup Is an Art Form",
+      "source": "Reddit — Custom Fallout Feed",
+      "coveredAt": 1787466332489
+    },
+    {
+      "fingerprint": "059f057515c6be2c",
+      "topicFingerprint": "310f8b05db52fb3f",
+      "contentType": "community",
+      "title": "This Beatrix Russell Cosplay Proves SFX Makeup Is an Art Form",
+      "articleTitle": "This Beatrix Russell Cosplay Proves SFX Makeup Is an Art Form",
+      "source": "Fallout Hub",
+      "coveredAt": 1787466332489
+    },
+    {
       "fingerprint": "6bb37e60e729e93d",
       "topicFingerprint": "975ead0230151756",
       "contentType": "news",
@@ -368,24 +386,6 @@
       "articleTitle": "GOG Just Made Installing Fallout: New California Way Easier",
       "source": "Fallout Hub",
       "coveredAt": 1785658063454
-    },
-    {
-      "fingerprint": "0a69d05f28c1d008",
-      "topicFingerprint": "80ba7938726eba56",
-      "contentType": "news",
-      "title": "Infestations Balance Adjustment - July 31, 2026",
-      "articleTitle": "Fallout 76 Infestation Bosses Just Got Nerfed, With Big QOL Coming",
-      "source": "Steam — Fallout 76",
-      "coveredAt": 1785571566303
-    },
-    {
-      "fingerprint": "869592c477869677",
-      "topicFingerprint": "fb378047233ce1b2",
-      "contentType": "news",
-      "title": "Fallout 76 Infestation Bosses Just Got Nerfed, With Big QOL Coming",
-      "articleTitle": "Fallout 76 Infestation Bosses Just Got Nerfed, With Big QOL Coming",
-      "source": "Fallout Hub",
-      "coveredAt": 1785571566303
     }
   ]
 }
