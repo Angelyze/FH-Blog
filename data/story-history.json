@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "7ee82a63c2be06e4",
+      "topicFingerprint": "41c8e09d382cbf04",
+      "contentType": "community",
+      "title": "Finished my NCR Ranger/Courier 6 Cosplay just in time for Gamescom",
+      "articleTitle": "This Fan-Made NCR Ranger Cosplay is Heading Straight to Gamescom",
+      "source": "Reddit — Custom Fallout Feed",
+      "coveredAt": 1787553537613
+    },
+    {
+      "fingerprint": "8ee5a5130764966f",
+      "topicFingerprint": "52e08c2fe6adb99c",
+      "contentType": "community",
+      "title": "This Fan-Made NCR Ranger Cosplay is Heading Straight to Gamescom",
+      "articleTitle": "This Fan-Made NCR Ranger Cosplay is Heading Straight to Gamescom",
+      "source": "Fallout Hub",
+      "coveredAt": 1787553537613
+    },
+    {
       "fingerprint": "766a23aa8b7fb979",
       "topicFingerprint": "2a5e923da1817026",
       "contentType": "community",
@@ -368,24 +386,6 @@
       "articleTitle": "Josh Sawyer Wants His Reported New Fallout Game to Hurt a Little",
       "source": "Fallout Hub",
       "coveredAt": 1785749136647
-    },
-    {
-      "fingerprint": "7dbd17f992e328d0",
-      "topicFingerprint": "b181e8a431fb0d71",
-      "contentType": "news",
-      "title": "Fallout: New California Release Will Keep More Fans Busy Until Fallout 5",
-      "articleTitle": "GOG Just Made Installing Fallout: New California Way Easier",
-      "source": "Insider Gaming",
-      "coveredAt": 1785658063454
-    },
-    {
-      "fingerprint": "69ce1099cc6f3dfb",
-      "topicFingerprint": "6610612a5e2bebee",
-      "contentType": "news",
-      "title": "GOG Just Made Installing Fallout: New California Way Easier",
-      "articleTitle": "GOG Just Made Installing Fallout: New California Way Easier",
-      "source": "Fallout Hub",
-      "coveredAt": 1785658063454
     }
   ]
 }
