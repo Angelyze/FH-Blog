@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "11dbd6063bee419e",
+      "topicFingerprint": "87c19db92204bf4b",
+      "contentType": "news",
+      "title": "Celebrating 25 Years of Play: Introducing XBOX Gear, New Community Designs, FanFest Tour Dates, and More",
+      "articleTitle": "Xbox Kicks Off 25th Anniversary with Free Gear, FanFest, and Fallout 4",
+      "source": "Xbox Wire",
+      "coveredAt": 1787639768319
+    },
+    {
+      "fingerprint": "5fa6abfdf2984c1b",
+      "topicFingerprint": "8b740d2e1d9b1108",
+      "contentType": "news",
+      "title": "Xbox Kicks Off 25th Anniversary with Free Gear, FanFest, and Fallout 4",
+      "articleTitle": "Xbox Kicks Off 25th Anniversary with Free Gear, FanFest, and Fallout 4",
+      "source": "Fallout Hub",
+      "coveredAt": 1787639768319
+    },
+    {
       "fingerprint": "7ee82a63c2be06e4",
       "topicFingerprint": "41c8e09d382cbf04",
       "contentType": "community",
@@ -368,24 +386,6 @@
       "articleTitle": "A New Vegas Fan Just Designed the Perfect NCR Prison Guard Uniform",
       "source": "Fallout Hub",
       "coveredAt": 1785831839908
-    },
-    {
-      "fingerprint": "17eeb1b50a74d080",
-      "topicFingerprint": "ba2f7570dc17b75c",
-      "contentType": "news",
-      "title": "Reported lead of Obsidian's new Fallout game wants you to feel a \"sense of agony\" when playing an RPG, rather than being an all-powerful god-splatterer",
-      "articleTitle": "Josh Sawyer Wants His Reported New Fallout Game to Hurt a Little",
-      "source": "Rock Paper Shotgun",
-      "coveredAt": 1785749136647
-    },
-    {
-      "fingerprint": "449fa31343349b9c",
-      "topicFingerprint": "194445aae4726076",
-      "contentType": "news",
-      "title": "Josh Sawyer Wants His Reported New Fallout Game to Hurt a Little",
-      "articleTitle": "Josh Sawyer Wants His Reported New Fallout Game to Hurt a Little",
-      "source": "Fallout Hub",
-      "coveredAt": 1785749136647
     }
   ]
 }
