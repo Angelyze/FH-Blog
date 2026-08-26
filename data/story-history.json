@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "1faff7bb434965f5",
+      "topicFingerprint": "a1543872752f0199",
+      "contentType": "community",
+      "title": "Turning Fallout 4 into Fallout 2",
+      "articleTitle": "Turning Fallout 4 Into Fallout 2: Inside a Grim Retro Mod List",
+      "source": "Reddit — Custom Fallout Feed",
+      "coveredAt": 1787725996134
+    },
+    {
+      "fingerprint": "9b5b04f04b5148b7",
+      "topicFingerprint": "b72f03f8a5522b73",
+      "contentType": "community",
+      "title": "Turning Fallout 4 Into Fallout 2: Inside a Grim Retro Mod List",
+      "articleTitle": "Turning Fallout 4 Into Fallout 2: Inside a Grim Retro Mod List",
+      "source": "Fallout Hub",
+      "coveredAt": 1787725996134
+    },
+    {
       "fingerprint": "11dbd6063bee419e",
       "topicFingerprint": "87c19db92204bf4b",
       "contentType": "news",
@@ -368,24 +386,6 @@
       "articleTitle": "Implant GRX Meets JoJo's Bizarre Adventure in This Fan Art",
       "source": "Fallout Hub",
       "coveredAt": 1786004300857
-    },
-    {
-      "fingerprint": "f57e8556d6b08f49",
-      "topicFingerprint": "9f8800eab5417e6f",
-      "contentType": "community",
-      "title": "I made some concepts that y'all might like",
-      "articleTitle": "A New Vegas Fan Just Designed the Perfect NCR Prison Guard Uniform",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1785831839908
-    },
-    {
-      "fingerprint": "fa9fe03f14f55696",
-      "topicFingerprint": "5b517bbd1cdcbae2",
-      "contentType": "community",
-      "title": "A New Vegas Fan Just Designed the Perfect NCR Prison Guard Uniform",
-      "articleTitle": "A New Vegas Fan Just Designed the Perfect NCR Prison Guard Uniform",
-      "source": "Fallout Hub",
-      "coveredAt": 1785831839908
     }
   ]
 }
