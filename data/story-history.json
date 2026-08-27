@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "9b3fb541c992f050",
+      "topicFingerprint": "7e837f99141546da",
+      "contentType": "news",
+      "title": "Inside the Vault: Join the Fallout 76 XBOX Series Public Test Server",
+      "articleTitle": "Fallout 76 is Finally Getting a Native Xbox Series X|S Version",
+      "source": "Xbox Wire",
+      "coveredAt": 1787850883215
+    },
+    {
+      "fingerprint": "53c16a4d6ec55505",
+      "topicFingerprint": "43b159fb0ef0d33e",
+      "contentType": "news",
+      "title": "Fallout 76 is Finally Getting a Native Xbox Series X|S Version",
+      "articleTitle": "Fallout 76 is Finally Getting a Native Xbox Series X|S Version",
+      "source": "Fallout Hub",
+      "coveredAt": 1787850883215
+    },
+    {
       "fingerprint": "1faff7bb434965f5",
       "topicFingerprint": "a1543872752f0199",
       "contentType": "community",
@@ -368,24 +386,6 @@
       "articleTitle": "Fallout: New California Hits GOG for an Easier Trip to Vault 18",
       "source": "Fallout Hub",
       "coveredAt": 1786086143352
-    },
-    {
-      "fingerprint": "0290cb9717589543",
-      "topicFingerprint": "71db4dd224a85166",
-      "contentType": "community",
-      "title": "How using Implant GRX feels like (art by me, u/Bowler-Hat-Nerd)",
-      "articleTitle": "Implant GRX Meets JoJo's Bizarre Adventure in This Fan Art",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1786004300857
-    },
-    {
-      "fingerprint": "e71decc39b3ec9c9",
-      "topicFingerprint": "41dabf04c82b62d0",
-      "contentType": "community",
-      "title": "Implant GRX Meets JoJo's Bizarre Adventure in This Fan Art",
-      "articleTitle": "Implant GRX Meets JoJo's Bizarre Adventure in This Fan Art",
-      "source": "Fallout Hub",
-      "coveredAt": 1786004300857
     }
   ]
 }
