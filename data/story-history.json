@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "9acfe4c9d84dd1df",
+      "topicFingerprint": "bfeb0364779ce5ad",
+      "contentType": "community",
+      "title": "Courier six cosplay wip",
+      "articleTitle": "This Courier Six Cosplay WIP Nailed the Mojave Aesthetic",
+      "source": "Reddit — Custom Fallout Feed",
+      "coveredAt": 1788004840399
+    },
+    {
+      "fingerprint": "ba14f8d30ffa27d3",
+      "topicFingerprint": "d3a6f4cc0bf85b93",
+      "contentType": "community",
+      "title": "This Courier Six Cosplay WIP Nailed the Mojave Aesthetic",
+      "articleTitle": "This Courier Six Cosplay WIP Nailed the Mojave Aesthetic",
+      "source": "Fallout Hub",
+      "coveredAt": 1788004840399
+    },
+    {
       "fingerprint": "3b78b6bba58c31a5",
       "topicFingerprint": "6ea9421f5dd9a24c",
       "contentType": "community",
@@ -368,24 +386,6 @@
       "articleTitle": "Did the Fallout Show Go Too Far Making the Brotherhood Look Dumb?",
       "source": "Fallout Hub",
       "coveredAt": 1786257679755
-    },
-    {
-      "fingerprint": "b3d049eb1fcd85ee",
-      "topicFingerprint": "e7ea2b5dee5d5fd2",
-      "contentType": "community",
-      "title": "Try JSawyer's mod right now!",
-      "articleTitle": "After 15 Years, This Mod Finally Restored My Fear of New Vegas",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1786171119930
-    },
-    {
-      "fingerprint": "1b055015afee8812",
-      "topicFingerprint": "fcc395ee6a1441ee",
-      "contentType": "community",
-      "title": "After 15 Years, This Mod Finally Restored My Fear of New Vegas",
-      "articleTitle": "After 15 Years, This Mod Finally Restored My Fear of New Vegas",
-      "source": "Fallout Hub",
-      "coveredAt": 1786171119930
     }
   ]
 }
