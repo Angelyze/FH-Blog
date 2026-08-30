@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "68a5a682a15688c1",
+      "topicFingerprint": "f28fc6d8bc1c49a9",
+      "contentType": "community",
+      "title": "T60 Cosplay almost complete!",
+      "articleTitle": "This Fan-Made T-60 Power Armor Cosplay Is a Masterclass in EVA Foam",
+      "source": "Reddit — Custom Fallout Feed",
+      "coveredAt": 1788087523818
+    },
+    {
+      "fingerprint": "49fc0b556b818521",
+      "topicFingerprint": "99fc599a25ad4dbf",
+      "contentType": "community",
+      "title": "This Fan-Made T-60 Power Armor Cosplay Is a Masterclass in EVA Foam",
+      "articleTitle": "This Fan-Made T-60 Power Armor Cosplay Is a Masterclass in EVA Foam",
+      "source": "Fallout Hub",
+      "coveredAt": 1788087523818
+    },
+    {
       "fingerprint": "9acfe4c9d84dd1df",
       "topicFingerprint": "bfeb0364779ce5ad",
       "contentType": "community",
@@ -368,24 +386,6 @@
       "articleTitle": "Fallout 76 Creative Director Teases 'Dark Content' Coming Very Soon",
       "source": "Fallout Hub",
       "coveredAt": 1786346013978
-    },
-    {
-      "fingerprint": "2df1718f78a0be0b",
-      "topicFingerprint": "2c2cb1adc2871cd8",
-      "contentType": "community",
-      "title": "Wait, so we can all agree this was dumb, right? (BOS Destroying Car)",
-      "articleTitle": "Did the Fallout Show Go Too Far Making the Brotherhood Look Dumb?",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1786257679755
-    },
-    {
-      "fingerprint": "d23ecc4a392f50dd",
-      "topicFingerprint": "e7ae71147c728b6a",
-      "contentType": "community",
-      "title": "Did the Fallout Show Go Too Far Making the Brotherhood Look Dumb?",
-      "articleTitle": "Did the Fallout Show Go Too Far Making the Brotherhood Look Dumb?",
-      "source": "Fallout Hub",
-      "coveredAt": 1786257679755
     }
   ]
 }
