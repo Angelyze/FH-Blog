@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "852e442961360b6d",
+      "topicFingerprint": "ee408adb33468a5c",
+      "contentType": "community",
+      "title": "Fallout 76 - Hevetia, WV IRL",
+      "articleTitle": "Real-Life Helvetia: Staying in Fallout 76's Beekeeper House",
+      "source": "Reddit — Custom Fallout Feed",
+      "coveredAt": 1788178700296
+    },
+    {
+      "fingerprint": "cb722d71a034c7c0",
+      "topicFingerprint": "7d4d4b80c58cae3e",
+      "contentType": "community",
+      "title": "Real-Life Helvetia: Staying in Fallout 76's Beekeeper House",
+      "articleTitle": "Real-Life Helvetia: Staying in Fallout 76's Beekeeper House",
+      "source": "Fallout Hub",
+      "coveredAt": 1788178700296
+    },
+    {
       "fingerprint": "68a5a682a15688c1",
       "topicFingerprint": "f28fc6d8bc1c49a9",
       "contentType": "community",
@@ -368,24 +386,6 @@
       "articleTitle": "Why Fans Are Eyeing the \"Nuclear Sunset\" Modpack for FO3 and New Vegas",
       "source": "Fallout Hub",
       "coveredAt": 1786431093238
-    },
-    {
-      "fingerprint": "4485ac7953254a85",
-      "topicFingerprint": "0059bfb361e25db3",
-      "contentType": "news",
-      "title": "Fallout 76 Creative Director Promises &#8216;Dark Content&#8217; Coming Soon",
-      "articleTitle": "Fallout 76 Creative Director Teases 'Dark Content' Coming Very Soon",
-      "source": "Insider Gaming",
-      "coveredAt": 1786346013978
-    },
-    {
-      "fingerprint": "b48a0bebac4ec4c4",
-      "topicFingerprint": "9bbc8b528b9cfcc0",
-      "contentType": "news",
-      "title": "Fallout 76 Creative Director Teases 'Dark Content' Coming Very Soon",
-      "articleTitle": "Fallout 76 Creative Director Teases 'Dark Content' Coming Very Soon",
-      "source": "Fallout Hub",
-      "coveredAt": 1786346013978
     }
   ]
 }
