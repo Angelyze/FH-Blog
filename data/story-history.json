@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "af409bad1ee9b380",
+      "topicFingerprint": "d4176f4c9ea6e1ba",
+      "contentType": "community",
+      "title": "Fallout 4 with \"16 times the detail\"",
+      "articleTitle": "The Modding Curse: Building a Gorgeous Fallout 4 Only to Burn Out",
+      "source": "Reddit — Custom Fallout Feed",
+      "coveredAt": 1788260046339
+    },
+    {
+      "fingerprint": "5bf472cee96d30f9",
+      "topicFingerprint": "495c1000c8ae3652",
+      "contentType": "community",
+      "title": "The Modding Curse: Building a Gorgeous Fallout 4 Only to Burn Out",
+      "articleTitle": "The Modding Curse: Building a Gorgeous Fallout 4 Only to Burn Out",
+      "source": "Fallout Hub",
+      "coveredAt": 1788260046339
+    },
+    {
       "fingerprint": "852e442961360b6d",
       "topicFingerprint": "ee408adb33468a5c",
       "contentType": "community",
@@ -368,24 +386,6 @@
       "articleTitle": "Fallout 76 Is Decent Now, But Fans Still Deserve Better",
       "source": "Fallout Hub",
       "coveredAt": 1786518631301
-    },
-    {
-      "fingerprint": "f24311a633cb48c6",
-      "topicFingerprint": "75bc8c269e36d2ff",
-      "contentType": "community",
-      "title": "Nuclear Sunset Modpack",
-      "articleTitle": "Why Fans Are Eyeing the \"Nuclear Sunset\" Modpack for FO3 and New Vegas",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1786431093238
-    },
-    {
-      "fingerprint": "74e229215c8b8d96",
-      "topicFingerprint": "24837fcc265cd8e1",
-      "contentType": "community",
-      "title": "Why Fans Are Eyeing the \"Nuclear Sunset\" Modpack for FO3 and New Vegas",
-      "articleTitle": "Why Fans Are Eyeing the \"Nuclear Sunset\" Modpack for FO3 and New Vegas",
-      "source": "Fallout Hub",
-      "coveredAt": 1786431093238
     }
   ]
 }
