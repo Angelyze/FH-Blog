@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "877a9e001d19f23e",
+      "topicFingerprint": "e7072a1ae3dc672e",
+      "contentType": "news",
+      "title": "Pint-Sized Terror Stalks Appalachia in The Slasher Update",
+      "articleTitle": "The Pint-Sized Slasher Returns in Fallout 76's Next Big Update",
+      "source": "Steam — Fallout 76",
+      "coveredAt": 1788344124160
+    },
+    {
+      "fingerprint": "c90384a8ce40b3fe",
+      "topicFingerprint": "553f1acecb0fd08e",
+      "contentType": "news",
+      "title": "The Pint-Sized Slasher Returns in Fallout 76's Next Big Update",
+      "articleTitle": "The Pint-Sized Slasher Returns in Fallout 76's Next Big Update",
+      "source": "Fallout Hub",
+      "coveredAt": 1788344124160
+    },
+    {
       "fingerprint": "af409bad1ee9b380",
       "topicFingerprint": "d4176f4c9ea6e1ba",
       "contentType": "community",
@@ -368,24 +386,6 @@
       "articleTitle": "How Fallout: New Vegas Helped One Fan Survive Their Darkest Days",
       "source": "Fallout Hub",
       "coveredAt": 1786605281134
-    },
-    {
-      "fingerprint": "da2679a3be2201ec",
-      "topicFingerprint": "66073f137d620416",
-      "contentType": "community",
-      "title": "(Opinion) Fallout 76 is \"decent\" now, but Fallout fans still deserve a better multiplayer game. A lot of it's reputation from it's terrible launch is still unsalvageable 7 years later.",
-      "articleTitle": "Fallout 76 Is Decent Now, But Fans Still Deserve Better",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1786518631301
-    },
-    {
-      "fingerprint": "4e6798f6c0321312",
-      "topicFingerprint": "ea58576210b7cc14",
-      "contentType": "community",
-      "title": "Fallout 76 Is Decent Now, But Fans Still Deserve Better",
-      "articleTitle": "Fallout 76 Is Decent Now, But Fans Still Deserve Better",
-      "source": "Fallout Hub",
-      "coveredAt": 1786518631301
     }
   ]
 }
