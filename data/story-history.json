@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "54bd93a205893899",
+      "topicFingerprint": "564f2771b84c3d72",
+      "contentType": "community",
+      "title": "Fallout 76 Trip Finale: Mothman Museum, Trans Allegheny Lunatic Asylum and Helvetia",
+      "articleTitle": "Inside a Fan's Real-Life Fallout 76 Road Trip Finale",
+      "source": "Reddit — Custom Fallout Feed",
+      "coveredAt": 1788431295618
+    },
+    {
+      "fingerprint": "924a221acf45e183",
+      "topicFingerprint": "feaf5833a7bd6ec1",
+      "contentType": "community",
+      "title": "Inside a Fan's Real-Life Fallout 76 Road Trip Finale",
+      "articleTitle": "Inside a Fan's Real-Life Fallout 76 Road Trip Finale",
+      "source": "Fallout Hub",
+      "coveredAt": 1788431295618
+    },
+    {
       "fingerprint": "877a9e001d19f23e",
       "topicFingerprint": "e7072a1ae3dc672e",
       "contentType": "news",
@@ -368,24 +386,6 @@
       "articleTitle": "This NCR Ranger Cosplay Set in an Abandoned Factory Hits Just Right",
       "source": "Fallout Hub",
       "coveredAt": 1786691485326
-    },
-    {
-      "fingerprint": "3cc0cbc08fdabe77",
-      "topicFingerprint": "57f85ae2e30810da",
-      "contentType": "community",
-      "title": "This Game Literally Saved My Life.",
-      "articleTitle": "How Fallout: New Vegas Helped One Fan Survive Their Darkest Days",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1786605281134
-    },
-    {
-      "fingerprint": "c0f50605dbc0b563",
-      "topicFingerprint": "2fc4dcb612cafd7a",
-      "contentType": "community",
-      "title": "How Fallout: New Vegas Helped One Fan Survive Their Darkest Days",
-      "articleTitle": "How Fallout: New Vegas Helped One Fan Survive Their Darkest Days",
-      "source": "Fallout Hub",
-      "coveredAt": 1786605281134
     }
   ]
 }
