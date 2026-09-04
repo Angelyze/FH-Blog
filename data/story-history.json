@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "e69bf3c0218b92e8",
+      "topicFingerprint": "5a111b3d2e71ce44",
+      "contentType": "community",
+      "title": "The master is actually the best villian in the franchise",
+      "articleTitle": "Why the Master is Still Fallout’s Best Villain",
+      "source": "Reddit — Custom Fallout Feed",
+      "coveredAt": 1788516950942
+    },
+    {
+      "fingerprint": "ec05506c83502167",
+      "topicFingerprint": "6338dcea628fa2de",
+      "contentType": "community",
+      "title": "Why the Master is Still Fallout’s Best Villain",
+      "articleTitle": "Why the Master is Still Fallout’s Best Villain",
+      "source": "Fallout Hub",
+      "coveredAt": 1788516950942
+    },
+    {
       "fingerprint": "54bd93a205893899",
       "topicFingerprint": "564f2771b84c3d72",
       "contentType": "community",
@@ -368,24 +386,6 @@
       "articleTitle": "Why the \"Foreign Gun\" Complaint in Fallout Makes No Sense",
       "source": "Fallout Hub",
       "coveredAt": 1786774934976
-    },
-    {
-      "fingerprint": "acf4b1dfb377676a",
-      "topicFingerprint": "cebb1bf3cc3c5fe1",
-      "contentType": "community",
-      "title": "Cosplay NCR Ranger with abandoned factory in Can Tho ,Viet Nam",
-      "articleTitle": "This NCR Ranger Cosplay Set in an Abandoned Factory Hits Just Right",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1786691485326
-    },
-    {
-      "fingerprint": "a96b22a935678950",
-      "topicFingerprint": "be97548c9b8e6e25",
-      "contentType": "community",
-      "title": "This NCR Ranger Cosplay Set in an Abandoned Factory Hits Just Right",
-      "articleTitle": "This NCR Ranger Cosplay Set in an Abandoned Factory Hits Just Right",
-      "source": "Fallout Hub",
-      "coveredAt": 1786691485326
     }
   ]
 }
