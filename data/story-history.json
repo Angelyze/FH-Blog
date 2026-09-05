@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "53556ae109e8945e",
+      "topicFingerprint": "b9552e4d2dc29929",
+      "contentType": "community",
+      "title": "What is your opinion on Mr. House as a character? His philosophy, behavior, backstory, and anything else you’d like to add.",
+      "articleTitle": "Why We're Still Arguing About Mr. House's Vision",
+      "source": "Reddit — Custom Fallout Feed",
+      "coveredAt": 1788601334346
+    },
+    {
+      "fingerprint": "b8834d322f5c398c",
+      "topicFingerprint": "d00c300b5b6c34a8",
+      "contentType": "community",
+      "title": "Why We're Still Arguing About Mr. House's Vision",
+      "articleTitle": "Why We're Still Arguing About Mr. House's Vision",
+      "source": "Fallout Hub",
+      "coveredAt": 1788601334346
+    },
+    {
       "fingerprint": "e69bf3c0218b92e8",
       "topicFingerprint": "5a111b3d2e71ce44",
       "contentType": "community",
@@ -368,24 +386,6 @@
       "articleTitle": "What Fallout 3 Looks Like in the Classic Isometric Style",
       "source": "Fallout Hub",
       "coveredAt": 1786861534390
-    },
-    {
-      "fingerprint": "e8d9a12f1136c7a2",
-      "topicFingerprint": "c37d9ed76e82a759",
-      "contentType": "community",
-      "title": "It ticks me off whenever I see people say it makes no sense for a gun to be in the wasteland because it was made in another country irl",
-      "articleTitle": "Why the \"Foreign Gun\" Complaint in Fallout Makes No Sense",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1786774934976
-    },
-    {
-      "fingerprint": "ef1f5ff5f9fcfccf",
-      "topicFingerprint": "8906d4c7211ce3f4",
-      "contentType": "community",
-      "title": "Why the \"Foreign Gun\" Complaint in Fallout Makes No Sense",
-      "articleTitle": "Why the \"Foreign Gun\" Complaint in Fallout Makes No Sense",
-      "source": "Fallout Hub",
-      "coveredAt": 1786774934976
     }
   ]
 }
