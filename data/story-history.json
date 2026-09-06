@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "c81f1f79b32f876a",
+      "topicFingerprint": "45deb735fa0755de",
+      "contentType": "community",
+      "title": "fallout in detroit (Expanded idea)",
+      "articleTitle": "Why a Detroit-Based Fallout Actually Makes Perfect Sense",
+      "source": "Reddit — Custom Fallout Feed",
+      "coveredAt": 1788688659886
+    },
+    {
+      "fingerprint": "6a8e8c5685e21a1e",
+      "topicFingerprint": "d7664d7b4c005277",
+      "contentType": "community",
+      "title": "Why a Detroit-Based Fallout Actually Makes Perfect Sense",
+      "articleTitle": "Why a Detroit-Based Fallout Actually Makes Perfect Sense",
+      "source": "Fallout Hub",
+      "coveredAt": 1788688659886
+    },
+    {
       "fingerprint": "53556ae109e8945e",
       "topicFingerprint": "b9552e4d2dc29929",
       "contentType": "community",
@@ -368,24 +386,6 @@
       "articleTitle": "Why Humanity in Fallout Can Never Actually Recover",
       "source": "Fallout Hub",
       "coveredAt": 1786948564447
-    },
-    {
-      "fingerprint": "16eaf5f65bf4132e",
-      "topicFingerprint": "e2d90b5343838095",
-      "contentType": "community",
-      "title": "Fallout 3 with classic Fallout's trimetric perspective",
-      "articleTitle": "What Fallout 3 Looks Like in the Classic Isometric Style",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1786861534390
-    },
-    {
-      "fingerprint": "19f118361a2825d4",
-      "topicFingerprint": "f1c9b8e866cad40f",
-      "contentType": "community",
-      "title": "What Fallout 3 Looks Like in the Classic Isometric Style",
-      "articleTitle": "What Fallout 3 Looks Like in the Classic Isometric Style",
-      "source": "Fallout Hub",
-      "coveredAt": 1786861534390
     }
   ]
 }
