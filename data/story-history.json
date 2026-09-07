@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "8af63396c707b906",
+      "topicFingerprint": "e447eed5dc396553",
+      "contentType": "community",
+      "title": "I did a Fallout themed birthday party with my family and it was fantastic.",
+      "articleTitle": "This Fan's Family Threw a Fallout Dinner Party and It Rules",
+      "source": "Reddit — Custom Fallout Feed",
+      "coveredAt": 1788779210710
+    },
+    {
+      "fingerprint": "d0e4109fca6a3c24",
+      "topicFingerprint": "648519833bd9c498",
+      "contentType": "community",
+      "title": "This Fan's Family Threw a Fallout Dinner Party and It Rules",
+      "articleTitle": "This Fan's Family Threw a Fallout Dinner Party and It Rules",
+      "source": "Fallout Hub",
+      "coveredAt": 1788779210710
+    },
+    {
       "fingerprint": "c81f1f79b32f876a",
       "topicFingerprint": "45deb735fa0755de",
       "contentType": "community",
@@ -359,33 +377,6 @@
       "articleTitle": "Heads Up: Upcoming Bethesda Updates Are About to Break Your Mods",
       "source": "Fallout Hub",
       "coveredAt": 1787034496266
-    },
-    {
-      "fingerprint": "d395af83f4a9561a",
-      "topicFingerprint": "c0633d8fe4621083",
-      "contentType": "community",
-      "title": "Why i think that the Fallout,s Humanity will never full recover",
-      "articleTitle": "Why Humanity in Fallout Can Never Actually Recover",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1786948564447
-    },
-    {
-      "fingerprint": "10aa665063fcabc7",
-      "topicFingerprint": "a1eaee07a63dc286",
-      "contentType": "community",
-      "title": "I Liked the Old Combat Shotgun",
-      "articleTitle": "Why Humanity in Fallout Can Never Actually Recover",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1786948564447
-    },
-    {
-      "fingerprint": "a3ae856a852c0f3a",
-      "topicFingerprint": "62f63c1088e3b734",
-      "contentType": "community",
-      "title": "Why Humanity in Fallout Can Never Actually Recover",
-      "articleTitle": "Why Humanity in Fallout Can Never Actually Recover",
-      "source": "Fallout Hub",
-      "coveredAt": 1786948564447
     }
   ]
 }
