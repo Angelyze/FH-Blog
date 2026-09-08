@@ -1,6 +1,33 @@
 {
   "entries": [
     {
+      "fingerprint": "03f51a2cf4356e8f",
+      "topicFingerprint": "d97837a2c742bb44",
+      "contentType": "community",
+      "title": "Screenshots of my courier",
+      "articleTitle": "This New Vegas Courier Build Nails the Ultimate Wasteland Cowboy Look",
+      "source": "Reddit — Custom Fallout Feed",
+      "coveredAt": 1788862780437
+    },
+    {
+      "fingerprint": "c0815520ec2726a1",
+      "topicFingerprint": "434be6fcdd1ad87b",
+      "contentType": "community",
+      "title": "Some Mr house and New Vegas propaganda posters",
+      "articleTitle": "This New Vegas Courier Build Nails the Ultimate Wasteland Cowboy Look",
+      "source": "Reddit — Custom Fallout Feed",
+      "coveredAt": 1788862780437
+    },
+    {
+      "fingerprint": "1401f51bdca0063b",
+      "topicFingerprint": "5bcf696e92a45dfa",
+      "contentType": "community",
+      "title": "This New Vegas Courier Build Nails the Ultimate Wasteland Cowboy Look",
+      "articleTitle": "This New Vegas Courier Build Nails the Ultimate Wasteland Cowboy Look",
+      "source": "Fallout Hub",
+      "coveredAt": 1788862780437
+    },
+    {
       "fingerprint": "8af63396c707b906",
       "topicFingerprint": "e447eed5dc396553",
       "contentType": "community",
@@ -359,24 +386,6 @@
       "articleTitle": "Fallout 4's Surprise August Update is a Massive Win for Modders",
       "source": "Fallout Hub",
       "coveredAt": 1787121001751
-    },
-    {
-      "fingerprint": "98566fa437d062da",
-      "topicFingerprint": "0cd5b7aaab4c2a78",
-      "contentType": "news",
-      "title": "Bethesda Warns Skyrim & Fallout 4 Players of Mod-breaking Update",
-      "articleTitle": "Heads Up: Upcoming Bethesda Updates Are About to Break Your Mods",
-      "source": "Polygon",
-      "coveredAt": 1787034496266
-    },
-    {
-      "fingerprint": "a81bde8c80a6229c",
-      "topicFingerprint": "616142288cdb7327",
-      "contentType": "news",
-      "title": "Heads Up: Upcoming Bethesda Updates Are About to Break Your Mods",
-      "articleTitle": "Heads Up: Upcoming Bethesda Updates Are About to Break Your Mods",
-      "source": "Fallout Hub",
-      "coveredAt": 1787034496266
     }
   ]
 }
