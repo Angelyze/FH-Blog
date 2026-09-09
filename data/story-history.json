@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "a62212c3e3dbe924",
+      "topicFingerprint": "f3dd8ba82606ed74",
+      "contentType": "news",
+      "title": "Breaking Benjamin Frontman Stops His Own Concert to Rant About His Feud With a Fallout 4 Modder",
+      "articleTitle": "Breaking Benjamin Frontman Pauses Concert Over Fallout 4 Mod Feud",
+      "source": "IGN",
+      "coveredAt": 1788949665013
+    },
+    {
+      "fingerprint": "dd8484acd7f5d7c5",
+      "topicFingerprint": "56d4d399e2892b23",
+      "contentType": "news",
+      "title": "Breaking Benjamin Frontman Pauses Concert Over Fallout 4 Mod Feud",
+      "articleTitle": "Breaking Benjamin Frontman Pauses Concert Over Fallout 4 Mod Feud",
+      "source": "Fallout Hub",
+      "coveredAt": 1788949665013
+    },
+    {
       "fingerprint": "03f51a2cf4356e8f",
       "topicFingerprint": "d97837a2c742bb44",
       "contentType": "community",
@@ -368,24 +386,6 @@
       "articleTitle": "The Pint-Sized Slasher Returns to Fallout 76 This September",
       "source": "Fallout Hub",
       "coveredAt": 1787207402750
-    },
-    {
-      "fingerprint": "5177490cf218e4d3",
-      "topicFingerprint": "070f41c5f06437f6",
-      "contentType": "mods",
-      "title": "Fallout 4 Update - August 18th",
-      "articleTitle": "Fallout 4's Surprise August Update is a Massive Win for Modders",
-      "source": "Steam Community — Fallout 4",
-      "coveredAt": 1787121001751
-    },
-    {
-      "fingerprint": "28a9224b519ff709",
-      "topicFingerprint": "7715b2123440aa1a",
-      "contentType": "mods",
-      "title": "Fallout 4's Surprise August Update is a Massive Win for Modders",
-      "articleTitle": "Fallout 4's Surprise August Update is a Massive Win for Modders",
-      "source": "Fallout Hub",
-      "coveredAt": 1787121001751
     }
   ]
 }
