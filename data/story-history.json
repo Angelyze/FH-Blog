@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "0d371f5456351de4",
+      "topicFingerprint": "a7fd877932930e0f",
+      "contentType": "news",
+      "title": "I'm not saying Fallout 4 modding drama gets to people, but here's Breaking Benjamin's singer begging concertgoers to try his AI-assisted first person mod",
+      "articleTitle": "Breaking Benjamin's Singer Promotes His Fallout 4 Mod Mid-Concert",
+      "source": "Rock Paper Shotgun",
+      "coveredAt": 1789035515996
+    },
+    {
+      "fingerprint": "98ce238bcc70128f",
+      "topicFingerprint": "fa45a29f03741d28",
+      "contentType": "news",
+      "title": "Breaking Benjamin's Singer Promotes His Fallout 4 Mod Mid-Concert",
+      "articleTitle": "Breaking Benjamin's Singer Promotes His Fallout 4 Mod Mid-Concert",
+      "source": "Fallout Hub",
+      "coveredAt": 1789035515996
+    },
+    {
       "fingerprint": "a62212c3e3dbe924",
       "topicFingerprint": "f3dd8ba82606ed74",
       "contentType": "news",
@@ -368,24 +386,6 @@
       "articleTitle": "Fallout 76’s Rumored 'Slasher' Update is a New Kind of Horror Event",
       "source": "Fallout Hub",
       "coveredAt": 1787293871826
-    },
-    {
-      "fingerprint": "98fccfd4e9b8cb4f",
-      "topicFingerprint": "7a15ae634ad42dac",
-      "contentType": "news",
-      "title": "“The Slasher” Cuts In on September 15",
-      "articleTitle": "The Pint-Sized Slasher Returns to Fallout 76 This September",
-      "source": "Steam — Fallout 76",
-      "coveredAt": 1787207402750
-    },
-    {
-      "fingerprint": "3fc21934c5c58093",
-      "topicFingerprint": "37ce80ec483d9538",
-      "contentType": "news",
-      "title": "The Pint-Sized Slasher Returns to Fallout 76 This September",
-      "articleTitle": "The Pint-Sized Slasher Returns to Fallout 76 This September",
-      "source": "Fallout Hub",
-      "coveredAt": 1787207402750
     }
   ]
 }
