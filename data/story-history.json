@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "5e6870ef29c3a544",
+      "topicFingerprint": "262daf9977b5792f",
+      "contentType": "community",
+      "title": "I understand the hype behind Fallout 3 and New Vegas now",
+      "articleTitle": "Why a Fallout 4 Defender Finally Cracked and Played the Classics",
+      "source": "Reddit — Custom Fallout Feed",
+      "coveredAt": 1789121992468
+    },
+    {
+      "fingerprint": "1f0a2f178639dc53",
+      "topicFingerprint": "b82ef007d5c000bc",
+      "contentType": "community",
+      "title": "Why a Fallout 4 Defender Finally Cracked and Played the Classics",
+      "articleTitle": "Why a Fallout 4 Defender Finally Cracked and Played the Classics",
+      "source": "Fallout Hub",
+      "coveredAt": 1789121992468
+    },
+    {
       "fingerprint": "0d371f5456351de4",
       "topicFingerprint": "a7fd877932930e0f",
       "contentType": "news",
@@ -368,24 +386,6 @@
       "articleTitle": "Heads Up: Fallout 4's New Update Is Here, and Your Mods Might Break",
       "source": "Fallout Hub",
       "coveredAt": 1787379868597
-    },
-    {
-      "fingerprint": "75c63135953a481f",
-      "topicFingerprint": "bff1b8df2ac298bd",
-      "contentType": "news",
-      "title": "Fallout 76&#039;s new Slasher update is \"a first of its kind\"",
-      "articleTitle": "Fallout 76’s Rumored 'Slasher' Update is a New Kind of Horror Event",
-      "source": "PCGamesN",
-      "coveredAt": 1787293871826
-    },
-    {
-      "fingerprint": "7b12993371b6347a",
-      "topicFingerprint": "6a31e743dc7fce73",
-      "contentType": "news",
-      "title": "Fallout 76’s Rumored 'Slasher' Update is a New Kind of Horror Event",
-      "articleTitle": "Fallout 76’s Rumored 'Slasher' Update is a New Kind of Horror Event",
-      "source": "Fallout Hub",
-      "coveredAt": 1787293871826
     }
   ]
 }
