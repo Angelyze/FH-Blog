@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "1735e5a731ca94fb",
+      "topicFingerprint": "369a12cb044e08f3",
+      "contentType": "news",
+      "title": "Maintenance Announcement - September 15, 2026",
+      "articleTitle": "The Slasher Update Will Shrink Your Fallout 76 Install Size",
+      "source": "Steam — Fallout 76",
+      "coveredAt": 1789206675678
+    },
+    {
+      "fingerprint": "5506204a2b969d7e",
+      "topicFingerprint": "d3799eed71731072",
+      "contentType": "news",
+      "title": "The Slasher Update Will Shrink Your Fallout 76 Install Size",
+      "articleTitle": "The Slasher Update Will Shrink Your Fallout 76 Install Size",
+      "source": "Fallout Hub",
+      "coveredAt": 1789206675678
+    },
+    {
       "fingerprint": "5e6870ef29c3a544",
       "topicFingerprint": "262daf9977b5792f",
       "contentType": "community",
@@ -368,24 +386,6 @@
       "articleTitle": "This Beatrix Russell Cosplay Proves SFX Makeup Is an Art Form",
       "source": "Fallout Hub",
       "coveredAt": 1787466332489
-    },
-    {
-      "fingerprint": "6bb37e60e729e93d",
-      "topicFingerprint": "975ead0230151756",
-      "contentType": "news",
-      "title": "Be warned: Fallout 4's next update may break your mods - and there's a similar one for Skyrim in the works, too",
-      "articleTitle": "Heads Up: Fallout 4's New Update Is Here, and Your Mods Might Break",
-      "source": "Eurogamer",
-      "coveredAt": 1787379868597
-    },
-    {
-      "fingerprint": "2faf07063f8bdb85",
-      "topicFingerprint": "54d6eabf7003ab5e",
-      "contentType": "news",
-      "title": "Heads Up: Fallout 4's New Update Is Here, and Your Mods Might Break",
-      "articleTitle": "Heads Up: Fallout 4's New Update Is Here, and Your Mods Might Break",
-      "source": "Fallout Hub",
-      "coveredAt": 1787379868597
     }
   ]
 }
