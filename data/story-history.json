@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "531d9466217dbb7b",
+      "topicFingerprint": "ae50f8b41eb6b244",
+      "contentType": "community",
+      "title": "I wish more quests were like \"Beyond Beef\"",
+      "articleTitle": "Why This New Vegas Quest Still Sets the Bar for RPG Freedom",
+      "source": "Reddit — Custom Fallout Feed",
+      "coveredAt": 1789384736452
+    },
+    {
+      "fingerprint": "b9f799ad3caef00e",
+      "topicFingerprint": "63a33d53b5f01169",
+      "contentType": "community",
+      "title": "Why This New Vegas Quest Still Sets the Bar for RPG Freedom",
+      "articleTitle": "Why This New Vegas Quest Still Sets the Bar for RPG Freedom",
+      "source": "Fallout Hub",
+      "coveredAt": 1789384736452
+    },
+    {
       "fingerprint": "1735e5a731ca94fb",
       "topicFingerprint": "369a12cb044e08f3",
       "contentType": "news",
@@ -350,42 +368,6 @@
       "articleTitle": "Xbox Kicks Off 25th Anniversary with Free Gear, FanFest, and Fallout 4",
       "source": "Fallout Hub",
       "coveredAt": 1787639768319
-    },
-    {
-      "fingerprint": "7ee82a63c2be06e4",
-      "topicFingerprint": "41c8e09d382cbf04",
-      "contentType": "community",
-      "title": "Finished my NCR Ranger/Courier 6 Cosplay just in time for Gamescom",
-      "articleTitle": "This Fan-Made NCR Ranger Cosplay is Heading Straight to Gamescom",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1787553537613
-    },
-    {
-      "fingerprint": "8ee5a5130764966f",
-      "topicFingerprint": "52e08c2fe6adb99c",
-      "contentType": "community",
-      "title": "This Fan-Made NCR Ranger Cosplay is Heading Straight to Gamescom",
-      "articleTitle": "This Fan-Made NCR Ranger Cosplay is Heading Straight to Gamescom",
-      "source": "Fallout Hub",
-      "coveredAt": 1787553537613
-    },
-    {
-      "fingerprint": "766a23aa8b7fb979",
-      "topicFingerprint": "2a5e923da1817026",
-      "contentType": "community",
-      "title": "Beatrix Russell FNV",
-      "articleTitle": "This Beatrix Russell Cosplay Proves SFX Makeup Is an Art Form",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1787466332489
-    },
-    {
-      "fingerprint": "059f057515c6be2c",
-      "topicFingerprint": "310f8b05db52fb3f",
-      "contentType": "community",
-      "title": "This Beatrix Russell Cosplay Proves SFX Makeup Is an Art Form",
-      "articleTitle": "This Beatrix Russell Cosplay Proves SFX Makeup Is an Art Form",
-      "source": "Fallout Hub",
-      "coveredAt": 1787466332489
     }
   ]
 }
