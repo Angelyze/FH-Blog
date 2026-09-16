@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "49181aa375eed86f",
+      "topicFingerprint": "85949ed4aa8b268f",
+      "contentType": "news",
+      "title": "Say Goodbye to Fallout's Best Replacement Before it Leaves Game Pass Forever",
+      "articleTitle": "Play Atomfall Before It Reportedly Leaves Game Pass This Month",
+      "source": "Polygon",
+      "coveredAt": 1789554921252
+    },
+    {
+      "fingerprint": "a3c59091062fd4d7",
+      "topicFingerprint": "25a8b3834931b50b",
+      "contentType": "news",
+      "title": "Play Atomfall Before It Reportedly Leaves Game Pass This Month",
+      "articleTitle": "Play Atomfall Before It Reportedly Leaves Game Pass This Month",
+      "source": "Fallout Hub",
+      "coveredAt": 1789554921252
+    },
+    {
       "fingerprint": "ccf606d6b21e3f83",
       "topicFingerprint": "d82461feb2954dd1",
       "contentType": "community",
@@ -350,24 +368,6 @@
       "articleTitle": "Fallout 76 is Finally Getting a Native Xbox Series X|S Version",
       "source": "Fallout Hub",
       "coveredAt": 1787850883215
-    },
-    {
-      "fingerprint": "1faff7bb434965f5",
-      "topicFingerprint": "a1543872752f0199",
-      "contentType": "community",
-      "title": "Turning Fallout 4 into Fallout 2",
-      "articleTitle": "Turning Fallout 4 Into Fallout 2: Inside a Grim Retro Mod List",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1787725996134
-    },
-    {
-      "fingerprint": "9b5b04f04b5148b7",
-      "topicFingerprint": "b72f03f8a5522b73",
-      "contentType": "community",
-      "title": "Turning Fallout 4 Into Fallout 2: Inside a Grim Retro Mod List",
-      "articleTitle": "Turning Fallout 4 Into Fallout 2: Inside a Grim Retro Mod List",
-      "source": "Fallout Hub",
-      "coveredAt": 1787725996134
     }
   ]
 }
