@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "f8db465b04a8bce9",
+      "topicFingerprint": "53d6d4c7eae35750",
+      "contentType": "news",
+      "title": "Hideo Kojima Thanks Xbox For Backing His Vision, As Physint Casts It Star Bill Skarsgård Amid PlayStation 2026 Fallout",
+      "articleTitle": "Kojima Praises Xbox Partnership as Physint Casts Bill Skarsgård",
+      "source": "Wccftech",
+      "coveredAt": 1789726683111
+    },
+    {
+      "fingerprint": "6563c06931e5866d",
+      "topicFingerprint": "7c1486e88b94b022",
+      "contentType": "news",
+      "title": "Kojima Praises Xbox Partnership as Physint Casts Bill Skarsgård",
+      "articleTitle": "Kojima Praises Xbox Partnership as Physint Casts Bill Skarsgård",
+      "source": "Fallout Hub",
+      "coveredAt": 1789726683111
+    },
+    {
       "fingerprint": "49181aa375eed86f",
       "topicFingerprint": "85949ed4aa8b268f",
       "contentType": "news",
@@ -350,24 +368,6 @@
       "articleTitle": "A Slimmer Take on Power Armor: Elwesar's Heroic Frame WIP",
       "source": "Fallout Hub",
       "coveredAt": 1787940242071
-    },
-    {
-      "fingerprint": "9b3fb541c992f050",
-      "topicFingerprint": "7e837f99141546da",
-      "contentType": "news",
-      "title": "Inside the Vault: Join the Fallout 76 XBOX Series Public Test Server",
-      "articleTitle": "Fallout 76 is Finally Getting a Native Xbox Series X|S Version",
-      "source": "Xbox Wire",
-      "coveredAt": 1787850883215
-    },
-    {
-      "fingerprint": "53c16a4d6ec55505",
-      "topicFingerprint": "43b159fb0ef0d33e",
-      "contentType": "news",
-      "title": "Fallout 76 is Finally Getting a Native Xbox Series X|S Version",
-      "articleTitle": "Fallout 76 is Finally Getting a Native Xbox Series X|S Version",
-      "source": "Fallout Hub",
-      "coveredAt": 1787850883215
     }
   ]
 }
