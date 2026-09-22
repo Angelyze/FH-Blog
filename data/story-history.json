@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "4dc130db388fde98",
+      "topicFingerprint": "9622ba03d3780a2e",
+      "contentType": "news",
+      "title": "\"It wasn't a planned thing\": Breaking Benjamin singer on his mid-gig Fallout 4 mod promo being down to a broken drum and his love of VR",
+      "articleTitle": "Breaking Benjamin's Singer Explains That Mid-Gig Fallout 4 Mod Promo",
+      "source": "Rock Paper Shotgun",
+      "coveredAt": 1790073580539
+    },
+    {
+      "fingerprint": "3b89c994bf452fb6",
+      "topicFingerprint": "bd1e37f642e28ccb",
+      "contentType": "news",
+      "title": "Breaking Benjamin's Singer Explains That Mid-Gig Fallout 4 Mod Promo",
+      "articleTitle": "Breaking Benjamin's Singer Explains That Mid-Gig Fallout 4 Mod Promo",
+      "source": "Fallout Hub",
+      "coveredAt": 1790073580539
+    },
+    {
       "fingerprint": "ea6805beaceb3ca9",
       "topicFingerprint": "086959f8a6c5a6ea",
       "contentType": "news",
@@ -314,60 +332,6 @@
       "articleTitle": "The Modding Curse: Building a Gorgeous Fallout 4 Only to Burn Out",
       "source": "Fallout Hub",
       "coveredAt": 1788260046339
-    },
-    {
-      "fingerprint": "852e442961360b6d",
-      "topicFingerprint": "ee408adb33468a5c",
-      "contentType": "community",
-      "title": "Fallout 76 - Hevetia, WV IRL",
-      "articleTitle": "Real-Life Helvetia: Staying in Fallout 76's Beekeeper House",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1788178700296
-    },
-    {
-      "fingerprint": "cb722d71a034c7c0",
-      "topicFingerprint": "7d4d4b80c58cae3e",
-      "contentType": "community",
-      "title": "Real-Life Helvetia: Staying in Fallout 76's Beekeeper House",
-      "articleTitle": "Real-Life Helvetia: Staying in Fallout 76's Beekeeper House",
-      "source": "Fallout Hub",
-      "coveredAt": 1788178700296
-    },
-    {
-      "fingerprint": "68a5a682a15688c1",
-      "topicFingerprint": "f28fc6d8bc1c49a9",
-      "contentType": "community",
-      "title": "T60 Cosplay almost complete!",
-      "articleTitle": "This Fan-Made T-60 Power Armor Cosplay Is a Masterclass in EVA Foam",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1788087523818
-    },
-    {
-      "fingerprint": "49fc0b556b818521",
-      "topicFingerprint": "99fc599a25ad4dbf",
-      "contentType": "community",
-      "title": "This Fan-Made T-60 Power Armor Cosplay Is a Masterclass in EVA Foam",
-      "articleTitle": "This Fan-Made T-60 Power Armor Cosplay Is a Masterclass in EVA Foam",
-      "source": "Fallout Hub",
-      "coveredAt": 1788087523818
-    },
-    {
-      "fingerprint": "9acfe4c9d84dd1df",
-      "topicFingerprint": "bfeb0364779ce5ad",
-      "contentType": "community",
-      "title": "Courier six cosplay wip",
-      "articleTitle": "This Courier Six Cosplay WIP Nailed the Mojave Aesthetic",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1788004840399
-    },
-    {
-      "fingerprint": "ba14f8d30ffa27d3",
-      "topicFingerprint": "d3a6f4cc0bf85b93",
-      "contentType": "community",
-      "title": "This Courier Six Cosplay WIP Nailed the Mojave Aesthetic",
-      "articleTitle": "This Courier Six Cosplay WIP Nailed the Mojave Aesthetic",
-      "source": "Fallout Hub",
-      "coveredAt": 1788004840399
     }
   ]
 }
