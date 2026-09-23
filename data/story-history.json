@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "1f8aa9ba5faf25e4",
+      "topicFingerprint": "8f6f971922816493",
+      "contentType": "news",
+      "title": "Obsidian&#8217;s New Fallout Game Is Still Coming, As The Studio Moves Under Bethesda&#8217;s Umbrella",
+      "articleTitle": "Obsidian is Reportedly Back on Fallout—Under Bethesda’s New Umbrella",
+      "source": "GameSpot",
+      "coveredAt": 1790159642233
+    },
+    {
+      "fingerprint": "70545387a0ab0dbf",
+      "topicFingerprint": "08580719f459dda0",
+      "contentType": "news",
+      "title": "Obsidian is Reportedly Back on Fallout—Under Bethesda’s New Umbrella",
+      "articleTitle": "Obsidian is Reportedly Back on Fallout—Under Bethesda’s New Umbrella",
+      "source": "Fallout Hub",
+      "coveredAt": 1790159642233
+    },
+    {
       "fingerprint": "4dc130db388fde98",
       "topicFingerprint": "9622ba03d3780a2e",
       "contentType": "news",
@@ -296,42 +314,6 @@
       "articleTitle": "Inside a Fan's Real-Life Fallout 76 Road Trip Finale",
       "source": "Fallout Hub",
       "coveredAt": 1788431295618
-    },
-    {
-      "fingerprint": "877a9e001d19f23e",
-      "topicFingerprint": "e7072a1ae3dc672e",
-      "contentType": "news",
-      "title": "Pint-Sized Terror Stalks Appalachia in The Slasher Update",
-      "articleTitle": "The Pint-Sized Slasher Returns in Fallout 76's Next Big Update",
-      "source": "Steam — Fallout 76",
-      "coveredAt": 1788344124160
-    },
-    {
-      "fingerprint": "c90384a8ce40b3fe",
-      "topicFingerprint": "553f1acecb0fd08e",
-      "contentType": "news",
-      "title": "The Pint-Sized Slasher Returns in Fallout 76's Next Big Update",
-      "articleTitle": "The Pint-Sized Slasher Returns in Fallout 76's Next Big Update",
-      "source": "Fallout Hub",
-      "coveredAt": 1788344124160
-    },
-    {
-      "fingerprint": "af409bad1ee9b380",
-      "topicFingerprint": "d4176f4c9ea6e1ba",
-      "contentType": "community",
-      "title": "Fallout 4 with \"16 times the detail\"",
-      "articleTitle": "The Modding Curse: Building a Gorgeous Fallout 4 Only to Burn Out",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1788260046339
-    },
-    {
-      "fingerprint": "5bf472cee96d30f9",
-      "topicFingerprint": "495c1000c8ae3652",
-      "contentType": "community",
-      "title": "The Modding Curse: Building a Gorgeous Fallout 4 Only to Burn Out",
-      "articleTitle": "The Modding Curse: Building a Gorgeous Fallout 4 Only to Burn Out",
-      "source": "Fallout Hub",
-      "coveredAt": 1788260046339
     }
   ]
 }
