@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "23aa7e78c977710a",
+      "topicFingerprint": "7e950e2d9dc232c2",
+      "contentType": "news",
+      "title": "Fallout 4&#8217;s New Midwestern Power Armor is a Blast From the Past",
+      "articleTitle": "Fallout 4's Midwestern Power Armor Brings Back a Tactics Classic",
+      "source": "Insider Gaming",
+      "coveredAt": 1790246924121
+    },
+    {
+      "fingerprint": "693d44366c1e2ed5",
+      "topicFingerprint": "439295b93648dfa5",
+      "contentType": "news",
+      "title": "Fallout 4's Midwestern Power Armor Brings Back a Tactics Classic",
+      "articleTitle": "Fallout 4's Midwestern Power Armor Brings Back a Tactics Classic",
+      "source": "Fallout Hub",
+      "coveredAt": 1790246924121
+    },
+    {
       "fingerprint": "1f8aa9ba5faf25e4",
       "topicFingerprint": "8f6f971922816493",
       "contentType": "news",
@@ -296,24 +314,6 @@
       "articleTitle": "Why the Master is Still Fallout’s Best Villain",
       "source": "Fallout Hub",
       "coveredAt": 1788516950942
-    },
-    {
-      "fingerprint": "54bd93a205893899",
-      "topicFingerprint": "564f2771b84c3d72",
-      "contentType": "community",
-      "title": "Fallout 76 Trip Finale: Mothman Museum, Trans Allegheny Lunatic Asylum and Helvetia",
-      "articleTitle": "Inside a Fan's Real-Life Fallout 76 Road Trip Finale",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1788431295618
-    },
-    {
-      "fingerprint": "924a221acf45e183",
-      "topicFingerprint": "feaf5833a7bd6ec1",
-      "contentType": "community",
-      "title": "Inside a Fan's Real-Life Fallout 76 Road Trip Finale",
-      "articleTitle": "Inside a Fan's Real-Life Fallout 76 Road Trip Finale",
-      "source": "Fallout Hub",
-      "coveredAt": 1788431295618
     }
   ]
 }
