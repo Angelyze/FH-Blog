@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "9a30fd3dee7a251d",
+      "topicFingerprint": "33660c3ab49c65da",
+      "contentType": "news",
+      "title": "Tim Cain claims Vault Boy caused issues with Fallout's original publishing partner",
+      "articleTitle": "Vault Boy was almost cut: Tim Cain explains why original partners",
+      "source": "Shacknews",
+      "coveredAt": 1790418857120
+    },
+    {
+      "fingerprint": "19350405059f8eb5",
+      "topicFingerprint": "7558a1db2acd6210",
+      "contentType": "news",
+      "title": "Vault Boy was almost cut: Tim Cain explains why original partners",
+      "articleTitle": "Vault Boy was almost cut: Tim Cain explains why original partners",
+      "source": "Fallout Hub",
+      "coveredAt": 1790418857120
+    },
+    {
       "fingerprint": "23aa7e78c977710a",
       "topicFingerprint": "7e950e2d9dc232c2",
       "contentType": "news",
@@ -278,42 +296,6 @@
       "articleTitle": "Why a Detroit-Based Fallout Actually Makes Perfect Sense",
       "source": "Fallout Hub",
       "coveredAt": 1788688659886
-    },
-    {
-      "fingerprint": "53556ae109e8945e",
-      "topicFingerprint": "b9552e4d2dc29929",
-      "contentType": "community",
-      "title": "What is your opinion on Mr. House as a character? His philosophy, behavior, backstory, and anything else you’d like to add.",
-      "articleTitle": "Why We're Still Arguing About Mr. House's Vision",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1788601334346
-    },
-    {
-      "fingerprint": "b8834d322f5c398c",
-      "topicFingerprint": "d00c300b5b6c34a8",
-      "contentType": "community",
-      "title": "Why We're Still Arguing About Mr. House's Vision",
-      "articleTitle": "Why We're Still Arguing About Mr. House's Vision",
-      "source": "Fallout Hub",
-      "coveredAt": 1788601334346
-    },
-    {
-      "fingerprint": "e69bf3c0218b92e8",
-      "topicFingerprint": "5a111b3d2e71ce44",
-      "contentType": "community",
-      "title": "The master is actually the best villian in the franchise",
-      "articleTitle": "Why the Master is Still Fallout’s Best Villain",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1788516950942
-    },
-    {
-      "fingerprint": "ec05506c83502167",
-      "topicFingerprint": "6338dcea628fa2de",
-      "contentType": "community",
-      "title": "Why the Master is Still Fallout’s Best Villain",
-      "articleTitle": "Why the Master is Still Fallout’s Best Villain",
-      "source": "Fallout Hub",
-      "coveredAt": 1788516950942
     }
   ]
 }
