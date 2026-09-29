@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "609dcfb1d148b336",
+      "topicFingerprint": "99a4aed5876819eb",
+      "contentType": "news",
+      "title": "The Elder Scrolls Doesn't Have a New Vegas-Like Spinoff Because Todd Howard Is 'Very Protective' of the Franchise, Former Dev Claims",
+      "articleTitle": "Why We Never Got an 'Elder Scrolls: New Vegas' Spinoff",
+      "source": "IGN",
+      "coveredAt": 1790682768769
+    },
+    {
+      "fingerprint": "6b65cc9f5a483ad1",
+      "topicFingerprint": "5444168a943234e7",
+      "contentType": "news",
+      "title": "Why We Never Got an 'Elder Scrolls: New Vegas' Spinoff",
+      "articleTitle": "Why We Never Got an 'Elder Scrolls: New Vegas' Spinoff",
+      "source": "Fallout Hub",
+      "coveredAt": 1790682768769
+    },
+    {
       "fingerprint": "9a30fd3dee7a251d",
       "topicFingerprint": "33660c3ab49c65da",
       "contentType": "news",
@@ -233,69 +251,6 @@
       "articleTitle": "Breaking Benjamin Frontman Pauses Concert Over Fallout 4 Mod Feud",
       "source": "Fallout Hub",
       "coveredAt": 1788949665013
-    },
-    {
-      "fingerprint": "03f51a2cf4356e8f",
-      "topicFingerprint": "d97837a2c742bb44",
-      "contentType": "community",
-      "title": "Screenshots of my courier",
-      "articleTitle": "This New Vegas Courier Build Nails the Ultimate Wasteland Cowboy Look",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1788862780437
-    },
-    {
-      "fingerprint": "c0815520ec2726a1",
-      "topicFingerprint": "434be6fcdd1ad87b",
-      "contentType": "community",
-      "title": "Some Mr house and New Vegas propaganda posters",
-      "articleTitle": "This New Vegas Courier Build Nails the Ultimate Wasteland Cowboy Look",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1788862780437
-    },
-    {
-      "fingerprint": "1401f51bdca0063b",
-      "topicFingerprint": "5bcf696e92a45dfa",
-      "contentType": "community",
-      "title": "This New Vegas Courier Build Nails the Ultimate Wasteland Cowboy Look",
-      "articleTitle": "This New Vegas Courier Build Nails the Ultimate Wasteland Cowboy Look",
-      "source": "Fallout Hub",
-      "coveredAt": 1788862780437
-    },
-    {
-      "fingerprint": "8af63396c707b906",
-      "topicFingerprint": "e447eed5dc396553",
-      "contentType": "community",
-      "title": "I did a Fallout themed birthday party with my family and it was fantastic.",
-      "articleTitle": "This Fan's Family Threw a Fallout Dinner Party and It Rules",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1788779210710
-    },
-    {
-      "fingerprint": "d0e4109fca6a3c24",
-      "topicFingerprint": "648519833bd9c498",
-      "contentType": "community",
-      "title": "This Fan's Family Threw a Fallout Dinner Party and It Rules",
-      "articleTitle": "This Fan's Family Threw a Fallout Dinner Party and It Rules",
-      "source": "Fallout Hub",
-      "coveredAt": 1788779210710
-    },
-    {
-      "fingerprint": "c81f1f79b32f876a",
-      "topicFingerprint": "45deb735fa0755de",
-      "contentType": "community",
-      "title": "fallout in detroit (Expanded idea)",
-      "articleTitle": "Why a Detroit-Based Fallout Actually Makes Perfect Sense",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1788688659886
-    },
-    {
-      "fingerprint": "6a8e8c5685e21a1e",
-      "topicFingerprint": "d7664d7b4c005277",
-      "contentType": "community",
-      "title": "Why a Detroit-Based Fallout Actually Makes Perfect Sense",
-      "articleTitle": "Why a Detroit-Based Fallout Actually Makes Perfect Sense",
-      "source": "Fallout Hub",
-      "coveredAt": 1788688659886
     }
   ]
 }
