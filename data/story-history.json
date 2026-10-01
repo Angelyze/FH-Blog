@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "47e9fa88dbea85f9",
+      "topicFingerprint": "1fbd81fc59778710",
+      "contentType": "news",
+      "title": "Halo Studios Denies There Was Creator Blacklist As The Halo Fallout Gets Messy",
+      "articleTitle": "Halo Studios Denies Creator Blacklist as Xbox Franchise Drama Mounts",
+      "source": "Kotaku",
+      "coveredAt": 1790856427555
+    },
+    {
+      "fingerprint": "c8e875fbc59e99a1",
+      "topicFingerprint": "39872b5fa4fff21f",
+      "contentType": "news",
+      "title": "Halo Studios Denies Creator Blacklist as Xbox Franchise Drama Mounts",
+      "articleTitle": "Halo Studios Denies Creator Blacklist as Xbox Franchise Drama Mounts",
+      "source": "Fallout Hub",
+      "coveredAt": 1790856427555
+    },
+    {
       "fingerprint": "609dcfb1d148b336",
       "topicFingerprint": "99a4aed5876819eb",
       "contentType": "news",
@@ -215,42 +233,6 @@
       "articleTitle": "Why a Fallout 4 Defender Finally Cracked and Played the Classics",
       "source": "Fallout Hub",
       "coveredAt": 1789121992468
-    },
-    {
-      "fingerprint": "0d371f5456351de4",
-      "topicFingerprint": "a7fd877932930e0f",
-      "contentType": "news",
-      "title": "I'm not saying Fallout 4 modding drama gets to people, but here's Breaking Benjamin's singer begging concertgoers to try his AI-assisted first person mod",
-      "articleTitle": "Breaking Benjamin's Singer Promotes His Fallout 4 Mod Mid-Concert",
-      "source": "Rock Paper Shotgun",
-      "coveredAt": 1789035515996
-    },
-    {
-      "fingerprint": "98ce238bcc70128f",
-      "topicFingerprint": "fa45a29f03741d28",
-      "contentType": "news",
-      "title": "Breaking Benjamin's Singer Promotes His Fallout 4 Mod Mid-Concert",
-      "articleTitle": "Breaking Benjamin's Singer Promotes His Fallout 4 Mod Mid-Concert",
-      "source": "Fallout Hub",
-      "coveredAt": 1789035515996
-    },
-    {
-      "fingerprint": "a62212c3e3dbe924",
-      "topicFingerprint": "f3dd8ba82606ed74",
-      "contentType": "news",
-      "title": "Breaking Benjamin Frontman Stops His Own Concert to Rant About His Feud With a Fallout 4 Modder",
-      "articleTitle": "Breaking Benjamin Frontman Pauses Concert Over Fallout 4 Mod Feud",
-      "source": "IGN",
-      "coveredAt": 1788949665013
-    },
-    {
-      "fingerprint": "dd8484acd7f5d7c5",
-      "topicFingerprint": "56d4d399e2892b23",
-      "contentType": "news",
-      "title": "Breaking Benjamin Frontman Pauses Concert Over Fallout 4 Mod Feud",
-      "articleTitle": "Breaking Benjamin Frontman Pauses Concert Over Fallout 4 Mod Feud",
-      "source": "Fallout Hub",
-      "coveredAt": 1788949665013
     }
   ]
 }
