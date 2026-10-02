@@ -1156,7 +1156,7 @@ export function selectStoriesForGeneration(candidates = [], historyEntries = [],
   const eligible = candidates
     .filter((item) => {
       if (isTopicCovered(item, historyEntries)) return false;
-      if (!meetsMinimumSourceQuality(item)) return false;
+      if (!item.manualResearch && !meetsMinimumSourceQuality(item)) return false;
       if (!isEligibleForGeneration(item)) return false;
 
       if (item.publishedAt && item.publishedAt < Date.now() - HISTORY_RETENTION_DAYS * 24 * 60 * 60 * 1000) {
@@ -1409,8 +1409,8 @@ export function isEligibleForGeneration(item = {}) {
 
   if (item.sourceKind === 'reddit') return true;
   if (/wiki|mutants allowed|duck and cover|steam community|steam —/i.test(item.source || '')) return true;
-  if (!hasFalloutFocus(item)) return false;
-  if (item.contentType === 'news' && item.sourceTier === 'press') {
+  if (!item.manualResearch && !hasFalloutFocus(item)) return false;
+  if (item.contentType === 'news' && item.sourceTier === 'press' && !item.manualResearch) {
     return hasFalloutTitleMention(item.title);
   }
   return true;
@@ -2991,6 +2991,41 @@ function mergeEnrichedDescription(item = {}, candidateText = '', extra = {}) {
   };
 }
 
+async function resolveManualResearchDetails(link = '') {
+  if (isRedditPostLink(link)) {
+    const detail = await fetchRedditPostDetail(link);
+    if (detail?.title) return detail;
+  }
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), ENRICH_FETCH_TIMEOUT_MS);
+    const response = await fetch(link, {
+      signal: controller.signal,
+      headers: {
+        'User-Agent': `${BRAND_NAME}Bot/1.0 (editorial enrichment)`,
+        Accept: 'text/html,application/xhtml+xml'
+      }
+    });
+    clearTimeout(timeout);
+    if (!response.ok) return {};
+
+    const html = await response.text();
+    const titleMatch = html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i)
+      || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:title["']/i)
+      || html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+    const descriptionMatch = html.match(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i)
+      || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:description["']/i)
+      || html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i);
+    return {
+      title: cleanText(titleMatch?.[1] || ''),
+      description: cleanText(descriptionMatch?.[1] || '')
+    };
+  } catch {
+    return {};
+  }
+}
+
 export function isRedditPostLink(link = '') {
   return Boolean(getRedditPostJsonUrl(link));
 }
@@ -3129,6 +3164,7 @@ export async function enrichStoryDetail(item) {
     const redditDetail = await fetchRedditPostDetail(item.link);
     if (redditDetail) {
       enrichedItem = mergeEnrichedDescription(enrichedItem, redditDetail.description, {
+        title: redditDetail.title || enrichedItem.title,
         redditScore: redditDetail.redditScore ?? enrichedItem.redditScore,
         redditComments: redditDetail.redditComments ?? enrichedItem.redditComments
       });
@@ -4126,25 +4162,34 @@ async function loadManualSeedItems() {
     const requestedTier = process.env.MANUAL_RESEARCH_TIER?.trim();
     const researchTier = ['official', 'press', 'community'].includes(requestedTier) ? requestedTier : 'press';
 
-    if (researchTitle && researchUrl) {
+    if (researchUrl) {
       try {
         const parsedUrl = new URL(researchUrl);
         if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
           throw new Error('URL must use HTTP or HTTPS.');
         }
+        const isReddit = isRedditPostLink(parsedUrl.href);
+        const details = researchTitle ? {} : await resolveManualResearchDetails(parsedUrl.href);
+        const slugTitle = decodeURIComponent(parsedUrl.pathname.split('/').filter(Boolean).at(-1) || '')
+          .replace(/[-_]+/g, ' ')
+          .trim();
+        const title = researchTitle || details.title || slugTitle
+          || (isReddit ? 'Fallout Community Research' : `Fallout research: ${parsedUrl.hostname}`);
         items.push({
-          title: researchTitle,
+          title,
           link: parsedUrl.href,
-          source: researchSource || 'Manual Research',
-          tier: researchTier,
-          category: 'news',
+          description: `Fallout research source: ${details.description || title}`,
+          source: researchSource || (isReddit ? 'Reddit Community' : 'Manual Research'),
+          tier: isReddit ? 'community' : researchTier,
+          category: isReddit ? 'community' : 'news',
           research: true
         });
+        console.log(`Loaded direct research link${researchTitle ? '' : ' (title inferred)'}: "${title}".`);
       } catch (error) {
         console.warn(`Manual research input ignored: ${error.message}`);
       }
-    } else if (researchTitle || researchUrl) {
-      console.warn('Manual research input ignored: provide both a title and URL.');
+    } else if (researchTitle) {
+      console.warn('Manual research input ignored: provide a URL.');
     }
 
     const cutoff = Date.now() - MANUAL_SEED_RETENTION_DAYS * 24 * 60 * 60 * 1000;
@@ -4746,7 +4791,7 @@ async function main() {
     if (item.enrichmentRole === 'research') {
       return Boolean(item.title && (item.description || '').length >= 40);
     }
-    return meetsMinimumSourceQuality(item) && isEligibleForGeneration(item);
+    return (item.manualResearch || meetsMinimumSourceQuality(item)) && isEligibleForGeneration(item);
   };
   const leadKey = `${mainStory.link || ''}|${mainStory.title || ''}`;
   const enrichedLead = enrichedItems.find((item) => `${item.link || ''}|${item.title || ''}` === leadKey)

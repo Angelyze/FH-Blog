@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       research_title:
-        description: 'Optional article title or research topic (provide together with the URL)'
+        description: 'Optional title or angle; inferred from the page when blank'
         required: false
         type: string
       research_url:

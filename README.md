@@ -44,7 +44,7 @@ Fallout Hub posts are designed to be:
 - Add a link to `data/manual-seeds.json` with `"research": true` to make it the lead and require deep research before drafting
 
 ### Request an article from a direct link
-To request one while manually running the workflow, open **Actions → Fallout Blog Draft → Run workflow** and fill in **Research title** and **Research URL**. **Research source** is optional, and **Trust tier** lets you classify the link as official, press, or community. The title and URL must both be provided; the generator fetches the page, prioritizes it as the lead, and runs focused deep research before writing. These inputs apply only to that manual run.
+To request one while manually running the workflow, open **Actions → Fallout Blog Draft → Run workflow** and fill in **Research URL**. **Research title** is optional: the generator tries to get it from the Reddit post or page metadata. **Research source** is optional, and **Trust tier** lets you classify non-Reddit links as official, press, or community. Reddit links are automatically classified as community sources. The generator prioritizes the link as the lead and runs focused deep research before writing. These inputs apply only to that manual run.
 
 You can also add a persistent item to `data/manual-seeds.json`. Set `research` to `true`; description is optional context. Set the source tier to match the link:
 
