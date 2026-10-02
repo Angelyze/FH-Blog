@@ -2,6 +2,28 @@ name: Fallout Blog Draft
 
 on:
   workflow_dispatch:
+    inputs:
+      research_title:
+        description: 'Optional article title or research topic (provide together with the URL)'
+        required: false
+        type: string
+      research_url:
+        description: 'Optional direct source URL to research for this run'
+        required: false
+        type: string
+      research_source:
+        description: 'Optional publisher or source name'
+        required: false
+        type: string
+      research_tier:
+        description: 'Trust tier for the supplied source'
+        required: false
+        type: choice
+        options:
+          - official
+          - press
+          - community
+        default: press
   schedule:
     - cron: '0 6 * * *'
 
@@ -37,6 +59,11 @@ jobs:
         run: npm run fallout:repair-history
 
       - name: Generate Fallout draft
+        env:
+          MANUAL_RESEARCH_TITLE: ${{ inputs.research_title }}
+          MANUAL_RESEARCH_URL: ${{ inputs.research_url }}
+          MANUAL_RESEARCH_SOURCE: ${{ inputs.research_source }}
+          MANUAL_RESEARCH_TIER: ${{ inputs.research_tier }}
         run: npm run fallout:generate
 
       - name: Commit pipeline state

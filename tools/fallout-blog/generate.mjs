@@ -4119,7 +4119,34 @@ async function loadManualSeedItems() {
   try {
     const raw = await fs.readFile(MANUAL_SEEDS_FILE, 'utf8');
     const parsed = JSON.parse(raw);
-    const items = Array.isArray(parsed?.items) ? parsed.items : [];
+    const items = Array.isArray(parsed?.items) ? [...parsed.items] : [];
+    const researchTitle = process.env.MANUAL_RESEARCH_TITLE?.trim();
+    const researchUrl = process.env.MANUAL_RESEARCH_URL?.trim();
+    const researchSource = process.env.MANUAL_RESEARCH_SOURCE?.trim();
+    const requestedTier = process.env.MANUAL_RESEARCH_TIER?.trim();
+    const researchTier = ['official', 'press', 'community'].includes(requestedTier) ? requestedTier : 'press';
+
+    if (researchTitle && researchUrl) {
+      try {
+        const parsedUrl = new URL(researchUrl);
+        if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+          throw new Error('URL must use HTTP or HTTPS.');
+        }
+        items.push({
+          title: researchTitle,
+          link: parsedUrl.href,
+          source: researchSource || 'Manual Research',
+          tier: researchTier,
+          category: 'news',
+          research: true
+        });
+      } catch (error) {
+        console.warn(`Manual research input ignored: ${error.message}`);
+      }
+    } else if (researchTitle || researchUrl) {
+      console.warn('Manual research input ignored: provide both a title and URL.');
+    }
+
     const cutoff = Date.now() - MANUAL_SEED_RETENTION_DAYS * 24 * 60 * 60 * 1000;
 
     return items
