@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "48d49e1c1de9cb86",
+      "topicFingerprint": "343a8ac6257d9f7e",
+      "contentType": "news",
+      "title": "Fallout 76 Update Notes - October 1",
+      "articleTitle": "Fallout 76 Update: Unique Weapon Visuals and Stability Fixes",
+      "source": "Steam — Fallout 76",
+      "coveredAt": 1790928010683
+    },
+    {
+      "fingerprint": "e58a959716035187",
+      "topicFingerprint": "4c01343ce000ca74",
+      "contentType": "news",
+      "title": "Fallout 76 Update: Unique Weapon Visuals and Stability Fixes",
+      "articleTitle": "Fallout 76 Update: Unique Weapon Visuals and Stability Fixes",
+      "source": "Fallout Hub",
+      "coveredAt": 1790928010683
+    },
+    {
       "fingerprint": "47e9fa88dbea85f9",
       "topicFingerprint": "1fbd81fc59778710",
       "contentType": "news",
