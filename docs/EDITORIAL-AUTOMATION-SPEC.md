@@ -338,12 +338,13 @@ Maintain a list of sources:
     "description": "Key confirmed points…",
     "source": "Studio Name",
     "tier": "official",
-    "category": "news"
+    "category": "news",
+    "research": true
   }]
 }
 ```
 
-Use when first-party posts appear on social **before** press RSS.
+Use when first-party posts appear on social **before** press RSS. Setting `research: true` prioritizes that seed as the lead and forces the deep research pass before article generation.
 
 ### 5.4 Feed health
 

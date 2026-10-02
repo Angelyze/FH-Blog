@@ -784,7 +784,9 @@ export function passesCustomRedditFeedQualityGate(item = {}) {
 }
 
 export function passesCommunityQualityGate(item = {}, { useCustomFeedRules } = {}) {
-  const customFeedRules = useCustomFeedRules ?? hasRedditCustomFeed();
+  const customFeed = getRedditCustomFeedSource();
+  const customFeedRules = useCustomFeedRules
+    ?? Boolean(customFeed && (item.isCustomFeed || !item.source || item.source === customFeed.name));
   if (customFeedRules) return passesCustomRedditFeedQualityGate(item);
   if (item.sourceKind !== 'reddit') return true;
   if (item.isStickied || item.over18) return false;
@@ -1064,6 +1066,9 @@ export function pickFeaturedStory(candidates = [], historyEntries = []) {
 
   const typeCounts = getContentTypeCounts(historyEntries);
   const mainStory = [...eligible].sort((a, b) => {
+    if (Boolean(a.manualResearch) !== Boolean(b.manualResearch)) {
+      return a.manualResearch ? -1 : 1;
+    }
     const scoreA = getEditorialCandidateScore(a, historyEntries, typeCounts);
     const scoreB = getEditorialCandidateScore(b, historyEntries, typeCounts);
     if (scoreB !== scoreA) return scoreB - scoreA;
@@ -1164,7 +1169,12 @@ export function selectStoriesForGeneration(candidates = [], historyEntries = [],
 
       return true;
     })
-    .sort((a, b) => getAdjustedCandidateScore(b, historyEntries) - getAdjustedCandidateScore(a, historyEntries));
+    .sort((a, b) => {
+      if (Boolean(a.manualResearch) !== Boolean(b.manualResearch)) {
+        return a.manualResearch ? -1 : 1;
+      }
+      return getAdjustedCandidateScore(b, historyEntries) - getAdjustedCandidateScore(a, historyEntries);
+    });
 
   if (eligible.length === 0) return [];
 
@@ -3650,8 +3660,8 @@ export function hasRedditCustomFeed() {
   return Boolean(getRedditCustomFeedSource());
 }
 
-export function getActiveRedditSources() {
-  if (hasRedditCustomFeed()) return [];
+export function getActiveRedditSources({ includeWhenCustomFeed = false } = {}) {
+  if (hasRedditCustomFeed() && !includeWhenCustomFeed) return [];
 
   const override = (process.env.REDDIT_SUBREDDITS || '').trim();
   if (!override) return REDDIT_SOURCES;
@@ -4122,7 +4132,8 @@ async function loadManualSeedItems() {
         title: item.title,
         link: item.link,
         description: item.description || item.title,
-        publishedAt: item.publishedAt ? parseRssDate(item.publishedAt) : Date.now()
+        publishedAt: item.publishedAt ? parseRssDate(item.publishedAt) : Date.now(),
+        manualResearch: item.research === true
       }, {
         name: item.source || 'Manual Seed',
         url: item.link,
@@ -4414,7 +4425,12 @@ function dedupeCollectedItems(collected = []) {
   const unique = [];
   const seenTopics = new Set();
 
-  for (const item of collected.sort((a, b) => b.score - a.score)) {
+  for (const item of collected.sort((a, b) => {
+    if (Boolean(a.manualResearch) !== Boolean(b.manualResearch)) {
+      return a.manualResearch ? -1 : 1;
+    }
+    return b.score - a.score;
+  })) {
     const topicKey = getStoryTopicKey(item);
     if (seenTopics.has(topicKey)) continue;
     if (unique.some((existing) => (
@@ -4475,7 +4491,7 @@ async function fetchContentItems() {
   const customRedditSource = getRedditCustomFeedSource();
 
   if (customRedditSource) {
-    console.log('Reddit custom feed configured; skipping individual subreddit sources.');
+    console.log('Reddit custom feed configured; subreddit sources will be used if it yields no fresh stories.');
   } else if (redditJobs.length > 0) {
     if (hasRedditOAuthCredentials()) {
       console.log('Reddit OAuth credentials detected; using authenticated API requests.');
@@ -4549,7 +4565,63 @@ async function fetchContentItems() {
     }
   }
 
-  await saveFeedHealth(feedHealth, { activeNames: activeFeedNames });
+  const manualItems = await loadManualSeedItems();
+  if (manualItems.length > 0) {
+    console.log(`Loaded ${manualItems.length} manual seed item(s).`);
+  }
+
+  let feedHealthNames = activeFeedNames;
+  if (customRedditSource) {
+    const currentItems = dedupeCollectedItems([...collected, ...manualItems]);
+    const history = await loadStoryHistory();
+    if (pickFeaturedStory(currentItems, history).length === 0) {
+      const fallbackRedditSources = getActiveRedditSources({ includeWhenCustomFeed: true });
+      feedHealthNames = new Set([
+        ...activeFeedNames,
+        ...fallbackRedditSources.map((source) => source.name)
+      ]);
+      const fallbackRedditJobs = fallbackRedditSources
+        .map((source) => ({ source, kind: 'reddit' }))
+        .filter(({ source }) => {
+          if (shouldSkipFeedSource(source.name, feedHealth)) {
+            skippedFeeds.push(source.name);
+            return false;
+          }
+          return true;
+        });
+
+      if (fallbackRedditJobs.length > 0) {
+        console.log('Custom Reddit feed yielded no fresh eligible stories; falling back to individual subreddit feeds.');
+        const fallbackPrimary = fallbackRedditJobs.filter(({ source }) => source.primary);
+        const fallbackSecondary = fallbackRedditJobs.filter(({ source }) => !source.primary);
+
+        for (const { source } of fallbackPrimary) {
+          try {
+            const value = await fetchRedditSourceItems(source);
+            recordSourceResult(source.name, { status: 'fulfilled', value });
+          } catch (error) {
+            recordSourceResult(source.name, { status: 'rejected', reason: error });
+          }
+        }
+
+        for (const [index, { source }] of fallbackSecondary.entries()) {
+          if ((index > 0 || fallbackPrimary.length > 0) && REDDIT_FETCH_DELAY_MS > 0) {
+            await sleep(REDDIT_FETCH_DELAY_MS);
+          }
+          try {
+            const value = await fetchRedditSourceItems(source);
+            recordSourceResult(source.name, { status: 'fulfilled', value });
+          } catch (error) {
+            recordSourceResult(source.name, { status: 'rejected', reason: error });
+          }
+        }
+      } else if (fallbackRedditSources.length > 0) {
+        console.warn('Custom Reddit feed yielded no fresh eligible stories, and all subreddit feeds are currently skipped as unhealthy.');
+      }
+    }
+  }
+
+  await saveFeedHealth(feedHealth, { activeNames: feedHealthNames });
 
   if (feedErrors.length > 0) {
     console.warn(`Feed warnings (${feedErrors.length}):`);
@@ -4559,14 +4631,9 @@ async function fetchContentItems() {
   }
 
   const unhealthy = getUnhealthyFeedSources(feedHealth)
-    .filter((entry) => activeFeedNames.has(entry.name));
+    .filter((entry) => feedHealthNames.has(entry.name));
   if (unhealthy.length > 0) {
     console.warn(`Unhealthy feeds (${unhealthy.length}): ${unhealthy.map((entry) => `${entry.name} (${entry.failureStreak}x, ${entry.lastError})`).join(', ')}`);
-  }
-
-  const manualItems = await loadManualSeedItems();
-  if (manualItems.length > 0) {
-    console.log(`Loaded ${manualItems.length} manual seed item(s).`);
   }
 
   return {
@@ -4675,8 +4742,9 @@ async function main() {
   ].filter(Boolean);
 
   // Thin lead / few related sources → research that topic and write a single-topic feature
-  if (needsDeepResearch(orderedSubstantive)) {
-    console.log(`Deep research mode: thin related batch for "${enrichedLead.title}" — gathering topic context (not unrelated news).`);
+  if (enrichedLead.manualResearch || needsDeepResearch(orderedSubstantive)) {
+    const researchReason = enrichedLead.manualResearch ? 'requested by manual seed' : 'thin related batch';
+    console.log(`Deep research mode (${researchReason}) for "${enrichedLead.title}" — gathering topic context (not unrelated news).`);
     const researchItems = await researchTopicSources(enrichedLead, { maxItems: 5 });
 
     // "Todd/Bethesda confirms…" from Reddit with zero real corroboration → do not write as news

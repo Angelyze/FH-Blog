@@ -41,7 +41,26 @@ Fallout Hub posts are designed to be:
 - **Official > confirmed press coverage > unconfirmed press reports > community**
 - Multi-outlet packages on one studio announcement (e.g. FO5 + remasters + Raven Rock) become **one** article
 - Confirmed studio news is not hedged as a leak; only TBA dates/windows stay soft
-- Optional: add a first-party link to `data/manual-seeds.json` with `"tier": "official"` when press is slow
+- Add a link to `data/manual-seeds.json` with `"research": true` to make it the lead and require deep research before drafting
+
+### Request an article from a direct link
+Add an item to `data/manual-seeds.json`. The title and URL are required; the generator fetches the page, prioritizes it as the lead, and runs focused deep research before writing. Description is optional context. Set the source tier to match the link:
+
+```json
+{
+  "items": [{
+    "title": "Fallout 4 update announcement",
+    "link": "https://example.com/fallout-update",
+    "description": "Optional angle or context for the editor.",
+    "source": "Bethesda",
+    "tier": "official",
+    "category": "news",
+    "research": true
+  }]
+}
+```
+
+Seeds with a `publishedAt` older than 14 days are ignored. Remove or update the item once the requested article has been handled.
 
 ## LLM setup
 Use a Gemini API key from Google AI Studio and store it as `GEMINI_API_KEY`.
