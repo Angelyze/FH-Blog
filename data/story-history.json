@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "fa3761e3030b0f6e",
+      "topicFingerprint": "ca16953504325674",
+      "contentType": "news",
+      "title": "Fallout: New York Appears Online, and ZeniMax Immediately Shuts It Down",
+      "articleTitle": "ZeniMax Instantly Nukes AI-Generated 'Fallout: New York' Browser Game",
+      "source": "Insider Gaming",
+      "coveredAt": 1791024727098
+    },
+    {
+      "fingerprint": "1695fce62e6043b0",
+      "topicFingerprint": "12d69039aed35b83",
+      "contentType": "news",
+      "title": "ZeniMax Instantly Nukes AI-Generated 'Fallout: New York' Browser Game",
+      "articleTitle": "ZeniMax Instantly Nukes AI-Generated 'Fallout: New York' Browser Game",
+      "source": "Fallout Hub",
+      "coveredAt": 1791024727098
+    },
+    {
       "fingerprint": "7642dfbe084e1661",
       "topicFingerprint": "0f2ce8e0a8a13134",
       "contentType": "community",
@@ -233,42 +251,6 @@
       "articleTitle": "Why This New Vegas Quest Still Sets the Bar for RPG Freedom",
       "source": "Fallout Hub",
       "coveredAt": 1789384736452
-    },
-    {
-      "fingerprint": "1735e5a731ca94fb",
-      "topicFingerprint": "369a12cb044e08f3",
-      "contentType": "news",
-      "title": "Maintenance Announcement - September 15, 2026",
-      "articleTitle": "The Slasher Update Will Shrink Your Fallout 76 Install Size",
-      "source": "Steam — Fallout 76",
-      "coveredAt": 1789206675678
-    },
-    {
-      "fingerprint": "5506204a2b969d7e",
-      "topicFingerprint": "d3799eed71731072",
-      "contentType": "news",
-      "title": "The Slasher Update Will Shrink Your Fallout 76 Install Size",
-      "articleTitle": "The Slasher Update Will Shrink Your Fallout 76 Install Size",
-      "source": "Fallout Hub",
-      "coveredAt": 1789206675678
-    },
-    {
-      "fingerprint": "5e6870ef29c3a544",
-      "topicFingerprint": "262daf9977b5792f",
-      "contentType": "community",
-      "title": "I understand the hype behind Fallout 3 and New Vegas now",
-      "articleTitle": "Why a Fallout 4 Defender Finally Cracked and Played the Classics",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1789121992468
-    },
-    {
-      "fingerprint": "1f0a2f178639dc53",
-      "topicFingerprint": "b82ef007d5c000bc",
-      "contentType": "community",
-      "title": "Why a Fallout 4 Defender Finally Cracked and Played the Classics",
-      "articleTitle": "Why a Fallout 4 Defender Finally Cracked and Played the Classics",
-      "source": "Fallout Hub",
-      "coveredAt": 1789121992468
     }
   ]
 }
