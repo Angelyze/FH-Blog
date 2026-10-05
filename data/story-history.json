@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "f18f1b3b6f977ec3",
+      "topicFingerprint": "c94c451c8eeabf81",
+      "contentType": "news",
+      "title": "Paradox&#039;s Afterworld ditches history for Fallout-style fantasy, and that&#039;s its biggest strength",
+      "articleTitle": "Paradox’s Afterworld: A New Strategy Challenger to the Wasteland?",
+      "source": "PCGamesN",
+      "coveredAt": 1791205668916
+    },
+    {
+      "fingerprint": "968c9c74e817e6e5",
+      "topicFingerprint": "82811b572cf63148",
+      "contentType": "news",
+      "title": "Paradox’s Afterworld: A New Strategy Challenger to the Wasteland?",
+      "articleTitle": "Paradox’s Afterworld: A New Strategy Challenger to the Wasteland?",
+      "source": "Fallout Hub",
+      "coveredAt": 1791205668916
+    },
+    {
       "fingerprint": "80d25a938f4120a8",
       "topicFingerprint": "4d7caff721f3969f",
       "contentType": "news",
@@ -251,24 +269,6 @@
       "articleTitle": "Why Some of Us Still Secretly Prefer Fallout 3 to New Vegas",
       "source": "Fallout Hub",
       "coveredAt": 1789469052557
-    },
-    {
-      "fingerprint": "531d9466217dbb7b",
-      "topicFingerprint": "ae50f8b41eb6b244",
-      "contentType": "community",
-      "title": "I wish more quests were like \"Beyond Beef\"",
-      "articleTitle": "Why This New Vegas Quest Still Sets the Bar for RPG Freedom",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1789384736452
-    },
-    {
-      "fingerprint": "b9f799ad3caef00e",
-      "topicFingerprint": "63a33d53b5f01169",
-      "contentType": "community",
-      "title": "Why This New Vegas Quest Still Sets the Bar for RPG Freedom",
-      "articleTitle": "Why This New Vegas Quest Still Sets the Bar for RPG Freedom",
-      "source": "Fallout Hub",
-      "coveredAt": 1789384736452
     }
   ]
 }
