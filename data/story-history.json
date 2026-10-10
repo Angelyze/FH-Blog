@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "7efb23f0088ad5ab",
+      "topicFingerprint": "e9b8764c6f3a3c78",
+      "contentType": "news",
+      "title": "\"It's not in the top five reference points\": Afterworld isn't just a Fallout grand strategy game, say Paradox, it owes a lot more to the Bronze Age",
+      "articleTitle": "\"Not in the Top Five\": Paradox Says Afterworld Isn't Fallout",
+      "source": "Rock Paper Shotgun",
+      "coveredAt": 1791632318958
+    },
+    {
+      "fingerprint": "65edcaffbf94f147",
+      "topicFingerprint": "58fa21f1b0128d98",
+      "contentType": "news",
+      "title": "\"Not in the Top Five\": Paradox Says Afterworld Isn't Fallout",
+      "articleTitle": "\"Not in the Top Five\": Paradox Says Afterworld Isn't Fallout",
+      "source": "Fallout Hub",
+      "coveredAt": 1791632318958
+    },
+    {
       "fingerprint": "f18f1b3b6f977ec3",
       "topicFingerprint": "c94c451c8eeabf81",
       "contentType": "news",
@@ -197,78 +215,6 @@
       "articleTitle": "Breaking Benjamin's Singer Explains That Mid-Gig Fallout 4 Mod Promo",
       "source": "Fallout Hub",
       "coveredAt": 1790073580539
-    },
-    {
-      "fingerprint": "ea6805beaceb3ca9",
-      "topicFingerprint": "086959f8a6c5a6ea",
-      "contentType": "news",
-      "title": "10 Things Fallout 3 and New Vegas Remasters Should Keep Exactly the Same",
-      "articleTitle": "What a Fallout 3 and New Vegas Remaster Absolutely Cannot Change",
-      "source": "DualShockers",
-      "coveredAt": 1789812008038
-    },
-    {
-      "fingerprint": "578ef146b8878ad5",
-      "topicFingerprint": "aa2f553345bb8046",
-      "contentType": "news",
-      "title": "What a Fallout 3 and New Vegas Remaster Absolutely Cannot Change",
-      "articleTitle": "What a Fallout 3 and New Vegas Remaster Absolutely Cannot Change",
-      "source": "Fallout Hub",
-      "coveredAt": 1789812008038
-    },
-    {
-      "fingerprint": "f8db465b04a8bce9",
-      "topicFingerprint": "53d6d4c7eae35750",
-      "contentType": "news",
-      "title": "Hideo Kojima Thanks Xbox For Backing His Vision, As Physint Casts It Star Bill Skarsgård Amid PlayStation 2026 Fallout",
-      "articleTitle": "Kojima Praises Xbox Partnership as Physint Casts Bill Skarsgård",
-      "source": "Wccftech",
-      "coveredAt": 1789726683111
-    },
-    {
-      "fingerprint": "6563c06931e5866d",
-      "topicFingerprint": "7c1486e88b94b022",
-      "contentType": "news",
-      "title": "Kojima Praises Xbox Partnership as Physint Casts Bill Skarsgård",
-      "articleTitle": "Kojima Praises Xbox Partnership as Physint Casts Bill Skarsgård",
-      "source": "Fallout Hub",
-      "coveredAt": 1789726683111
-    },
-    {
-      "fingerprint": "49181aa375eed86f",
-      "topicFingerprint": "85949ed4aa8b268f",
-      "contentType": "news",
-      "title": "Say Goodbye to Fallout's Best Replacement Before it Leaves Game Pass Forever",
-      "articleTitle": "Play Atomfall Before It Reportedly Leaves Game Pass This Month",
-      "source": "Polygon",
-      "coveredAt": 1789554921252
-    },
-    {
-      "fingerprint": "a3c59091062fd4d7",
-      "topicFingerprint": "25a8b3834931b50b",
-      "contentType": "news",
-      "title": "Play Atomfall Before It Reportedly Leaves Game Pass This Month",
-      "articleTitle": "Play Atomfall Before It Reportedly Leaves Game Pass This Month",
-      "source": "Fallout Hub",
-      "coveredAt": 1789554921252
-    },
-    {
-      "fingerprint": "ccf606d6b21e3f83",
-      "topicFingerprint": "d82461feb2954dd1",
-      "contentType": "community",
-      "title": "Asking why some people prefer Fallout 3 over New Vegas? (including me)",
-      "articleTitle": "Why Some of Us Still Secretly Prefer Fallout 3 to New Vegas",
-      "source": "Reddit — Custom Fallout Feed",
-      "coveredAt": 1789469052557
-    },
-    {
-      "fingerprint": "29eba8b5d209368c",
-      "topicFingerprint": "ed168e32524fa8eb",
-      "contentType": "community",
-      "title": "Why Some of Us Still Secretly Prefer Fallout 3 to New Vegas",
-      "articleTitle": "Why Some of Us Still Secretly Prefer Fallout 3 to New Vegas",
-      "source": "Fallout Hub",
-      "coveredAt": 1789469052557
     }
   ]
 }
