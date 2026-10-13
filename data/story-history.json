@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "7fc5ed7b6548f22e",
+      "topicFingerprint": "5527ac3857428d7b",
+      "contentType": "news",
+      "title": "Battlefield 6 goes back to its roots with Area 51, but the new Vegas Strip map feels too frenetic",
+      "articleTitle": "Battlefield 6 Takes On Nevada: Area 51 Hits, Vegas Stumbles",
+      "source": "PCGamesN",
+      "coveredAt": 1791897538937
+    },
+    {
+      "fingerprint": "722687ab326ee199",
+      "topicFingerprint": "3171e3b28e1a8251",
+      "contentType": "news",
+      "title": "Battlefield 6 Takes On Nevada: Area 51 Hits, Vegas Stumbles",
+      "articleTitle": "Battlefield 6 Takes On Nevada: Area 51 Hits, Vegas Stumbles",
+      "source": "Fallout Hub",
+      "coveredAt": 1791897538937
+    },
+    {
       "fingerprint": "eb84af66f03a4cb2",
       "topicFingerprint": "9f5ac032a66f848a",
       "contentType": "news",
@@ -215,24 +233,6 @@
       "articleTitle": "Obsidian is Reportedly Back on Fallout—Under Bethesda’s New Umbrella",
       "source": "Fallout Hub",
       "coveredAt": 1790159642233
-    },
-    {
-      "fingerprint": "4dc130db388fde98",
-      "topicFingerprint": "9622ba03d3780a2e",
-      "contentType": "news",
-      "title": "\"It wasn't a planned thing\": Breaking Benjamin singer on his mid-gig Fallout 4 mod promo being down to a broken drum and his love of VR",
-      "articleTitle": "Breaking Benjamin's Singer Explains That Mid-Gig Fallout 4 Mod Promo",
-      "source": "Rock Paper Shotgun",
-      "coveredAt": 1790073580539
-    },
-    {
-      "fingerprint": "3b89c994bf452fb6",
-      "topicFingerprint": "bd1e37f642e28ccb",
-      "contentType": "news",
-      "title": "Breaking Benjamin's Singer Explains That Mid-Gig Fallout 4 Mod Promo",
-      "articleTitle": "Breaking Benjamin's Singer Explains That Mid-Gig Fallout 4 Mod Promo",
-      "source": "Fallout Hub",
-      "coveredAt": 1790073580539
     }
   ]
 }
