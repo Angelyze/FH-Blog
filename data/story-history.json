@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "e4c53c68291b4d8a",
+      "topicFingerprint": "f687cf491bc8b1e2",
+      "contentType": "news",
+      "title": "Officially Licensed Fallout Bookends Are Up for Preorder for a Whopping $325",
+      "articleTitle": "$325 for Fallout Bookends? Sideshow’s New Preorder Is a Heavy",
+      "source": "IGN",
+      "coveredAt": 1791975475188
+    },
+    {
+      "fingerprint": "99aeacc479ec1cdd",
+      "topicFingerprint": "98556ba98e24682e",
+      "contentType": "news",
+      "title": "$325 for Fallout Bookends? Sideshow’s New Preorder Is a Heavy",
+      "articleTitle": "$325 for Fallout Bookends? Sideshow’s New Preorder Is a Heavy",
+      "source": "Fallout Hub",
+      "coveredAt": 1791975475188
+    },
+    {
       "fingerprint": "7fc5ed7b6548f22e",
       "topicFingerprint": "5527ac3857428d7b",
       "contentType": "news",
@@ -215,24 +233,6 @@
       "articleTitle": "Fallout 4's Midwestern Power Armor Brings Back a Tactics Classic",
       "source": "Fallout Hub",
       "coveredAt": 1790246924121
-    },
-    {
-      "fingerprint": "1f8aa9ba5faf25e4",
-      "topicFingerprint": "8f6f971922816493",
-      "contentType": "news",
-      "title": "Obsidian&#8217;s New Fallout Game Is Still Coming, As The Studio Moves Under Bethesda&#8217;s Umbrella",
-      "articleTitle": "Obsidian is Reportedly Back on Fallout—Under Bethesda’s New Umbrella",
-      "source": "GameSpot",
-      "coveredAt": 1790159642233
-    },
-    {
-      "fingerprint": "70545387a0ab0dbf",
-      "topicFingerprint": "08580719f459dda0",
-      "contentType": "news",
-      "title": "Obsidian is Reportedly Back on Fallout—Under Bethesda’s New Umbrella",
-      "articleTitle": "Obsidian is Reportedly Back on Fallout—Under Bethesda’s New Umbrella",
-      "source": "Fallout Hub",
-      "coveredAt": 1790159642233
     }
   ]
 }
