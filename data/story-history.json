@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "8161b0b1b38c4602",
+      "topicFingerprint": "e3ed800e0717f8ab",
+      "contentType": "community",
+      "title": "fo4 fallout 4 in godot engine",
+      "articleTitle": "Someone is Recreating Fallout 4 in the Godot Engine",
+      "source": "Reddit Community",
+      "coveredAt": 1792141719030
+    },
+    {
+      "fingerprint": "c8f1d3063bea4974",
+      "topicFingerprint": "c7cb8e53490f34c3",
+      "contentType": "community",
+      "title": "Someone is Recreating Fallout 4 in the Godot Engine",
+      "articleTitle": "Someone is Recreating Fallout 4 in the Godot Engine",
+      "source": "Fallout Hub",
+      "coveredAt": 1792141719030
+    },
+    {
       "fingerprint": "e4c53c68291b4d8a",
       "topicFingerprint": "f687cf491bc8b1e2",
       "contentType": "news",
@@ -215,24 +233,6 @@
       "articleTitle": "Vault Boy was almost cut: Tim Cain explains why original partners",
       "source": "Fallout Hub",
       "coveredAt": 1790418857120
-    },
-    {
-      "fingerprint": "23aa7e78c977710a",
-      "topicFingerprint": "7e950e2d9dc232c2",
-      "contentType": "news",
-      "title": "Fallout 4&#8217;s New Midwestern Power Armor is a Blast From the Past",
-      "articleTitle": "Fallout 4's Midwestern Power Armor Brings Back a Tactics Classic",
-      "source": "Insider Gaming",
-      "coveredAt": 1790246924121
-    },
-    {
-      "fingerprint": "693d44366c1e2ed5",
-      "topicFingerprint": "439295b93648dfa5",
-      "contentType": "news",
-      "title": "Fallout 4's Midwestern Power Armor Brings Back a Tactics Classic",
-      "articleTitle": "Fallout 4's Midwestern Power Armor Brings Back a Tactics Classic",
-      "source": "Fallout Hub",
-      "coveredAt": 1790246924121
     }
   ]
 }
