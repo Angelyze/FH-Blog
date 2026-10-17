@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "68409a8246ac99f6",
+      "topicFingerprint": "0457586fa3d7a57f",
+      "contentType": "news",
+      "title": "Maintenance Announcement - October 20, 2026",
+      "articleTitle": "Fallout 76 Maintenance Scheduled for October 20",
+      "source": "Steam — Fallout 76",
+      "coveredAt": 1792230926072
+    },
+    {
+      "fingerprint": "63376a8e726e3471",
+      "topicFingerprint": "340a809532d60d31",
+      "contentType": "news",
+      "title": "Fallout 76 Maintenance Scheduled for October 20",
+      "articleTitle": "Fallout 76 Maintenance Scheduled for October 20",
+      "source": "Fallout Hub",
+      "coveredAt": 1792230926072
+    },
+    {
       "fingerprint": "e9c8b5dc04f3ad74",
       "topicFingerprint": "169acecbe90ec8b1",
       "contentType": "mods",
