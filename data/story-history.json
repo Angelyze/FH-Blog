@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "bea31a6c2615c36b",
+      "topicFingerprint": "b4760bdae26b2ef9",
+      "contentType": "news",
+      "title": "Follow Our New Channel",
+      "articleTitle": "Bethesda Launches Dedicated @PlayFallout76 Channel on X",
+      "source": "Steam — Fallout 76",
+      "coveredAt": 1792493201880
+    },
+    {
+      "fingerprint": "e5d9cb8614200fc7",
+      "topicFingerprint": "3c473ff619a5234a",
+      "contentType": "news",
+      "title": "Bethesda Launches Dedicated @PlayFallout76 Channel on X",
+      "articleTitle": "Bethesda Launches Dedicated @PlayFallout76 Channel on X",
+      "source": "Fallout Hub",
+      "coveredAt": 1792493201880
+    },
+    {
       "fingerprint": "68409a8246ac99f6",
       "topicFingerprint": "0457586fa3d7a57f",
       "contentType": "news",
@@ -251,24 +269,6 @@
       "articleTitle": "Why We Never Got an 'Elder Scrolls: New Vegas' Spinoff",
       "source": "Fallout Hub",
       "coveredAt": 1790682768769
-    },
-    {
-      "fingerprint": "9a30fd3dee7a251d",
-      "topicFingerprint": "33660c3ab49c65da",
-      "contentType": "news",
-      "title": "Tim Cain claims Vault Boy caused issues with Fallout's original publishing partner",
-      "articleTitle": "Vault Boy was almost cut: Tim Cain explains why original partners",
-      "source": "Shacknews",
-      "coveredAt": 1790418857120
-    },
-    {
-      "fingerprint": "19350405059f8eb5",
-      "topicFingerprint": "7558a1db2acd6210",
-      "contentType": "news",
-      "title": "Vault Boy was almost cut: Tim Cain explains why original partners",
-      "articleTitle": "Vault Boy was almost cut: Tim Cain explains why original partners",
-      "source": "Fallout Hub",
-      "coveredAt": 1790418857120
     }
   ]
 }
