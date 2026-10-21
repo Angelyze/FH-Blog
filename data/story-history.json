@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "8c3231812301f7da",
+      "topicFingerprint": "b2dca1428629439d",
+      "contentType": "news",
+      "title": "Fallout Day Celebrations 2026: Fallout Shelter and Fallout 4 News",
+      "articleTitle": "Fallout Day 2026: Baby Deathclaws in Shelter and New FO4 Creations",
+      "source": "Steam — Fallout 4",
+      "coveredAt": 1792580020098
+    },
+    {
+      "fingerprint": "3249b34f00f9e2b4",
+      "topicFingerprint": "86a39ac09ea3936d",
+      "contentType": "news",
+      "title": "Fallout Day 2026: Baby Deathclaws in Shelter and New FO4 Creations",
+      "articleTitle": "Fallout Day 2026: Baby Deathclaws in Shelter and New FO4 Creations",
+      "source": "Fallout Hub",
+      "coveredAt": 1792580020098
+    },
+    {
       "fingerprint": "bea31a6c2615c36b",
       "topicFingerprint": "b4760bdae26b2ef9",
       "contentType": "news",
@@ -251,24 +269,6 @@
       "articleTitle": "Halo Studios Denies Creator Blacklist as Xbox Franchise Drama Mounts",
       "source": "Fallout Hub",
       "coveredAt": 1790856427555
-    },
-    {
-      "fingerprint": "609dcfb1d148b336",
-      "topicFingerprint": "99a4aed5876819eb",
-      "contentType": "news",
-      "title": "The Elder Scrolls Doesn't Have a New Vegas-Like Spinoff Because Todd Howard Is 'Very Protective' of the Franchise, Former Dev Claims",
-      "articleTitle": "Why We Never Got an 'Elder Scrolls: New Vegas' Spinoff",
-      "source": "IGN",
-      "coveredAt": 1790682768769
-    },
-    {
-      "fingerprint": "6b65cc9f5a483ad1",
-      "topicFingerprint": "5444168a943234e7",
-      "contentType": "news",
-      "title": "Why We Never Got an 'Elder Scrolls: New Vegas' Spinoff",
-      "articleTitle": "Why We Never Got an 'Elder Scrolls: New Vegas' Spinoff",
-      "source": "Fallout Hub",
-      "coveredAt": 1790682768769
     }
   ]
 }
