@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "26acc2446b186805",
+      "topicFingerprint": "3326b4b87f891da6",
+      "contentType": "news",
+      "title": "World Pets Overview Trailer",
+      "articleTitle": "Fallout 76 World Pets Update Arrives December 1 with Deathclaws and",
+      "source": "Steam — Fallout 76",
+      "coveredAt": 1792752404839
+    },
+    {
+      "fingerprint": "6e2a5cbf143fdb49",
+      "topicFingerprint": "6aa101ae1f3904e8",
+      "contentType": "news",
+      "title": "Fallout 76 World Pets Update Arrives December 1 with Deathclaws and",
+      "articleTitle": "Fallout 76 World Pets Update Arrives December 1 with Deathclaws and",
+      "source": "Fallout Hub",
+      "coveredAt": 1792752404839
+    },
+    {
       "fingerprint": "edc9bf177e724312",
       "topicFingerprint": "9d49fc93824b5d9d",
       "contentType": "news",
@@ -233,60 +251,6 @@
       "articleTitle": "ZeniMax Instantly Nukes AI-Generated 'Fallout: New York' Browser Game",
       "source": "Fallout Hub",
       "coveredAt": 1791024727098
-    },
-    {
-      "fingerprint": "7642dfbe084e1661",
-      "topicFingerprint": "0f2ce8e0a8a13134",
-      "contentType": "community",
-      "title": "fallout 2 coop fully playable from temple to",
-      "articleTitle": "Fallout 2 Co-op is Finally Playable From Start to Finish",
-      "source": "Reddit Community",
-      "coveredAt": 1790930563364
-    },
-    {
-      "fingerprint": "e3d7eacd3ccbee16",
-      "topicFingerprint": "a24e58bc7f5a552f",
-      "contentType": "community",
-      "title": "Fallout 2 Co-op is Finally Playable From Start to Finish",
-      "articleTitle": "Fallout 2 Co-op is Finally Playable From Start to Finish",
-      "source": "Fallout Hub",
-      "coveredAt": 1790930563364
-    },
-    {
-      "fingerprint": "48d49e1c1de9cb86",
-      "topicFingerprint": "343a8ac6257d9f7e",
-      "contentType": "news",
-      "title": "Fallout 76 Update Notes - October 1",
-      "articleTitle": "Fallout 76 Update: Unique Weapon Visuals and Stability Fixes",
-      "source": "Steam — Fallout 76",
-      "coveredAt": 1790928010683
-    },
-    {
-      "fingerprint": "e58a959716035187",
-      "topicFingerprint": "4c01343ce000ca74",
-      "contentType": "news",
-      "title": "Fallout 76 Update: Unique Weapon Visuals and Stability Fixes",
-      "articleTitle": "Fallout 76 Update: Unique Weapon Visuals and Stability Fixes",
-      "source": "Fallout Hub",
-      "coveredAt": 1790928010683
-    },
-    {
-      "fingerprint": "47e9fa88dbea85f9",
-      "topicFingerprint": "1fbd81fc59778710",
-      "contentType": "news",
-      "title": "Halo Studios Denies There Was Creator Blacklist As The Halo Fallout Gets Messy",
-      "articleTitle": "Halo Studios Denies Creator Blacklist as Xbox Franchise Drama Mounts",
-      "source": "Kotaku",
-      "coveredAt": 1790856427555
-    },
-    {
-      "fingerprint": "c8e875fbc59e99a1",
-      "topicFingerprint": "39872b5fa4fff21f",
-      "contentType": "news",
-      "title": "Halo Studios Denies Creator Blacklist as Xbox Franchise Drama Mounts",
-      "articleTitle": "Halo Studios Denies Creator Blacklist as Xbox Franchise Drama Mounts",
-      "source": "Fallout Hub",
-      "coveredAt": 1790856427555
     }
   ]
 }
