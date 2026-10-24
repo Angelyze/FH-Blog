@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "64ca360c2db1e33a",
+      "topicFingerprint": "250e9a72d86920b9",
+      "contentType": "news",
+      "title": "Happy Fallout Day!",
+      "articleTitle": "Bethesda Teases D.C. Event and Fallout Shelter: The Experiment",
+      "source": "Steam — Fallout 76",
+      "coveredAt": 1792836620471
+    },
+    {
+      "fingerprint": "2a98175019f947a9",
+      "topicFingerprint": "6eacd887da869d6a",
+      "contentType": "news",
+      "title": "Bethesda Teases D.C. Event and Fallout Shelter: The Experiment",
+      "articleTitle": "Bethesda Teases D.C. Event and Fallout Shelter: The Experiment",
+      "source": "Fallout Hub",
+      "coveredAt": 1792836620471
+    },
+    {
       "fingerprint": "26acc2446b186805",
       "topicFingerprint": "3326b4b87f891da6",
       "contentType": "news",
