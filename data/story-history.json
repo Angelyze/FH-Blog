@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "a2f3221d68188313",
+      "topicFingerprint": "7d41256b748da3b4",
+      "contentType": "news",
+      "title": "Prime Video's Fallout reality competition Fallout Shelter: The Experiment premieres in January",
+      "articleTitle": "Prime Video Is Making a Real Fallout Shelter Game Show",
+      "source": "Eurogamer",
+      "coveredAt": 1792924326343
+    },
+    {
+      "fingerprint": "220787ad0945a5b7",
+      "topicFingerprint": "17947a63cc68f54e",
+      "contentType": "news",
+      "title": "Prime Video Is Making a Real Fallout Shelter Game Show",
+      "articleTitle": "Prime Video Is Making a Real Fallout Shelter Game Show",
+      "source": "Fallout Hub",
+      "coveredAt": 1792924326343
+    },
+    {
       "fingerprint": "64ca360c2db1e33a",
       "topicFingerprint": "250e9a72d86920b9",
       "contentType": "news",
@@ -251,24 +269,6 @@
       "articleTitle": "Bethesda and Activision Shut Down Viral AI Fan Projects",
       "source": "Fallout Hub",
       "coveredAt": 1791113632936
-    },
-    {
-      "fingerprint": "fa3761e3030b0f6e",
-      "topicFingerprint": "ca16953504325674",
-      "contentType": "news",
-      "title": "Fallout: New York Appears Online, and ZeniMax Immediately Shuts It Down",
-      "articleTitle": "ZeniMax Instantly Nukes AI-Generated 'Fallout: New York' Browser Game",
-      "source": "Insider Gaming",
-      "coveredAt": 1791024727098
-    },
-    {
-      "fingerprint": "1695fce62e6043b0",
-      "topicFingerprint": "12d69039aed35b83",
-      "contentType": "news",
-      "title": "ZeniMax Instantly Nukes AI-Generated 'Fallout: New York' Browser Game",
-      "articleTitle": "ZeniMax Instantly Nukes AI-Generated 'Fallout: New York' Browser Game",
-      "source": "Fallout Hub",
-      "coveredAt": 1791024727098
     }
   ]
 }
