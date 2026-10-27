@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "e5360afb1b4f1b5c",
+      "topicFingerprint": "3c8aafbfff716198",
+      "contentType": "news",
+      "title": "\"IT FLIPS UP,\" Fallout New Vegas modders yell after releasing a funky Pip-Boy based on cancelled entry Van Buren's design docs",
+      "articleTitle": "New Vegas Modders Resurrect Van Buren's Flip-Up Pip-Boy",
+      "source": "Rock Paper Shotgun",
+      "coveredAt": 1793100150848
+    },
+    {
+      "fingerprint": "e3b6bb7514fefe16",
+      "topicFingerprint": "b7367b45a75b29df",
+      "contentType": "news",
+      "title": "New Vegas Modders Resurrect Van Buren's Flip-Up Pip-Boy",
+      "articleTitle": "New Vegas Modders Resurrect Van Buren's Flip-Up Pip-Boy",
+      "source": "Fallout Hub",
+      "coveredAt": 1793100150848
+    },
+    {
       "fingerprint": "fba08aeb9dd7be19",
       "topicFingerprint": "4582f7c45a89861b",
       "contentType": "news",
@@ -251,24 +269,6 @@
       "articleTitle": "\"Not in the Top Five\": Paradox Says Afterworld Isn't Fallout",
       "source": "Fallout Hub",
       "coveredAt": 1791632318958
-    },
-    {
-      "fingerprint": "f18f1b3b6f977ec3",
-      "topicFingerprint": "c94c451c8eeabf81",
-      "contentType": "news",
-      "title": "Paradox&#039;s Afterworld ditches history for Fallout-style fantasy, and that&#039;s its biggest strength",
-      "articleTitle": "Paradox’s Afterworld: A New Strategy Challenger to the Wasteland?",
-      "source": "PCGamesN",
-      "coveredAt": 1791205668916
-    },
-    {
-      "fingerprint": "968c9c74e817e6e5",
-      "topicFingerprint": "82811b572cf63148",
-      "contentType": "news",
-      "title": "Paradox’s Afterworld: A New Strategy Challenger to the Wasteland?",
-      "articleTitle": "Paradox’s Afterworld: A New Strategy Challenger to the Wasteland?",
-      "source": "Fallout Hub",
-      "coveredAt": 1791205668916
     }
   ]
 }
