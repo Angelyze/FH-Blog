@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "3009b52e98019864",
+      "topicFingerprint": "73ace88b1aabcb97",
+      "contentType": "news",
+      "title": "Delve into \"a deep underground facility full of secrets and horrors\" in the latest Fallout 4 quest mod from the Commonwealth Story Expansion Project",
+      "articleTitle": "Fallout 4 Mod Under The Stars Adds an Alien Bunker to the Glowing Sea",
+      "source": "Rock Paper Shotgun",
+      "coveredAt": 1793629566653
+    },
+    {
+      "fingerprint": "69c60468012f7772",
+      "topicFingerprint": "df056645b51d5d92",
+      "contentType": "news",
+      "title": "Fallout 4 Mod Under The Stars Adds an Alien Bunker to the Glowing Sea",
+      "articleTitle": "Fallout 4 Mod Under The Stars Adds an Alien Bunker to the Glowing Sea",
+      "source": "Fallout Hub",
+      "coveredAt": 1793629566653
+    },
+    {
       "fingerprint": "e5360afb1b4f1b5c",
       "topicFingerprint": "3c8aafbfff716198",
       "contentType": "news",
@@ -233,42 +251,6 @@
       "articleTitle": "Battlefield 6 Takes On Nevada: Area 51 Hits, Vegas Stumbles",
       "source": "Fallout Hub",
       "coveredAt": 1791897538937
-    },
-    {
-      "fingerprint": "eb84af66f03a4cb2",
-      "topicFingerprint": "9f5ac032a66f848a",
-      "contentType": "news",
-      "title": "Explore the town of Detour in this new Fallout 4 mod chock full of voiced NPCs and quests",
-      "articleTitle": "Detour: New Modded Highway Town Hits Fallout 4",
-      "source": "Rock Paper Shotgun",
-      "coveredAt": 1791813667289
-    },
-    {
-      "fingerprint": "31e1a9abb323deab",
-      "topicFingerprint": "8993b643a7e14e57",
-      "contentType": "news",
-      "title": "Detour: New Modded Highway Town Hits Fallout 4",
-      "articleTitle": "Detour: New Modded Highway Town Hits Fallout 4",
-      "source": "Fallout Hub",
-      "coveredAt": 1791813667289
-    },
-    {
-      "fingerprint": "7efb23f0088ad5ab",
-      "topicFingerprint": "e9b8764c6f3a3c78",
-      "contentType": "news",
-      "title": "\"It's not in the top five reference points\": Afterworld isn't just a Fallout grand strategy game, say Paradox, it owes a lot more to the Bronze Age",
-      "articleTitle": "\"Not in the Top Five\": Paradox Says Afterworld Isn't Fallout",
-      "source": "Rock Paper Shotgun",
-      "coveredAt": 1791632318958
-    },
-    {
-      "fingerprint": "65edcaffbf94f147",
-      "topicFingerprint": "58fa21f1b0128d98",
-      "contentType": "news",
-      "title": "\"Not in the Top Five\": Paradox Says Afterworld Isn't Fallout",
-      "articleTitle": "\"Not in the Top Five\": Paradox Says Afterworld Isn't Fallout",
-      "source": "Fallout Hub",
-      "coveredAt": 1791632318958
     }
   ]
 }
