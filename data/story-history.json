@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "07271636fb7706ac",
+      "topicFingerprint": "23a8740b4cc124e2",
+      "contentType": "news",
+      "title": "God of War Laufey Slips From February 16 to May 20, 2027, Leaving a Q1 Window Crowded by the GTA VI Fallout",
+      "articleTitle": "God of War Laufey Delayed to May 2027 to Avoid Q1 Release Chaos",
+      "source": "Wccftech",
+      "coveredAt": 1793886333689
+    },
+    {
+      "fingerprint": "637f45192a41c9ec",
+      "topicFingerprint": "4215b97748b3cf41",
+      "contentType": "news",
+      "title": "God of War Laufey Delayed to May 2027 to Avoid Q1 Release Chaos",
+      "articleTitle": "God of War Laufey Delayed to May 2027 to Avoid Q1 Release Chaos",
+      "source": "Fallout Hub",
+      "coveredAt": 1793886333689
+    },
+    {
       "fingerprint": "3009b52e98019864",
       "topicFingerprint": "73ace88b1aabcb97",
       "contentType": "news",
@@ -215,42 +233,6 @@
       "articleTitle": "Someone is Recreating Fallout 4 in the Godot Engine",
       "source": "Fallout Hub",
       "coveredAt": 1792141719030
-    },
-    {
-      "fingerprint": "e4c53c68291b4d8a",
-      "topicFingerprint": "f687cf491bc8b1e2",
-      "contentType": "news",
-      "title": "Officially Licensed Fallout Bookends Are Up for Preorder for a Whopping $325",
-      "articleTitle": "$325 for Fallout Bookends? Sideshow’s New Preorder Is a Heavy",
-      "source": "IGN",
-      "coveredAt": 1791975475188
-    },
-    {
-      "fingerprint": "99aeacc479ec1cdd",
-      "topicFingerprint": "98556ba98e24682e",
-      "contentType": "news",
-      "title": "$325 for Fallout Bookends? Sideshow’s New Preorder Is a Heavy",
-      "articleTitle": "$325 for Fallout Bookends? Sideshow’s New Preorder Is a Heavy",
-      "source": "Fallout Hub",
-      "coveredAt": 1791975475188
-    },
-    {
-      "fingerprint": "7fc5ed7b6548f22e",
-      "topicFingerprint": "5527ac3857428d7b",
-      "contentType": "news",
-      "title": "Battlefield 6 goes back to its roots with Area 51, but the new Vegas Strip map feels too frenetic",
-      "articleTitle": "Battlefield 6 Takes On Nevada: Area 51 Hits, Vegas Stumbles",
-      "source": "PCGamesN",
-      "coveredAt": 1791897538937
-    },
-    {
-      "fingerprint": "722687ab326ee199",
-      "topicFingerprint": "3171e3b28e1a8251",
-      "contentType": "news",
-      "title": "Battlefield 6 Takes On Nevada: Area 51 Hits, Vegas Stumbles",
-      "articleTitle": "Battlefield 6 Takes On Nevada: Area 51 Hits, Vegas Stumbles",
-      "source": "Fallout Hub",
-      "coveredAt": 1791897538937
     }
   ]
 }
