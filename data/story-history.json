@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "55a8d769e61c5805",
+      "topicFingerprint": "421320ec6708d274",
+      "contentType": "news",
+      "title": "A Big Talk About Big Walk’s AI Fallout",
+      "articleTitle": "The AI Fallout Behind Big Walk: IGF Debates and Disclosure",
+      "source": "Kotaku",
+      "coveredAt": 1794403591744
+    },
+    {
+      "fingerprint": "178a0637c0640bde",
+      "topicFingerprint": "beefcae304de115f",
+      "contentType": "news",
+      "title": "The AI Fallout Behind Big Walk: IGF Debates and Disclosure",
+      "articleTitle": "The AI Fallout Behind Big Walk: IGF Debates and Disclosure",
+      "source": "Fallout Hub",
+      "coveredAt": 1794403591744
+    },
+    {
       "fingerprint": "07271636fb7706ac",
       "topicFingerprint": "23a8740b4cc124e2",
       "contentType": "news",
@@ -143,96 +161,6 @@
       "articleTitle": "Vote on the Next Real Nuka-Cola Flavor for Fallout Day 2026",
       "source": "Fallout Hub",
       "coveredAt": 1792667007722
-    },
-    {
-      "fingerprint": "8c3231812301f7da",
-      "topicFingerprint": "b2dca1428629439d",
-      "contentType": "news",
-      "title": "Fallout Day Celebrations 2026: Fallout Shelter and Fallout 4 News",
-      "articleTitle": "Fallout Day 2026: Baby Deathclaws in Shelter and New FO4 Creations",
-      "source": "Steam — Fallout 4",
-      "coveredAt": 1792580020098
-    },
-    {
-      "fingerprint": "3249b34f00f9e2b4",
-      "topicFingerprint": "86a39ac09ea3936d",
-      "contentType": "news",
-      "title": "Fallout Day 2026: Baby Deathclaws in Shelter and New FO4 Creations",
-      "articleTitle": "Fallout Day 2026: Baby Deathclaws in Shelter and New FO4 Creations",
-      "source": "Fallout Hub",
-      "coveredAt": 1792580020098
-    },
-    {
-      "fingerprint": "bea31a6c2615c36b",
-      "topicFingerprint": "b4760bdae26b2ef9",
-      "contentType": "news",
-      "title": "Follow Our New Channel",
-      "articleTitle": "Bethesda Launches Dedicated @PlayFallout76 Channel on X",
-      "source": "Steam — Fallout 76",
-      "coveredAt": 1792493201880
-    },
-    {
-      "fingerprint": "e5d9cb8614200fc7",
-      "topicFingerprint": "3c473ff619a5234a",
-      "contentType": "news",
-      "title": "Bethesda Launches Dedicated @PlayFallout76 Channel on X",
-      "articleTitle": "Bethesda Launches Dedicated @PlayFallout76 Channel on X",
-      "source": "Fallout Hub",
-      "coveredAt": 1792493201880
-    },
-    {
-      "fingerprint": "68409a8246ac99f6",
-      "topicFingerprint": "0457586fa3d7a57f",
-      "contentType": "news",
-      "title": "Maintenance Announcement - October 20, 2026",
-      "articleTitle": "Fallout 76 Maintenance Scheduled for October 20",
-      "source": "Steam — Fallout 76",
-      "coveredAt": 1792230926072
-    },
-    {
-      "fingerprint": "63376a8e726e3471",
-      "topicFingerprint": "340a809532d60d31",
-      "contentType": "news",
-      "title": "Fallout 76 Maintenance Scheduled for October 20",
-      "articleTitle": "Fallout 76 Maintenance Scheduled for October 20",
-      "source": "Fallout Hub",
-      "coveredAt": 1792230926072
-    },
-    {
-      "fingerprint": "e9c8b5dc04f3ad74",
-      "topicFingerprint": "169acecbe90ec8b1",
-      "contentType": "mods",
-      "title": "Fallout 4 Creation Kit Update - October 15",
-      "articleTitle": "Fallout 4 Creation Kit: The October 15 Update is Live",
-      "source": "Steam Community — Fallout 4",
-      "coveredAt": 1792146202368
-    },
-    {
-      "fingerprint": "27debc1e28d6370e",
-      "topicFingerprint": "09760ad1fcc907c9",
-      "contentType": "mods",
-      "title": "Fallout 4 Creation Kit: The October 15 Update is Live",
-      "articleTitle": "Fallout 4 Creation Kit: The October 15 Update is Live",
-      "source": "Fallout Hub",
-      "coveredAt": 1792146202368
-    },
-    {
-      "fingerprint": "8161b0b1b38c4602",
-      "topicFingerprint": "e3ed800e0717f8ab",
-      "contentType": "community",
-      "title": "fo4 fallout 4 in godot engine",
-      "articleTitle": "Someone is Recreating Fallout 4 in the Godot Engine",
-      "source": "Reddit Community",
-      "coveredAt": 1792141719030
-    },
-    {
-      "fingerprint": "c8f1d3063bea4974",
-      "topicFingerprint": "c7cb8e53490f34c3",
-      "contentType": "community",
-      "title": "Someone is Recreating Fallout 4 in the Godot Engine",
-      "articleTitle": "Someone is Recreating Fallout 4 in the Godot Engine",
-      "source": "Fallout Hub",
-      "coveredAt": 1792141719030
     }
   ]
 }
