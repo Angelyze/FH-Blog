@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "3c93320e7495ba33",
+      "topicFingerprint": "77b6ba0c47dfe4f4",
+      "contentType": "news",
+      "title": "Candy Crush Saga Gives Halo, Fallout, Forza and More a Sweet Makeover for XBOX’s 25th",
+      "articleTitle": "Vault Boy and Dogmeat Dachs Are Crossing Over into Candy Crush",
+      "source": "Xbox Wire",
+      "coveredAt": 1794577452842
+    },
+    {
+      "fingerprint": "bbc0a1dfd47cc81f",
+      "topicFingerprint": "93b8e890886822ff",
+      "contentType": "news",
+      "title": "Vault Boy and Dogmeat Dachs Are Crossing Over into Candy Crush",
+      "articleTitle": "Vault Boy and Dogmeat Dachs Are Crossing Over into Candy Crush",
+      "source": "Fallout Hub",
+      "coveredAt": 1794577452842
+    },
+    {
       "fingerprint": "55a8d769e61c5805",
       "topicFingerprint": "421320ec6708d274",
       "contentType": "news",
@@ -125,42 +143,6 @@
       "articleTitle": "Bethesda Teases D.C. Event and Fallout Shelter: The Experiment",
       "source": "Fallout Hub",
       "coveredAt": 1792836620471
-    },
-    {
-      "fingerprint": "26acc2446b186805",
-      "topicFingerprint": "3326b4b87f891da6",
-      "contentType": "news",
-      "title": "World Pets Overview Trailer",
-      "articleTitle": "Fallout 76 World Pets Update Arrives December 1 with Deathclaws and",
-      "source": "Steam — Fallout 76",
-      "coveredAt": 1792752404839
-    },
-    {
-      "fingerprint": "6e2a5cbf143fdb49",
-      "topicFingerprint": "6aa101ae1f3904e8",
-      "contentType": "news",
-      "title": "Fallout 76 World Pets Update Arrives December 1 with Deathclaws and",
-      "articleTitle": "Fallout 76 World Pets Update Arrives December 1 with Deathclaws and",
-      "source": "Fallout Hub",
-      "coveredAt": 1792752404839
-    },
-    {
-      "fingerprint": "edc9bf177e724312",
-      "topicFingerprint": "9d49fc93824b5d9d",
-      "contentType": "news",
-      "title": "Fallout Day Celebrations 2026: Join Fallout Events!",
-      "articleTitle": "Vote on the Next Real Nuka-Cola Flavor for Fallout Day 2026",
-      "source": "Steam — Fallout 76",
-      "coveredAt": 1792667007722
-    },
-    {
-      "fingerprint": "1f48e3749722c491",
-      "topicFingerprint": "bf269330481615ca",
-      "contentType": "news",
-      "title": "Vote on the Next Real Nuka-Cola Flavor for Fallout Day 2026",
-      "articleTitle": "Vote on the Next Real Nuka-Cola Flavor for Fallout Day 2026",
-      "source": "Fallout Hub",
-      "coveredAt": 1792667007722
     }
   ]
 }
