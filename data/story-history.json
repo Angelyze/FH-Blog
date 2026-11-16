@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "5826cf3c50a4b131",
+      "topicFingerprint": "6f875b6c0b9d23de",
+      "contentType": "news",
+      "title": "NVIDIA RTX Remix Was Built for Older Fixed-Function Games, but Modders Have Now Brought Path Tracing to Dark Souls and Fallout 4",
+      "articleTitle": "Modders Bring Path Tracing to Fallout 4 via RTX Remix",
+      "source": "Wccftech",
+      "coveredAt": 1794839223203
+    },
+    {
+      "fingerprint": "fb25c1f5eee84bad",
+      "topicFingerprint": "feaa114612abed84",
+      "contentType": "news",
+      "title": "Modders Bring Path Tracing to Fallout 4 via RTX Remix",
+      "articleTitle": "Modders Bring Path Tracing to Fallout 4 via RTX Remix",
+      "source": "Fallout Hub",
+      "coveredAt": 1794839223203
+    },
+    {
       "fingerprint": "3c93320e7495ba33",
       "topicFingerprint": "77b6ba0c47dfe4f4",
       "contentType": "news",
@@ -89,60 +107,6 @@
       "articleTitle": "New Vegas Modders Resurrect Van Buren's Flip-Up Pip-Boy",
       "source": "Fallout Hub",
       "coveredAt": 1793100150848
-    },
-    {
-      "fingerprint": "fba08aeb9dd7be19",
-      "topicFingerprint": "4582f7c45a89861b",
-      "contentType": "news",
-      "title": "25 Million Players - Thank You",
-      "articleTitle": "Fallout 76 Officially Crosses 25 Million Players",
-      "source": "Steam — Fallout 76",
-      "coveredAt": 1793016257843
-    },
-    {
-      "fingerprint": "db5682e9ef962aad",
-      "topicFingerprint": "fcae1d3ea0ca804d",
-      "contentType": "news",
-      "title": "Fallout 76 Officially Crosses 25 Million Players",
-      "articleTitle": "Fallout 76 Officially Crosses 25 Million Players",
-      "source": "Fallout Hub",
-      "coveredAt": 1793016257843
-    },
-    {
-      "fingerprint": "a2f3221d68188313",
-      "topicFingerprint": "7d41256b748da3b4",
-      "contentType": "news",
-      "title": "Prime Video's Fallout reality competition Fallout Shelter: The Experiment premieres in January",
-      "articleTitle": "Prime Video Is Making a Real Fallout Shelter Game Show",
-      "source": "Eurogamer",
-      "coveredAt": 1792924326343
-    },
-    {
-      "fingerprint": "220787ad0945a5b7",
-      "topicFingerprint": "17947a63cc68f54e",
-      "contentType": "news",
-      "title": "Prime Video Is Making a Real Fallout Shelter Game Show",
-      "articleTitle": "Prime Video Is Making a Real Fallout Shelter Game Show",
-      "source": "Fallout Hub",
-      "coveredAt": 1792924326343
-    },
-    {
-      "fingerprint": "64ca360c2db1e33a",
-      "topicFingerprint": "250e9a72d86920b9",
-      "contentType": "news",
-      "title": "Happy Fallout Day!",
-      "articleTitle": "Bethesda Teases D.C. Event and Fallout Shelter: The Experiment",
-      "source": "Steam — Fallout 76",
-      "coveredAt": 1792836620471
-    },
-    {
-      "fingerprint": "2a98175019f947a9",
-      "topicFingerprint": "6eacd887da869d6a",
-      "contentType": "news",
-      "title": "Bethesda Teases D.C. Event and Fallout Shelter: The Experiment",
-      "articleTitle": "Bethesda Teases D.C. Event and Fallout Shelter: The Experiment",
-      "source": "Fallout Hub",
-      "coveredAt": 1792836620471
     }
   ]
 }
