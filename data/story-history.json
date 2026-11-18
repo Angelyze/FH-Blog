@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "70e0c8eabab9d280",
+      "topicFingerprint": "2566a7c5ce3c5fc0",
+      "contentType": "news",
+      "title": "World of Fallout Exhibit at the Las Vegas Atomic Museum Expands &#8211; and It’s Full of Easter Eggs for Fans",
+      "articleTitle": "The World of Fallout Exhibit Just Doubled in Size in Las Vegas",
+      "source": "Xbox Wire",
+      "coveredAt": 1795013601758
+    },
+    {
+      "fingerprint": "f2617c46f807d32d",
+      "topicFingerprint": "90939140d68938df",
+      "contentType": "news",
+      "title": "The World of Fallout Exhibit Just Doubled in Size in Las Vegas",
+      "articleTitle": "The World of Fallout Exhibit Just Doubled in Size in Las Vegas",
+      "source": "Fallout Hub",
+      "coveredAt": 1795013601758
+    },
+    {
       "fingerprint": "5826cf3c50a4b131",
       "topicFingerprint": "6f875b6c0b9d23de",
       "contentType": "news",
@@ -89,24 +107,6 @@
       "articleTitle": "Fallout 4 Mod Under The Stars Adds an Alien Bunker to the Glowing Sea",
       "source": "Fallout Hub",
       "coveredAt": 1793629566653
-    },
-    {
-      "fingerprint": "e5360afb1b4f1b5c",
-      "topicFingerprint": "3c8aafbfff716198",
-      "contentType": "news",
-      "title": "\"IT FLIPS UP,\" Fallout New Vegas modders yell after releasing a funky Pip-Boy based on cancelled entry Van Buren's design docs",
-      "articleTitle": "New Vegas Modders Resurrect Van Buren's Flip-Up Pip-Boy",
-      "source": "Rock Paper Shotgun",
-      "coveredAt": 1793100150848
-    },
-    {
-      "fingerprint": "e3b6bb7514fefe16",
-      "topicFingerprint": "b7367b45a75b29df",
-      "contentType": "news",
-      "title": "New Vegas Modders Resurrect Van Buren's Flip-Up Pip-Boy",
-      "articleTitle": "New Vegas Modders Resurrect Van Buren's Flip-Up Pip-Boy",
-      "source": "Fallout Hub",
-      "coveredAt": 1793100150848
     }
   ]
 }
