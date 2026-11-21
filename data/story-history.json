@@ -1,6 +1,24 @@
 {
   "entries": [
     {
+      "fingerprint": "5888a2b363989ae6",
+      "topicFingerprint": "3ffd22ee8343c0f7",
+      "contentType": "news",
+      "title": "Fallout-Themed AriZona Iced Tea Gets Black Friday Discount, Including New 'Apocalyptic Orange' Flavor",
+      "articleTitle": "AriZona's Fallout Iced Teas Hit Black Friday Sale with New Flavor",
+      "source": "IGN",
+      "coveredAt": 1795269713793
+    },
+    {
+      "fingerprint": "6600bd75058cd66a",
+      "topicFingerprint": "10260a5d4877fadd",
+      "contentType": "news",
+      "title": "AriZona's Fallout Iced Teas Hit Black Friday Sale with New Flavor",
+      "articleTitle": "AriZona's Fallout Iced Teas Hit Black Friday Sale with New Flavor",
+      "source": "Fallout Hub",
+      "coveredAt": 1795269713793
+    },
+    {
       "fingerprint": "bf357603caf5d4df",
       "topicFingerprint": "ad12bcb141e579e7",
       "contentType": "news",
